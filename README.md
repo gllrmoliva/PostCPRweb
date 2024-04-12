@@ -1,22 +1,39 @@
-# Como iniciar la pagina
-Para poder iniciar la pagina, primero debemos utilizar el entorno virtual, para esto utilizamos el comando:
-## Linux
-```source venv/bin/activate```
-## Windows
+# Guía de Inicio para la Página
+
+Para iniciar la página, es necesario utilizar un entorno virtual. Sigue estos pasos:
+
+## En Linux
+
+Abre una terminal y ejecuta el siguiente comando para activar el entorno virtual:
+
 ```
-# En cmd.exe
-venv\Scripts\activate.bat
-# En PowerShell
-venv\Scripts\Activate.ps1
+source venv/bin/activate
 ```
 
-Luego de esto iniciamos el localhost de flask con:
-```flask run --debug```
+## En Windows (utilizando GIT BASH)
 
-Para ver la pagina hacemos [Ctrl + Click izq] sobre la dirección IP que nos muestra la terminal.
+Abre GIT BASH y ejecuta el siguiente comando para activar el entorno virtual:
 
-# En caso que no funcione
-en la carpeta base del proyecto de encuentra un archivo de texto llamado ```requirements.txt```
-, el cual contiene los requerimientos del entorno virtual, se puede volver a crear el entorno virtual con el siguiente comando:
+```
+. venv/bin/Activate
+```
 
-```pip install -r requirements.txt```
+Una vez activado el entorno virtual, inicia el servidor local de Flask con el siguiente comando:
+
+```
+flask run --debug
+```
+
+Para visualizar la página, abre tu navegador web y realiza clic izquierdo mientras mantienes presionada la tecla "Ctrl" en la dirección IP que aparece en la terminal (generalmente localhost).
+
+# Solución de Problemas
+
+En caso de que encuentres dificultades, sigue estos pasos:
+
+1. Dirígete a la carpeta base del proyecto.
+2. Encuentra el archivo de texto llamado `requirements.txt`, que contiene los requerimientos del entorno virtual.
+3. Crea nuevamente el entorno virtual con la misma configuración utilizando el siguiente comando:
+
+```
+pip install -r requirements.txt
+```
