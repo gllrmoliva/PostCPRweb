@@ -1,0 +1,25 @@
+{% extends "tutor/base.html" %}
+
+{% block title %}Home{% endblock %}
+
+
+{% block addbutton %}<button type="button" class="btn btn-primary mx-2 ">Crear Clase</button> {% endblock %}
+
+{% block content %}
+
+<div class="row">
+    {% for curso in cursos %}
+    <div class="col-sm-3 mb-3 mb-sm-0 my-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{curso}}</h5>
+                <p class="card-text">Descripcion del curso</p>
+                <a href="#" class="btn btn-primary">Ingresar</a>
+                <a href="#" class="btn btn-danger">Editar</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
