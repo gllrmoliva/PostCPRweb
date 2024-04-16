@@ -44,11 +44,20 @@
                 <label for="password">Contraseña</label>
             </div>
 
+            <!--Esto es por si el inicio de sesión no es exitoso-->
+            {% if error_message %}
+            <div class="alert alert-danger" role="alert">
+                {{ error_message }}
+            </div>
+            {% endif %}
+
             <button name="signinstudent" type="submit" class="btn btn-primary btn-lg w-100 mt-3">Iniciar sesión</button>
 
             <button name="signintutor" type="submit" class="btn btn-success btn-lg w-100 mt-3">Iniciar sesión como
                 tutor</button>
         </form>
+
+
     </div>
 
     <footer class="footer mt-auto py-2 text-center bg-light">
