@@ -1,9 +1,11 @@
+import random
+
 student = { 'email':'student@student.com',
             'password':'1234'
 }
 
 tutor = { 'email':'tutor@tutor.com',
-            'password':'5678'
+            'password':'1234'
 }
 
 tareas = []
@@ -31,12 +33,15 @@ def get_cursos():
 
 
 # OJo, criterios es una lista de criterios
-def crear_tarea(id, nombre, descripcion, criterios):
-    tarea = {'id': id, 'nombre':nombre , 'descripcion': descripcion, 'criterios': criterios }
+def crear_tarea(nombre, descripcion, criterios):
+    tarea = {'id': random.random() , 'nombre':nombre , 'descripcion': descripcion, 'criterios': criterios }
     tareas.append(tarea)
 
-def crear_curso(id, nombre, descripcion):
-    curso = {'id': id, 'nombre':nombre , 'descripcion': descripcion, 'tareas':[]}
+def crear_curso(nombre, descripcion):
+    curso = {'id': random.random(), 'nombre':nombre , 'descripcion': descripcion, 'tareas':[]}
     cursos.append(curso)
+
+# Esto es de prueba
+crear_curso("hola mundo", "hola mundo")
     
 
