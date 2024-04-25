@@ -3,19 +3,63 @@
 {% block title %}Home{% endblock %}
 
 
-{% block addbutton %}<button type="button" class="btn btn-primary mx-2 ">Crear Clase</button> {% endblock %}
+{% block addbutton %}
+<button type="button" class="btn btn-primary mx-2" data-bs-toggle="modal" data-bs-target="#createcourseModal">Crear
+    Curso</button>
+{% endblock %}
 
 {% block content %}
+<!-- ventana emergente de crear curso (modal window)-->
+<div class="modal fade" id="createcourseModal" tabindex="-1" aria-labelledby="createcourseModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="createcourseModalLabel">Crear curso</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/tutor" method="post">
 
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="new_course_name" name="name" required>
+                        <label for="new_course_name">Nombre del curso</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" id="new_course_description" value="" name="description"
+                            style="height: 100px"></textarea>
+                        <label for="new_course_description">Descripción del curso</label>
+                    </div>
+
+                    <input type="hidden" name="type" value="create_course">
+                    <button name="action" value="create" type="submit" class="btn btn-primary">Crear</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Generación de tarjetas cursos-->
 <div class="row">
     {% for curso in cursos %}
     <div class="col-sm-3 mb-3 mb-sm-0 my-3">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title fw-bold">{{curso}}</h5>
-                <p class="card-text">Descripcion del curso</p>
-                <a href="#" class="btn btn-primary">Ingresar</a>
-                <a href="#" class="btn btn-danger">Editar</a>
+                <h5 class="card-title fw-bold">{{curso['nombre']}}</h5>
+                <p class="card-text">{{curso['descripcion']}}</p>
+
+                <!--esto es para debug, para ver si los id corresponden-->
+                <p>id: {{curso['id']}}</p>
+
+                <form action="/tutor" method="post">
+                    <input type="hidden" name="type" value="create_course">
+                    <input type="hidden" name="id" value="{{ curso['id'] }}">
+                    <button name="action" value="enter" type="submit" class="btn btn-primary">Ingresar</button>
+                    <button name="action" value="edit" type="submit" class="btn btn-danger">Editar</button>
+                </form>
+
             </div>
         </div>
     </div>
