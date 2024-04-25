@@ -1,5 +1,7 @@
 from flask import Flask, redirect, render_template,request, url_for
+
 import database
+
 app = Flask(__name__)
 
 
@@ -9,8 +11,11 @@ basicamente todos los botones los estoy metiendo dentro de un form, esto es malo
 usuario estan siendo vistos como forms pero es la solución que encontre al problema sin tener que aprender Js.
 se puede manejar todo desde python con if's lo unico malo es que hace un poco menos legible el codigo de html
 
+TODO:
+-[] Separar las funciones en archivos, estaba pensando en tutor, student y auth (login register)
+-[] Añadir el sistema de hacer acciones tutor/student solo cuando este este logueado 
+-[] Hacer documentación del codigo.
 """
-
 
 # Pagina de inicio de sesión
 @app.route("/", methods = ['GET', 'POST'])
@@ -51,25 +56,25 @@ def hometutor():
                 #TODO: agregar vista de editar curso
                 return "estas editando el curso"
             elif request_form['action'] == 'enter':
-                #TODO: agregar vista de que se vera en el curso
-                return "estas entrando a un curso"
+                return redirect(url_for(coursetutor()) + request_form['id']) 
 
         if request_form['type'] == 'create_course':
-            if (request_form['name'] != ""):
-                database.crear_curso(request_form['name'], request_form['description'])
+            database.crear_curso(request_form['name'], request_form['description'])
 
             return redirect(url_for('hometutor'))
 
 
 # TODO:hay que implementar esto aaaaaaaaaaaaaa
-@app.route("/tutor/c/<int:courseid>", methods = ['GET', 'POST'])
-def coursetutor():
+@app.route("/tutor/c/<courseid>", methods = ['GET', 'POST'])
+def coursetutor(courseid):
 
     if request.method == 'GET':
-        return render_template('tutor/course.html')
+        curso = database.get_curso(courseid)
+        return render_template('tutor/course.html', curso = curso)
 
     elif request.method == 'POST':
-        return render_template('algo')
+        curso = database.get_curso(courseid)
+        return render_template('tutor/course.html', curso = curso)
 
 # RUTAS STUDIANTE
 #pagina de cursos alumno, quizas cambiar el nombre a /student/cursos
