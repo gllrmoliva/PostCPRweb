@@ -10,9 +10,18 @@
     <div class="col-sm-3 mb-3 mb-sm-0 my-3">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title fw-bold ">{{curso}}</h5>
-                <p class="card-text">Descripcion del curso</p>
-                <a href="#" class="btn btn-primary text">Ingresar</a>
+                <h5 class="card-title fw-bold">{{curso['nombre']}}</h5>
+                <p class="card-text">{{curso['descripcion']}}</p>
+
+                <!--Esto es para debug, para ver si los id's coinciden-->
+                <p>id: {{curso['id']}}</p>
+
+                <form action="/student" method="post">
+                    <input type="hidden" name="type" value="course">
+                    <input type="hidden" name="id" value="{{ curso['id'] }}">
+                    <button name="action" value="enter" type="submit" class="btn btn-primary">Ingresar</button>
+                </form>
+
             </div>
         </div>
     </div>
