@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-student = Blueprint('student', __name__)
+student = Blueprint('student', __name__, template_folder= '../../templates')
 
 from . import views

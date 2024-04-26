@@ -10,6 +10,6 @@ def create_app():
     app.register_blueprint(student_blueprint, url_prefix='/student')
 
     from .auth import auth as auth_blueprint
-    app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    app.register_blueprint(auth_blueprint, url_prefix='')
 
     return app

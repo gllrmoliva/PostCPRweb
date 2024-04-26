@@ -1,3 +1,9 @@
+"""
+Este archivo lo vo a borrar quizas mañana, era solo para empezar el desarrollo, pero como ahora tenemos una
+base de datos, usaremos lol
+"""
+
+
 import random
 
 student = { 'email':'student@student.com',
@@ -52,8 +58,8 @@ def crear_curso(nombre, descripcion):
     cursos.append(curso)
 
 # Esto es de prueba
-crear_curso("Lenguaje", "es una materia de mierda")
+crear_curso("Lenguaje", "Profesor: Juan Alfonso")
 for curso in cursos:
     if curso['nombre'] == 'Lenguaje':
-        crear_tarea(curso['id'], 'Tarea 1', 'debes hacer la tarea po wn, que mas queri')
-        crear_tarea(curso['id'], 'Tarea 2', 'debes hacer la tarea po wn, que mas queri')
+        crear_tarea(curso['id'], 'Tarea 1', 'En esta tarea debes escribir un ensayo sobre porque los ornitorrincos con mamiferos')
+        crear_tarea(curso['id'], 'Tarea 2', 'En esta tarea debes leer la biblia y resumirla')
