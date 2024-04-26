@@ -1,6 +1,6 @@
 from . import auth 
 from flask import render_template, request, redirect, url_for
-import database
+import fakedatabase
 
 """
 Aquí se puede iniciar sesión como estudiante o tutor. Si se apreta el botón iniciar sesión como tutor, se verifica
@@ -16,13 +16,13 @@ def signin():
         request_form = request.form
         # Esto es solo para el primer sprint
         if 'signinstudent' in request_form:
-            if (database.studentInDB(request_form['email'], request_form['password'])):
+            if (fakedatabase.studentInDB(request_form['email'], request_form['password'])):
                 return redirect(url_for('student.homestudent'))
             else:
                 return render_template("signin.html", error_message = 'Email o Contraseña equivocado, intente con otro')
 
         elif 'signintutor' in request_form:
-            if (database.tutorInDB(request_form['email'], request_form['password'])):
+            if (fakedatabase.tutorInDB(request_form['email'], request_form['password'])):
                 return redirect(url_for('tutor.hometutor'))
             else:
                 return render_template("signin.html", error_message = 'Email o Contraseña equivocado, intente con otro')
