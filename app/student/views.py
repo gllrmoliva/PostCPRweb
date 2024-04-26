@@ -1,6 +1,9 @@
 from . import student 
 from flask import render_template, request, redirect, url_for
-import database
+
+from database import db
+
+import fakedatabase
 
 """
 Cosas basicas sobre la interfaz de Estudiante:
@@ -15,16 +18,26 @@ Aquí se muestran los cursos a los que pertenece el estudiante, en esta pagina s
 """
 @student.route("/", methods = ['GET', 'POST'])
 def homestudent():
+    # Basicamente pareciese que siempre te tienes que conectar a una base de datos desde las rutas, y despues
+    # trabajar con los metodos de la clase Connection, supongo que esta bien :)
+    c = db.Connection()
+    c.connect()
+
+    # Aqui se esta creando un usuario, esto lo hay que borrar por ahora
+    c.add_user("johnny@mail.com", "1234", "Johnny")
+    user = c.get_user_from_email("johnny@mail.com")
+    c.promote_to_student(user)
+
     request_form = request.form
     if request.method == 'GET':
         # Claramente el Cursos, debe ser sacado con una función de backend la cual de de output los cursos, con sus caracteristicas
-        return render_template('student/home.html',cursos = database.get_cursos())
+        return render_template('student/home.html',cursos = fakedatabase.get_cursos())
     if request.method == 'POST':
         request_form = request.form
         if request_form['type'] == 'course':
             if request_form['action'] == 'enter':
                 #TODO: agregar vista de que se vera en el curso
-                return "estas entrando a un curso"
+                return str(user)
 
 """
 En esta pagina se muestran las tareas dentro de un curso seleccionado en la ruta homestudent,
