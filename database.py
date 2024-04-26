@@ -53,10 +53,7 @@ def crear_curso(nombre, descripcion):
 
 # Esto es de prueba
 crear_curso("Lenguaje", "es una materia de mierda")
-
 for curso in cursos:
     if curso['nombre'] == 'Lenguaje':
         crear_tarea(curso['id'], 'Tarea 1', 'debes hacer la tarea po wn, que mas queri')
         crear_tarea(curso['id'], 'Tarea 2', 'debes hacer la tarea po wn, que mas queri')
-    
-
