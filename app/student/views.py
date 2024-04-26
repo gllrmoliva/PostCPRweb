@@ -2,9 +2,18 @@ from . import student
 from flask import render_template, request, redirect, url_for
 import database
 
-# RUTAS STUDIANTE
-#pagina de cursos alumno, quizas cambiar el nombre a /student/cursos
-@student.route("/student", methods = ['GET', 'POST'])
+"""
+Cosas basicas sobre la interfaz de Estudiante:
+- En la barra de navegación superior, se debe poder: cerrar sesión, ir a la homepage(ver cual es la homepage),
+Ir a la vision de cursos, ir a la vision de evaluaciones (probablemente tambien se deba añadir una vista para 
+ver las evaluaciones dentro de cada curso, tipo seccion de evaluaciones INFODA)
+"""
+
+"""
+Aquí se muestran los cursos a los que pertenece el estudiante, en esta pagina se debe poder:
+- Entrar a los cursos a los que pertenece el estudiante
+"""
+@student.route("/", methods = ['GET', 'POST'])
 def homestudent():
     request_form = request.form
     if request.method == 'GET':
@@ -17,9 +26,12 @@ def homestudent():
                 #TODO: agregar vista de que se vera en el curso
                 return "estas entrando a un curso"
 
-
-# TODO:hay que implementar esto aaaaaaaaaaaaaa
-@student.route("/student/c/<int:courseid>", methods = ['GET', 'POST'])
+"""
+En esta pagina se muestran las tareas dentro de un curso seleccionado en la ruta homestudent,
+ademas estas tareas muestran su fecha limite de entrega y estado. Las tareas son clickables y 
+te llevan a la pagina de la tarea (ruta: task_student)
+"""
+@student.route("/c/<courseid>", methods = ['GET', 'POST'])
 def coursestudent(courseid):
     if request.method == 'GET':
         return render_template('student/course.html', courseid = courseid)
@@ -31,9 +43,17 @@ def coursestudent(courseid):
                 return "estas entrando a un curso"
 
 
-@student.route("/student/h", methods = ['GET', 'POST'])
-def homeworksstudent():
+"""
+En esta ruta, se muestra la tarea del usuario. Aquí el usuario puede:
+- Ver los datos de la tarea (nombre, descripcion, estado, deadline, etc)
+- Si la tarea no ha sido entregada todavia debe dejar la opción de entregar.
+- Si la tarea ya fue entregada se debe mostrar la entrega que hizo el estudiante.
+- Si la tarea no fue entregada en el tiempo limite, debe mostrar de alguna forma que no se puede entregar
+porque se excedio el tiempo limite.
+"""
+@student.route("/t/<taskid>", methods = ['GET', 'POST'])
+def taskstudent(taskid):
     if request.method == 'GET':
-        return render_template('student/homeworks.html')
+        return render_template('student/uploadtask.html')
     elif request.method == 'POST':
         return render_template('algo')

@@ -19,5 +19,13 @@ def hometutor():
 
 @tutor.route("/c/<courseid>", methods=['GET', 'POST'])
 def coursetutor(courseid):
-    curso = database.get_curso(courseid)
-    return render_template('tutor/course.html', curso=curso)
+    if request.method == 'GET':
+        curso = database.get_curso(courseid)
+        return render_template('tutor/course.html', curso=curso)
+    elif request.method == 'POST':
+        return "se hizo una peticion post"
+
+
+@tutor.route("/t/<taskid>", methods=['GET', 'POST'])
+def tasktutor(taskid):
+    return render_template("tutor/tasktutor.html")

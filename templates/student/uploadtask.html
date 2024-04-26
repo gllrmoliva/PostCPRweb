@@ -1,0 +1,53 @@
+{% extends "student/base.html" %}
+
+{% block title %}poner aqui el nombre de la tarea{% endblock %}
+
+{% block content %}
+
+<h3 class="fw-bold">poner aqui el nombre de la tarea</h3>
+
+<hr>
+
+<div class="row">
+
+    <div class="col-auto mr-5">
+        <span class="fw-bold d-inline">Fecha de entrega: </span>
+        <span class="d-inline">Poner aqui la deadline de la tarea</span>
+    </div>
+
+    <div class="col-auto mr-5">
+        <span class="fw-bold d-inline">Puntos:</span>
+        <span class="d-inline">poner aqui los puntos de la tarea */10</span>
+    </div>
+
+    <div class="col-auto mr-5">
+        <span class="fw-bold d-inline">Estado:</span>
+        <span class="d-inline">poner aqui es estado de la tarea</span>
+    </div>
+
+</div>
+
+<hr>
+
+<p>
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio velit aut, doloremque ipsa harum
+    laboriosam ut
+    ducimus aperiam labore veniam quos pariatur! Consequuntur impedit nesciunt asperiores, illum ut tempore
+    doloremque.
+</p>
+
+<!--TODO: Aqui deberia ir un if dependiendo del estado de la tarea-->
+<form action="">
+    <div class="form-floating">
+        <textarea class="form-control" placeholder="Leave your homework here!" id="floatingTextarea"
+            style="height: 200px; resize: none;"></textarea>
+        <label for="floatingTextarea">Ingresa aquí el url de tu tarea.</label>
+    </div>
+    <div class="text-end my-3">
+        <button type="submit" class="btn btn-primary btn-md">Enviar</button>
+    </div>
+</form>
+
+
+
+{% endblock %}
