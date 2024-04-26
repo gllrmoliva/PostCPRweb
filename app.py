@@ -4,7 +4,6 @@ import database
 
 app = Flask(__name__)
 
-
 """
 OJO, creo que estoy haciendo una mala practica, pero realmente no se si es tan así.
 basicamente todos los botones los estoy metiendo dentro de un form, esto es malo supongo porque todos los inputs del
@@ -13,7 +12,7 @@ se puede manejar todo desde python con if's lo unico malo es que hace un poco me
 
 TODO:
 -[] Separar las funciones en archivos, estaba pensando en tutor, student y auth (login register)
--[] Añadir el sistema de hacer acciones tutor/student solo cuando este este logueado 
+-[] Añadir el sistema de hacer acciones tutor/student solo cuando este esté logueado 
 -[] Hacer documentación del codigo.
 """
 
@@ -55,8 +54,8 @@ def hometutor():
             if request_form['action'] == 'edit':
                 #TODO: agregar vista de editar curso
                 return "estas editando el curso"
-            elif request_form['action'] == 'enter':
-                return redirect(url_for(coursetutor()) + request_form['id']) 
+            elif request_form['action'] == 'enter': 
+                return redirect(url_for('coursetutor', courseid=request_form['id']))
 
         if request_form['type'] == 'create_course':
             database.crear_curso(request_form['name'], request_form['description'])
@@ -103,6 +102,7 @@ def coursestudent(courseid):
             if request_form['action'] == 'enter':
                 #TODO: agregar vista de que se vera en el curso
                 return "estas entrando a un curso"
+
 
 @app.route("/student/h", methods = ['GET', 'POST'])
 def homeworksstudent():
