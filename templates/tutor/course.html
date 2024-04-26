@@ -1,0 +1,26 @@
+{% extends "tutor/base.html" %}
+
+
+{% block title %}{{curso['nombre']}}{% endblock %}
+
+{% block addbutton %}
+<button type="button" class="btn btn-warning me-2">Editar curso</button>
+
+<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#createhomeworkModal">Crear
+    Tarea</button>
+{% endblock %}
+
+{% block content %}
+<h1>Tareas</h1>
+<div class="list-group">
+    {% for tarea in curso['tareas'] %}
+
+    <a href="#" class="list-group-item list-group-item-action">
+        <span>
+            <p>{{tarea['nombre']}}</p>
+        </span>
+    </a>
+
+    {% endfor %}
+</div>
+{% endblock %}
