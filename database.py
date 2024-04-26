@@ -30,18 +30,33 @@ def get_tareas():
 def get_cursos():
     return cursos
 
+def get_curso(id):
+    for curso in cursos:
+        if str(curso['id']) == id:
+            return curso
 
+def get_tarea(id):
+    for tarea in tareas:
+        if str(tarea['id']) == id:
+            return tarea
 
 # OJo, criterios es una lista de criterios
-def crear_tarea(nombre, descripcion, criterios):
-    tarea = {'id': random.random() , 'nombre':nombre , 'descripcion': descripcion, 'criterios': criterios }
-    tareas.append(tarea)
+def crear_tarea(idcurso, nombre, descripcion):
+    tarea = {'id': int(random.random()*1000) ,'course':idcurso, 'nombre':nombre , 'descripcion': descripcion, 'criterios': []}
+    for curso in cursos:
+        if curso['id'] == idcurso:
+            curso['tareas'].append(tarea)
 
 def crear_curso(nombre, descripcion):
-    curso = {'id': random.random(), 'nombre':nombre , 'descripcion': descripcion, 'tareas':[]}
+    curso = {'id': int(random.random()*1000), 'nombre':nombre , 'descripcion': descripcion, 'tareas':[]}
     cursos.append(curso)
 
 # Esto es de prueba
-crear_curso("hola mundo", "hola mundo")
+crear_curso("Lenguaje", "es una materia de mierda")
+
+for curso in cursos:
+    if curso['nombre'] == 'Lenguaje':
+        crear_tarea(curso['id'], 'Tarea 1', 'debes hacer la tarea po wn, que mas queri')
+        crear_tarea(curso['id'], 'Tarea 2', 'debes hacer la tarea po wn, que mas queri')
     
 
