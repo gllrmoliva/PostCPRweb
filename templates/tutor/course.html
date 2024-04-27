@@ -13,11 +13,11 @@
 {% block content %}
 <h1>Tareas</h1>
 <div class="list-group">
-    {% for tarea in curso['tareas'] %}
+    {% for task in course['tasks'] %}
 
     <a href="{{ url_for('tutor.tasktutor', taskid=tarea['id']) }}" class="list-group-item list-group-item-action">
         <span>
-            <p>{{tarea['nombre']}}</p>
+            <p>{{task['name']}}</p>
         </span>
     </a>
 
