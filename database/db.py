@@ -1,6 +1,8 @@
 import sqlite3
 import os
 
+MAIN_PATH = "database"
+
 # Esta función cambia la forma de como SQLite devuelve peticiones fetch
 def dict_factory(cursor, row):
     d = {}
@@ -13,41 +15,54 @@ class Connection:
 
     def connect(self):
         try:
-            # Eliminar la base de datos existente (si existe), esto habria que eliminarlo despues jaja
-            # Esto en realidad es muy malo, porque siempre se van a eliminar los datos de la database
-            # al conectarse a la db, pero sirvio para juntar la db con el proyecto
-            if os.path.exists('database/database.db'):
-                os.remove('database/database.db')
-
             # Connect to a new SQLite database
-            self.connection = sqlite3.connect('database/database.db')
+            self.connection = sqlite3.connect(MAIN_PATH + "/database.db")
             self.cursor = self.connection.cursor()
-
-            # Crear tablas usando creation_lite.sql
-            self.cursor.executescript(open('database/creation_lite.sql', 'r').read())
-
-            # Confirmar los cambios
-            self.connection.commit()
             
             # Configura para que las filas se devuelvan como diccionarios
             self.connection.row_factory = dict_factory 
             self.cursor = self.connection.cursor()
 
         except sqlite3.Error as error:
+            print("SQLite Error connecting to the database:", error)
+        except Exception as e:
             print("Error connecting to the database:", error)
 
     def disconnect(self):
         try:
-            # Close the cursor and connection
+            # Cerrar el cursor y conexión
             if self.connection:
                 self.cursor.close()
                 self.connection.close()
 
-        # TODO: Nose si esto esta bueno o no, pero funciona (gllrm)
         except sqlite3.Error as error:
-            print("Error disconnecting the database:", error)
+            print("SQLite Error disconnecting the database:", error)
         except Exception as e:
-            print("Error disconnecting the database", e)
+            print("Error disconnecting the database:", e)
+        
+    def create_tables(self):
+        try:
+            # Crear tablas usando create_tables.sql
+            self.cursor.executescript(open(MAIN_PATH + "/create_tables.sql", 'r').read())
+            # Confirmar los cambios
+            self.connection.commit()
+
+        except sqlite3.Error as error:
+            print("SQLite Error creating tables:", error)
+        except Exception as e:
+            print("Error creating tables:", e)
+    
+    def delete_tables(self):
+        try:
+            # Borrar tablas usando delete_tables.sql
+            self.cursor.executescript(open(MAIN_PATH + "/delete_tables.sql", 'r').read())
+            # Confirmar los cambios
+            self.connection.commit()
+            
+        except sqlite3.Error as error:
+            print("SQLite Error deleting tables:", error)
+        except Exception as e:
+            print("Error deleting tables:", e)
 
     # Contract functions
     
@@ -122,14 +137,26 @@ class Connection:
         self.connection.commit()
         
     def add_course(self, name, user):
-        tutor_id = user['id']
+        try:
+            tutor_id = user['id']
 
-        entry_query = "INSERT INTO Course (name, tutor_id) VALUES (?, ?)"
-        data = (name, tutor_id)
-        self.cursor.execute(entry_query, data)
-        self.connection.commit()
+            entry_query = "INSERT INTO Course (name, tutor_id) VALUES (?, ?)"
+            data = (name, tutor_id)
 
-        return self.get_course_from_pair_name_tutor(name, user)
+            self.cursor.execute(entry_query, data)
+            self.connection.commit()
+
+            return self.get_course_from_pair_name_tutor(name, user)
+        except sqlite3.Error as Error:
+            print("sqlite3 error: ",Error)
+            raise
+        except Exception as e:
+            print("Exception: ",e)
+            raise
+        finally:
+            self.connection.commit()
+
+
     
     def get_course(self, id):
         entry_query = "SELECT * FROM Course WHERE id = ?"
@@ -206,3 +233,15 @@ class Connection:
         if len(courses) == 0:
             return None
         return courses[0]
+    
+    def fill_tables_with_examples(self):
+        try:
+            # Rellenar tablas usando example_values.sql
+            self.cursor.executescript(open(MAIN_PATH + "/example_values.sql", 'r').read())
+            # Confirmar los cambios
+            self.connection.commit()
+
+        except sqlite3.Error as error:
+            print("SQLite Error filling tables with values:", error)
+        except Exception as e:
+            print("Error filling tables with values:", e)

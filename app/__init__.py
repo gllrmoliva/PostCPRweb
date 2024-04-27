@@ -3,6 +3,8 @@ from flask import Flask
 def create_app():
     app = Flask(__name__)
 
+    app.config['SECRET_KEY'] = 'secret-key-goes-here'
+
     from .tutor import tutor as tutor_blueprint
     app.register_blueprint(tutor_blueprint, url_prefix='/tutor')
 
