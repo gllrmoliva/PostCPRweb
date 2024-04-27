@@ -16,8 +16,23 @@
 
 </ul>
 {% block addbutton %}{% endblock %}
-<button type="button" class="btn btn-danger">Cerrar sesión</button>
+<a href="/logout" class="btn btn-danger">Cerrar sesión</a>
+
 {% endblock %}
 
 {% block content %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // obtener el botón por su id
+    var boton = document.getelementbyid("logout");
+
+    // agregar un evento de clic al botón
+    boton.addeventlistener("click", function () {
+        // redirigir a la url deseada
+        window.location.href = "https://www.google.com";
+    });
+</script>
 {% endblock %}

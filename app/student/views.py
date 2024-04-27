@@ -1,10 +1,8 @@
 from . import student 
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, session
 
 from login_required import login_required
 from database import db
-
-import fakedatabase
 
 """
 Cosas basicas sobre la interfaz de Estudiante:
@@ -20,26 +18,31 @@ Aquí se muestran los cursos a los que pertenece el estudiante, en esta pagina s
 @student.route("/", methods = ['GET', 'POST'])
 @login_required('student')
 def homestudent():
-    # Basicamente pareciese que siempre te tienes que conectar a una base de datos desde las rutas, y despues
-    # trabajar con los metodos de la clase Connection, supongo que esta bien :)
-    c = db.Connection()
-    c.connect()
 
-    # Aqui se esta creando un usuario, esto lo hay que borrar por ahora
-    c.add_user("johnny@mail.com", "1234", "Johnny")
-    user = c.get_user_from_email("johnny@mail.com")
-    c.promote_to_student(user)
+    # Accedemos a la base de datos
+    database = db.Connection()
+    database.connect()
 
-    request_form = request.form
+    # Obtenemos el usuario a partir de la variable global session, guardamos datos de usuario anteriormente(auth)
+    user = database.get_user(session['user_id'])
+    # aqui tambien obtenemos los cursos del estudiante 
+    courses = database.get_courses_from_student(user)
+
     if request.method == 'GET':
-        # Claramente el Cursos, debe ser sacado con una función de backend la cual de de output los cursos, con sus caracteristicas
-        return render_template('student/home.html',cursos = fakedatabase.get_cursos())
+        # Renderizamos la plantilla de student home, y le pasamos los cursos sacados de la base de datos previamente
+        return render_template('student/home.html',courses = courses)
+    
+    # El metodo post se esta usando para manejar que sucede cuando apretamos los botones de ingresar a curso
     if request.method == 'POST':
+        # obtenemos los datos del formulario apretado
         request_form = request.form
+        # si el formulario apretado tiene un input hidden del tipo course, entonces hacermos una acción
         if request_form['type'] == 'course':
+            # si la acción de formulario es entrar al curso, entonces entramos
             if request_form['action'] == 'enter':
                 #TODO: agregar vista de que se vera en el curso
-                return str(user)
+                # por ahora es solo los datos del curso
+                return str(database.get_course(request_form['id']))
 
 """
 En esta pagina se muestran las tareas dentro de un curso seleccionado en la ruta homestudent,
