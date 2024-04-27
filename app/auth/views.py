@@ -13,13 +13,17 @@ muestra un mensaje tipo no se pudo iniciar sesion. Lo mismo ocurre con estudiant
 
 @auth.route("/", methods = ['GET', 'POST'])
 def signin():
-    # FIXME: AL parecer el problema con que se puede iniciar a tutor sin serlo, es que se guardan los
-    # datos del usuario en las cookies, si no se cierra sesión, estonces se sabe que usuario es en las cookies
-    # quizas puede ser una buena al momento de tratar de iniciar sesión verificar si las cookies tienen algo
-    # si es así entonces te manda directamente a la pagina de home(tutor/student)
 
-    # Si se accede con el metodo get se renderiza la pagina html (templates/signin.html)
+    # Si accedemos con el metodo get, verificamos si hay datos guardados en session, si los hay
+    # te redirige inmediatamente a la pagina de tutor o student segun corresponda
+    # si no hay datos guardados puedes iniciar sesion
     if request.method == 'GET':
+        if 'user_type' in session and 'user_id' in session:
+            if session['user_type'] == 'tutor':
+                return redirect(url_for('tutor.hometutor'))
+            elif session['user_type'] == 'student':
+                return redirect(url_for('student.homestudent'))
+
         return render_template("signin.html")
 
     # Al accederse con el metodo post
