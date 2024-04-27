@@ -45,11 +45,14 @@
             </div>
 
             <!--Esto es por si el inicio de sesión no es exitoso-->
-            {% if error_message %}
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
             <div class="alert alert-danger" role="alert">
-                {{ error_message }}
+                {{ messages[0] }}
             </div>
             {% endif %}
+            {% endwith %}
+
 
             <button name="signinstudent" type="submit" class="btn btn-primary btn-lg w-100 mt-3">Iniciar sesión</button>
 

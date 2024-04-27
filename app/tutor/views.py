@@ -1,8 +1,10 @@
 from . import tutor
 from flask import render_template, request, redirect, url_for
+from login_required import login_required
 import fakedatabase
 
 @tutor.route("/", methods=['GET', 'POST'])
+@login_required('tutor')
 def hometutor():
     if request.method == 'GET':
         return render_template('tutor/home.html', cursos=fakedatabase.get_cursos())
@@ -18,6 +20,7 @@ def hometutor():
             return redirect(url_for('tutor.hometutor'))
 
 @tutor.route("/c/<courseid>", methods=['GET', 'POST'])
+@login_required('tutor')
 def coursetutor(courseid):
     if request.method == 'GET':
         curso = fakedatabase.get_curso(courseid)
@@ -25,7 +28,7 @@ def coursetutor(courseid):
     elif request.method == 'POST':
         return "se hizo una peticion post"
 
-
 @tutor.route("/t/<taskid>", methods=['GET', 'POST'])
+@login_required('tutor')
 def tasktutor(taskid):
     return render_template("tutor/tasktutor.html")

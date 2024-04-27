@@ -1,6 +1,7 @@
 from . import student 
 from flask import render_template, request, redirect, url_for
 
+from login_required import login_required
 from database import db
 
 import fakedatabase
@@ -17,6 +18,7 @@ Aquí se muestran los cursos a los que pertenece el estudiante, en esta pagina s
 - Entrar a los cursos a los que pertenece el estudiante
 """
 @student.route("/", methods = ['GET', 'POST'])
+@login_required('student')
 def homestudent():
     # Basicamente pareciese que siempre te tienes que conectar a una base de datos desde las rutas, y despues
     # trabajar con los metodos de la clase Connection, supongo que esta bien :)
@@ -45,6 +47,7 @@ ademas estas tareas muestran su fecha limite de entrega y estado. Las tareas son
 te llevan a la pagina de la tarea (ruta: task_student)
 """
 @student.route("/c/<courseid>", methods = ['GET', 'POST'])
+@login_required('student')
 def coursestudent(courseid):
     if request.method == 'GET':
         return render_template('student/course.html', courseid = courseid)
@@ -65,6 +68,7 @@ En esta ruta, se muestra la tarea del usuario. Aquí el usuario puede:
 porque se excedio el tiempo limite.
 """
 @student.route("/t/<taskid>", methods = ['GET', 'POST'])
+@login_required('student')
 def taskstudent(taskid):
     if request.method == 'GET':
         return render_template('student/uploadtask.html')
