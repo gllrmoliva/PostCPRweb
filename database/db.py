@@ -137,14 +137,26 @@ class Connection:
         self.connection.commit()
         
     def add_course(self, name, user):
-        tutor_id = user['id']
+        try:
+            tutor_id = user['id']
 
-        entry_query = "INSERT INTO Course (name, tutor_id) VALUES (?, ?)"
-        data = (name, tutor_id)
-        self.cursor.execute(entry_query, data)
-        self.connection.commit()
+            entry_query = "INSERT INTO Course (name, tutor_id) VALUES (?, ?)"
+            data = (name, tutor_id)
 
-        return self.get_course_from_pair_name_tutor(name, user)
+            self.cursor.execute(entry_query, data)
+            self.connection.commit()
+
+            return self.get_course_from_pair_name_tutor(name, user)
+        except sqlite3.Error as Error:
+            print("sqlite3 error: ",Error)
+            raise
+        except Exception as e:
+            print("Exception: ",e)
+            raise
+        finally:
+            self.connection.commit()
+
+
     
     def get_course(self, id):
         entry_query = "SELECT * FROM Course WHERE id = ?"
