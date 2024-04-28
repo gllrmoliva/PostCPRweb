@@ -13,19 +13,27 @@
 {% block content %}
 <h1>Tareas</h1>
 <div class="list-group">
-    <!--{% for task in course['tasks'] %}
+    {%for task in tasks %}
 
-    <a href="{{ url_for('tutor.tasktutor', taskid=tarea['id']) }}" class="list-group-item list-group-item-action">
-        <span>
-            <p>{{task['name']}}</p>
-        </span>
+    <!-- ruta = -->
+
+    <a href="{{url_for('tutor.tasktutor', task_id = task['id'])}}" class="list-group-item list-group-item-action">
+
+        <div class="containerr">
+            <div class="row align-items-start">
+                <div class="col">
+                    <span class="fw-bold">{{task['name']}}</span>
+                </div>
+                <div class="col">
+                </div>
+                <div class="col text-end">
+                    <span class="fw-bold">Fecha de entrega: </span>
+                    <span>{{task['deadline_date']}}</span>
+                </div>
+            </div>
+        </div>
     </a>
 
-    {% endfor %}-->
-    <a href="" class="list-group-item list-group-item-action">
-        <span>
-            <p>{{course}}</p>
-        </span>
-    </a>
+    {% endfor %}
 </div>
 {% endblock %}
