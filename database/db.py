@@ -208,6 +208,67 @@ class Connection:
             students.append(self.get_user(entries[i]['student_id']))
    
         return students
+    
+    def add_task(self, name, course):
+        course_id = course['id']
+
+        entry_query = "INSERT INTO Task (name, course_id) VALUES (?, ?)"
+        data = (name, course_id)
+        self.cursor.execute(entry_query, data)
+        self.connection.commit()
+
+        return self.get_task_from_pair_name_course(name, course)
+    
+    def get_task(self, id):
+        entry_query = "SELECT * FROM Task WHERE id = ?"
+        data = (id, )
+        self.cursor.execute(entry_query, data)
+        tasks = self.cursor.fetchall()
+   
+        if len(tasks) == 0:
+            return None
+        return tasks[0]
+    
+    def get_tasks_from_course(self, course):
+        course_id = course['id']
+
+        entry_query = "SELECT * FROM Task WHERE course_id = ?"
+        data = (course_id, )
+        self.cursor.execute(entry_query, data)
+        tasks = self.cursor.fetchall()
+   
+        return tasks
+    
+    def add_criterion(self, name, task):
+        task_id = task['id']
+
+        entry_query = "INSERT INTO Criterion (name, task_id) VALUES (?, ?)"
+        data = (name, task_id)
+        self.cursor.execute(entry_query, data)
+        self.connection.commit()
+
+        return self.get_criterion_from_pair_name_task(name, task)
+
+    def get_criterion(self, id):
+        entry_query = "SELECT * FROM Criterion WHERE id = ?"
+        data = (id, )
+        self.cursor.execute(entry_query, data)
+        criteria = self.cursor.fetchall()
+   
+        if len(criteria) == 0:
+            return None
+        return criteria[0]
+    
+    def get_criteria_of_task(self, task):
+        task_id = task['id']
+
+        entry_query = "SELECT * FROM Criterion WHERE task_id = ?"
+        data = (task_id, )
+        self.cursor.execute(entry_query, data)
+        criteria = self.cursor.fetchall()
+   
+        return criteria
+
         
 
     # Auxiliar functions
@@ -222,6 +283,30 @@ class Connection:
         if len(courses) == 0:
             return None
         return courses[0]
+    
+    def get_task_from_pair_name_course(self, name, course):
+        course_id = course['id']
+
+        entry_query = "SELECT * FROM Task WHERE name = ? AND course_id = ?"
+        data = (name, course_id)
+        self.cursor.execute(entry_query, data)
+        tasks = self.cursor.fetchall()
+   
+        if len(tasks) == 0:
+            return None
+        return tasks[0]
+    
+    def get_criterion_from_pair_name_task(self, name, task):
+        task_id = task['id']
+
+        entry_query = "SELECT * FROM Criterion WHERE name = ? AND task_id = ?"
+        data = (name, task_id)
+        self.cursor.execute(entry_query, data)
+        criteria = self.cursor.fetchall()
+   
+        if len(criteria) == 0:
+            return None
+        return criteria[0]
 
     def fill_tables_with_examples(self):
         try:
