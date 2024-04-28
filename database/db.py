@@ -201,6 +201,7 @@ class Connection:
             return []
         for i in range(n):
             courses.append(self.get_course(entries[i]['course_id']))
+        
    
         return courses
     

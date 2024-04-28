@@ -22,6 +22,7 @@ def hometutor():
         request_form = request.form
         if request_form['type'] == 'course':
             if request_form['action'] == 'edit':
+                return redirect(url_for('tutor.editcourse', courseid=int(request_form['id'])))
                 return "estás editando el curso"
             elif request_form['action'] == 'enter': 
                 return redirect(url_for('tutor.coursetutor', courseid=int(request_form['id'])))
@@ -56,6 +57,32 @@ def coursetutor(courseid):
 
     elif request.method == 'POST':
         return "se hizo una peticion post a coursetutor"
+
+@tutor.route("/c/<int:courseid>/edit", methods=['GET', 'POST'])
+@login_required('tutor')
+def editcourse(courseid):
+
+    database = db.Connection()
+    database.connect()
+
+    tutor = database.get_user(session['user_id'])
+    course = database.get_course(courseid)
+
+    if request.method == 'GET':
+
+        if (course in database.get_courses_from_tutor(tutor)):
+            return render_template('tutor/editcourse.html')
+        else:
+            flash('No se puede acceder a ese curso')
+            return redirect(url_for('tutor.hometutor'))
+
+    elif request.method == 'POST':
+        return "se hizo una peticion post a editcurso"
+
+
+
+
+
 
 @tutor.route("/t/<task_id>", methods=['GET', 'POST'])
 @login_required('tutor')
