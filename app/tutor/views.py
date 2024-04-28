@@ -4,8 +4,6 @@ from login_required import login_required
 from database import db
 import sqlite3
 
-import fakedatabase
-
 @tutor.route("/", methods=['GET', 'POST'])
 @login_required('tutor')
 def hometutor():
@@ -26,12 +24,9 @@ def hometutor():
             if request_form['action'] == 'edit':
                 return "estás editando el curso"
             elif request_form['action'] == 'enter': 
-                return str(database.get_course(request_form['id']))
-                return redirect(url_for('tutor.coursetutor', courseid=request_form['id']))
+                return redirect(url_for('tutor.coursetutor', courseid=int(request_form['id'])))
         if request_form['type'] == 'create_course':
             try:
-                # TODO: al crear bases de datos, por alguna razon, cuando ya existe un curso con
-                #el nombre que quiero crear en la segunda vez de usar la DB, se freezea sqlite
                 database.add_course(request_form['name'], user)
 
                 return redirect(url_for('tutor.hometutor'))
@@ -43,11 +38,23 @@ def hometutor():
 @tutor.route("/c/<int:courseid>", methods=['GET', 'POST'])
 @login_required('tutor')
 def coursetutor(courseid):
+
+    database = db.Connection()
+    database.connect()
+
+    tutor = database.get_user(session['user_id'])
+    course = database.get_course(courseid)
+
     if request.method == 'GET':
-        curso = fakedatabase.get_curso(courseid)
-        return render_template('tutor/course.html', curso=curso)
+
+        if (course in database.get_courses_from_tutor(tutor)):
+            return render_template('tutor/course.html', course = course)
+        else:
+            flash('No se puede acceder a ese curso')
+            return redirect(url_for('tutor.hometutor'))
+
     elif request.method == 'POST':
-        return "se hizo una peticion post"
+        return "se hizo una peticion post a coursetutor"
 
 @tutor.route("/t/<taskid>", methods=['GET', 'POST'])
 @login_required('tutor')
