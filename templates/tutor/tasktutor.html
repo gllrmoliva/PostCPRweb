@@ -1,9 +1,13 @@
 {% extends "tutor/base.html" %}
 
+<!-- 
+    TODO: 
+    - Proveer la referencia a la TAREA del CURSO clickeada a este archivo, para así renderizar
+      la información correctamente.
+        
+ -->
 
 {% block title %}Nombre de tarea{% endblock %}
-
-
 {% block addbutton %}
 <button type="button" class="btn btn-warning me-2">Editar tarea</button>
 {% endblock %}
@@ -35,23 +39,45 @@
 <hr>
 <div class="my-4">
     <div class="mb-3">
-        <h3 class="fw-bold">Criterios</h3>
+        <h3 class="fw-bold">Rúbrica</h3>
     </div>
-    <hr>
-    <ul class="list-group">
-        <li class="list-group-item">Criterio 1: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 2: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 3: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 4: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 5: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 6: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-    </ul>
+    <!--    
+        Tabla mostrada LUEGO DE CREAR TAREA que lista los criterios de evaluacion de la tarea
+            TODO:
+            - Cargar los criterios existentes de la tarea mediante un bucle con Jinja2
+    -->
+    <div id="criteria-table">
+        <table class="table table-bordered">
+            <tr>
+                <th>Criterio</th>
+                <th>Descripción</th>
+                <th></th>
+            </tr>
+            
+            <!-- criterio de EJEMPLO -->
+            <tr>
+                <th>Puntualidad</th>
+                <th style="font-weight:normal">El alumno sube su tarea a tiempo según la fecha de entrega especificada.</th>
+                <th>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-secondary"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button type="button" class="btn btn-danger"><i class="fa-regular fa-trash-can"></i></button>
+                    </div>
+                </th>
+            </tr>
+
+            <!-- 
+                aqui cargar filas con los criterios de la tarea que fueron cargados 
+            -->
+
+            <tr>
+                <td colspan="3" style="text-align: center">
+                    <button id="btn-add-criterion" value="create_criterion" type="submit" class="btn btn-success btn-sm">Añadir criterio</button>
+                </td>
+            </tr>
+
+        </table>
+    </div>
 </div>
 
 <hr>
