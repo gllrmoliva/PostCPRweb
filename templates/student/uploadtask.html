@@ -1,6 +1,6 @@
 {% extends "student/base.html" %}
 
-{% block title %}poner aqui el nombre de la tarea{% endblock %}
+{% block title %}{{task['name']}}{% endblock %}
 
 {% block content %}
 
@@ -32,9 +32,9 @@
 <hr>
 
 <!--Ver como se llama esto en el diccionario-->
-<p>Descripción del tarea</p>
+<p>{{task['instructions']}}</p>
 
-<!--TODO: Aqui deberia ir un if dependiendo del estado de la tarea-->
+<!--TODO: Aqui deberia ir un if dependiendo del estado de la tarea, ademas deberia generalizarse con un url_for-->
 <form action="/student/t/{{task['id']}}" method="post">
     <div class="form-floating">
 
@@ -45,7 +45,10 @@
 
     </div>
     <div class="text-end my-3">
-        <button type="submit" class="btn btn-primary btn-md">Enviar</button>
+        <a href="{{url_for('student.coursestudent', courseid = task['course_id'])}}"
+            class="btn btn-warning btn-md ">Cancelar</a>
+
+        <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
     </div>
 </form>
 

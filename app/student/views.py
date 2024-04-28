@@ -28,6 +28,10 @@ def homestudent():
     # aqui tambien obtenemos los cursos del estudiante 
     courses = database.get_courses_from_student(user)
 
+    # Esto no estaba antes (gllrm)
+    for course in courses:
+        course['tutor_name'] = database.get_user(course['tutor_id'])['name']
+
     if request.method == 'GET':
         # Renderizamos la plantilla de student home, y le pasamos los cursos sacados de la base de datos previamente
         return render_template('student/home.html',courses = courses)

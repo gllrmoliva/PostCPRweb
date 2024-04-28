@@ -47,6 +47,7 @@ CREATE TABLE Task (
     -- Atributos no relacionales
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    instructions TEXT,
     creation_date TEXT,
     deadline_date TEXT,
 
