@@ -53,9 +53,12 @@ CREATE TABLE Task (
     -- Atributos relacionales
     course_id INTEGER NOT NULL,
     FOREIGN KEY (course_id) REFERENCES Course(id)
+
+    -- Restricciones
+    UNIQUE (name, course_id) -- Para evitar que el unico elemento identificatorio sea implicito
 );
 
-CREATE TABLE Criteria (
+CREATE TABLE Criterion (
     -- Atributos no relacionales
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -65,7 +68,7 @@ CREATE TABLE Criteria (
     FOREIGN KEY (task_id) REFERENCES Task(id),
 
     -- Restricciones 
-    UNIQUE (task_id, name) -- En caso de que queramos una única entrega
+    UNIQUE (name, task_id) -- Para evitar que el unico elemento identificatorio sea implicito
 );
 
 CREATE TABLE Submission (
@@ -74,13 +77,13 @@ CREATE TABLE Submission (
     date TEXT,
 
     -- Atributos relacionales
-    user_id INTEGER NOT NULL,
+    student_id INTEGER NOT NULL,
     task_id INTEGER NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Student(user_id),
+    FOREIGN KEY (student_id) REFERENCES Student(user_id),
     FOREIGN KEY (task_id) REFERENCES Task(id),
 
     -- Restricciones
-    UNIQUE (user_id, task_id)
+    UNIQUE (student_id, task_id) -- En caso de que queramos una única entrega
 );
 
 CREATE TABLE Review (
@@ -96,18 +99,18 @@ CREATE TABLE Review (
     FOREIGN KEY (submission_id) REFERENCES Submission(id),
 
     -- Restricciones
-    UNIQUE (reviewer_id, submission_id)
+    UNIQUE (reviewer_id, submission_id) -- En caso de que queramos que una misma persona no puede revisar la misma entrega dos veces
 );
 
 -- Tabla de unión
-CREATE TABLE Review_Criteria (
+CREATE TABLE Review_Criterion (
     -- Atributos no relacionales
     valoracion FLOAT,
 
     -- Atributos relacionales
     review_id INTEGER NOT NULL,
-    criteria_id INTEGER NOT NULL,
+    criterion_id INTEGER NOT NULL,
     FOREIGN KEY (review_id) REFERENCES Review(id),
-    FOREIGN KEY (criteria_id) REFERENCES Criteria(id),
-    PRIMARY KEY (review_id, criteria_id)
+    FOREIGN KEY (criterion_id) REFERENCES Criterion(id),
+    PRIMARY KEY (review_id, criterion_id)
 );
