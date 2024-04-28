@@ -48,7 +48,8 @@ def coursetutor(courseid):
     if request.method == 'GET':
 
         if (course in database.get_courses_from_tutor(tutor)):
-            return render_template('tutor/course.html', course = course)
+            tasks = database.get_tasks_from_course(course)
+            return render_template('tutor/course.html', course = course, tasks=tasks)
         else:
             flash('No se puede acceder a ese curso')
             return redirect(url_for('tutor.hometutor'))
@@ -56,7 +57,16 @@ def coursetutor(courseid):
     elif request.method == 'POST':
         return "se hizo una peticion post a coursetutor"
 
-@tutor.route("/t/<taskid>", methods=['GET', 'POST'])
+@tutor.route("/t/<task_id>", methods=['GET', 'POST'])
 @login_required('tutor')
-def tasktutor(taskid):
-    return render_template("tutor/tasktutor.html")
+def tasktutor(task_id):
+    database = db.Connection()
+    database.connect()
+
+    task = database.get_task(task_id)
+    criteria = database.get_criteria_of_task(task)
+
+    if request.method == 'GET':
+        return render_template("tutor/tasktutor.html", task = task, criteria = criteria)
+    elif request.method == 'POST':
+        return "metodo post en tasktutor"
