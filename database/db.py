@@ -208,6 +208,7 @@ class Connection:
             students.append(self.get_user(entries[i]['student_id']))
    
         return students
+        
 
     # Auxiliar functions
     def get_course_from_pair_name_tutor(self, name, user):
@@ -221,7 +222,7 @@ class Connection:
         if len(courses) == 0:
             return None
         return courses[0]
-    
+
     def fill_tables_with_examples(self):
         try:
             # Rellenar tablas usando example_values.sql
