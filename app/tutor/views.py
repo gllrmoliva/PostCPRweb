@@ -56,6 +56,21 @@ def coursetutor(courseid):
             return redirect(url_for('tutor.hometutor'))
 
     elif request.method == 'POST':
+        request_form = request.form
+        # si se presiona el botón crear tarea y se crea una tarea
+        if request_form['type'] == 'create_task':
+            name = request_form['name']
+            instructions = request_form['instructions']
+
+            try: 
+                database.add_task(name,instructions,course)
+            except Exception as Error:
+                # TODO: poner un nombre de error mas demostrativo
+                flash(Error)
+
+            tasks = database.get_tasks_from_course(course)
+            return render_template('tutor/course.html', course = course, tasks=tasks)
+
         return "se hizo una peticion post a coursetutor"
 
 @tutor.route("/c/<int:courseid>/edit", methods=['GET', 'POST'])
@@ -78,10 +93,6 @@ def editcourse(courseid):
 
     elif request.method == 'POST':
         return "se hizo una peticion post a editcurso"
-
-
-
-
 
 
 @tutor.route("/t/<task_id>", methods=['GET', 'POST'])

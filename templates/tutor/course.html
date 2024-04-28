@@ -11,6 +11,43 @@
 {% endblock %}
 
 {% block content %}
+
+<!-- ventana emergente de crear curso (modal window)-->
+<div class="modal fade" id="createhomeworkModal" tabindex="-1" aria-labelledby="createcourseModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="createcourseModalLabel">Crear curso</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{url_for('tutor.coursetutor', courseid = course['id'])}}" method="post">
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="new_task_name" name="name" required>
+                        <label for="new_task_name">Nombre de la tarea</label>
+                    </div>
+
+                    <div class="mb-3">Aqui faltaria sistema para añadir fecha</div>
+
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control" name="instructions" id="new_task_instructions"
+                            style="height: 150px" required></textarea>
+                        <label for="new_task_instructions">Instrucciones</label>
+                    </div>
+
+                    <input type="hidden" name="type" value="create_task">
+                    <button name="action" value="create" type="submit" class="btn btn-primary">Crear</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <h1>Tareas</h1>
 <div class="list-group">
     {%for task in tasks %}
