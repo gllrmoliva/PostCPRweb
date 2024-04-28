@@ -4,8 +4,6 @@ from login_required import login_required
 from database import db
 import sqlite3
 
-import fakedatabase
-
 @tutor.route("/", methods=['GET', 'POST'])
 @login_required('tutor')
 def hometutor():
@@ -27,13 +25,11 @@ def hometutor():
                 return "estás editando el curso"
             elif request_form['action'] == 'enter': 
                 # para debugging, esto retorna el dictionary curso:
+                # return str(database.get_course(request_form['id']))
                 # Miembros de CURSO: {'id','name','tutor_id'} 
-                return str(database.get_course(request_form['id']))
-                return redirect(url_for('tutor.coursetutor', courseid=request_form['id']))
+                return redirect(url_for('tutor.coursetutor', courseid=int(request_form['id'])))
         if request_form['type'] == 'create_course':
             try:
-                # TODO: al crear bases de datos, por alguna razon, cuando ya existe un curso con
-                #el nombre que quiero crear en la segunda vez de usar la DB, se freezea sqlite
                 database.add_course(request_form['name'], user)
 
                 return redirect(url_for('tutor.hometutor'))
@@ -45,16 +41,23 @@ def hometutor():
 @tutor.route("/c/<int:courseid>", methods=['GET', 'POST'])
 @login_required('tutor')
 def coursetutor(courseid):
-    # inicializacion de variables conteniendo al usuario de esta sesion (tutor) y del curso actual
+
     database = db.Connection()
     database.connect()
-    this_course = database.get_course(courseid)
+
+    tutor = database.get_user(session['user_id'])
+    course = database.get_course(courseid)
 
     if request.method == 'GET':
-        # TODO: course.html necesita conocer las Tareas del curso para renderizarlas
-        return render_template('tutor/course.html', course=this_course)
+
+        if (course in database.get_courses_from_tutor(tutor)):
+            return render_template('tutor/course.html', course = course)
+        else:
+            flash('No se puede acceder a ese curso')
+            return redirect(url_for('tutor.hometutor'))
+
     elif request.method == 'POST':
-        return render_template('tutor/course.html',)
+        return "se hizo una peticion post a coursetutor"
 
 @tutor.route("/t/<taskid>", methods=['GET', 'POST'])
 @login_required('tutor')

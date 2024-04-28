@@ -1,7 +1,7 @@
 {% extends "tutor/base.html" %}
 
 
-{% block title %}{{course['nombre']}}{% endblock %}
+{% block title %}{{course['name']}}{% endblock %}
 
 {% block addbutton %}
 <button type="button" class="btn btn-warning me-2">Editar curso</button>
@@ -13,13 +13,19 @@
 {% block content %}
 <h1>Tareas</h1>
 <div class="list-group">
-    {% for task in course['tasks'] %}
+    <!--{% for task in course['tasks'] %}
+
     <a href="{{ url_for('tutor.tasktutor', taskid=tarea['id']) }}" class="list-group-item list-group-item-action">
         <span>
             <p>{{task['name']}}</p>
         </span>
     </a>
 
-    {% endfor %}
+    {% endfor %}-->
+    <a href="" class="list-group-item list-group-item-action">
+        <span>
+            <p>{{course}}</p>
+        </span>
+    </a>
 </div>
 {% endblock %}
