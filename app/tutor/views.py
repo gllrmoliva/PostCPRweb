@@ -7,14 +7,10 @@ import sqlite3
 @tutor.route("/", methods=['GET', 'POST'])
 @login_required('tutor')
 def hometutor():
-
     database = db.Connection()
     database.connect()
-
     user = database.get_user(session['user_id'])
-
     courses = database.get_courses_from_tutor(user)
-
 
     if request.method == 'GET':
         return render_template('tutor/home.html', courses = courses)
@@ -41,22 +37,18 @@ def hometutor():
 @tutor.route("/c/<int:courseid>", methods=['GET', 'POST'])
 @login_required('tutor')
 def coursetutor(courseid):
-
     database = db.Connection()
     database.connect()
-
     tutor = database.get_user(session['user_id'])
     course = database.get_course(courseid)
 
     if request.method == 'GET':
-
         if (course in database.get_courses_from_tutor(tutor)):
             tasks = database.get_tasks_from_course(course)
             return render_template('tutor/course.html', course = course, tasks=tasks)
         else:
             flash('No se puede acceder a ese curso')
             return redirect(url_for('tutor.hometutor'))
-
     elif request.method == 'POST':
         return "se hizo una peticion post a coursetutor"
 

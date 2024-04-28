@@ -7,9 +7,13 @@
         
  -->
 
-{% block title %}{{task['name']}}{% endblock %}
+ <head>
+    <!--JQuery-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/scripts/tutor_edit_task.js"></script>
+ </head>
 
-
+{% block title %}Nombre de tarea{% endblock %}
 {% block addbutton %}
 <button type="button" class="btn btn-warning me-2">Editar tarea</button>
 {% endblock %}
@@ -68,30 +72,43 @@
             <!-- 
                 aqui cargar filas con los criterios de la tarea que fueron cargados 
             -->
-
-            <tr>
-                <td colspan="3" style="text-align: center">
-                    <button id="btn-add-criterion" value="create_criterion" type="submit" class="btn btn-success btn-sm">Añadir criterio</button>
-                </td>
-            </tr>
-
+        
         </table>
     </div>
-    <hr>
-    <ul class="list-group">
-        <li class="list-group-item">Criterio 1: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 2: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 3: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 4: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 5: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 6: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-    </ul>
+
+    <div id="add-criterion">
+        <!--Boton para añadir criterios (solo Bootstrap)-->
+        <div class="add-criterion-btn">
+            <div class="row">
+                <div class="col text-center">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#myModal">Añadir criterio</button>
+                </div>
+            </div>
+        </div>
+
+        <!--Modal activado por el boton "Añadir criterio"-->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Nuevo criterio de evaluación</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <label for="new_criterion_name">Nombre del criterio</label>
+                        <input type="text" class="form-control" id="new_criterion_name" name="criterion_name" required>
+                        <label for="new_criterion_desc">Descripción</label>
+                        <input type="text" class="form-control" id="new_criterion_desc" name="criterion_desc" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary">Finalizar</button>
+                    </div>
+                </div>
+            </div>
+          </div>
+    </div> 
 </div>
 
 <hr>
