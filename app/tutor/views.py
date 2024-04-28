@@ -26,6 +26,8 @@ def hometutor():
             if request_form['action'] == 'edit':
                 return "estás editando el curso"
             elif request_form['action'] == 'enter': 
+                # para debugging, esto retorna el dictionary curso:
+                # Miembros de CURSO: {'id','name','tutor_id'} 
                 return str(database.get_course(request_form['id']))
                 return redirect(url_for('tutor.coursetutor', courseid=request_form['id']))
         if request_form['type'] == 'create_course':
@@ -43,11 +45,16 @@ def hometutor():
 @tutor.route("/c/<int:courseid>", methods=['GET', 'POST'])
 @login_required('tutor')
 def coursetutor(courseid):
+    # inicializacion de variables conteniendo al usuario de esta sesion (tutor) y del curso actual
+    database = db.Connection()
+    database.connect()
+    this_course = database.get_course(courseid)
+
     if request.method == 'GET':
-        curso = fakedatabase.get_curso(courseid)
-        return render_template('tutor/course.html', curso=curso)
+        # TODO: course.html necesita conocer las Tareas del curso para renderizarlas
+        return render_template('tutor/course.html', course=this_course)
     elif request.method == 'POST':
-        return "se hizo una peticion post"
+        return render_template('tutor/course.html',)
 
 @tutor.route("/t/<taskid>", methods=['GET', 'POST'])
 @login_required('tutor')
