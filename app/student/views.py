@@ -1,5 +1,5 @@
 from . import student 
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, flash
 
 from login_required import login_required
 from database import db
@@ -28,6 +28,10 @@ def homestudent():
     # aqui tambien obtenemos los cursos del estudiante 
     courses = database.get_courses_from_student(user)
 
+    # Esto no estaba antes (gllrm)
+    for course in courses:
+        course['tutor_name'] = database.get_user(course['tutor_id'])['name']
+
     if request.method == 'GET':
         # Renderizamos la plantilla de student home, y le pasamos los cursos sacados de la base de datos previamente
         return render_template('student/home.html',courses = courses)
@@ -42,7 +46,7 @@ def homestudent():
             if request_form['action'] == 'enter':
                 #TODO: agregar vista de que se vera en el curso
                 # por ahora es solo los datos del curso
-                return str(database.get_course(request_form['id']))
+                return redirect(url_for('student.coursestudent', courseid=int(request_form['id'])))
 
 """
 En esta pagina se muestran las tareas dentro de un curso seleccionado en la ruta homestudent,
@@ -52,14 +56,23 @@ te llevan a la pagina de la tarea (ruta: task_student)
 @student.route("/c/<courseid>", methods = ['GET', 'POST'])
 @login_required('student')
 def coursestudent(courseid):
+    database = db.Connection()
+    database.connect()
+
+    student = database.get_user(session['user_id'])
+    course = database.get_course(courseid)
+
     if request.method == 'GET':
-        return render_template('student/course.html', courseid = courseid)
+
+        if (course in database.get_courses_from_student(student)):
+            tasks = database.get_tasks_from_course(course)
+            return render_template('student/course.html', course = course, tasks=tasks)
+        else:
+            flash('No se puede acceder a ese curso')
+            return redirect(url_for('tutor.hometutor'))
+
     elif request.method == 'POST':
-        request_form = request.form
-        if request_form['type'] == 'course':
-            if request_form['action'] == 'enter':
-                #TODO: agregar vista de que se vera en el curso
-                return "estas entrando a un curso"
+        return "se hizo una peticion post a coursetutor"
 
 
 """
@@ -70,10 +83,15 @@ En esta ruta, se muestra la tarea del usuario. Aquí el usuario puede:
 - Si la tarea no fue entregada en el tiempo limite, debe mostrar de alguna forma que no se puede entregar
 porque se excedio el tiempo limite.
 """
-@student.route("/t/<taskid>", methods = ['GET', 'POST'])
+@student.route("/t/<task_id>", methods = ['GET', 'POST'])
 @login_required('student')
-def taskstudent(taskid):
+def taskstudent(task_id):
+    database = db.Connection()
+    database.connect()
+
+    task = database.get_task(task_id)
+
     if request.method == 'GET':
-        return render_template('student/uploadtask.html')
+        return render_template('student/uploadtask.html', task = task)
     elif request.method == 'POST':
-        return render_template('algo')
+        return "metodo post en taskstudent"

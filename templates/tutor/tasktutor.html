@@ -1,7 +1,7 @@
 {% extends "tutor/base.html" %}
 
 
-{% block title %}Nombre de tarea{% endblock %}
+{% block title %}{{task['name']}}{% endblock %}
 
 
 {% block addbutton %}
@@ -11,7 +11,7 @@
 
 {% block content %}
 <div>
-    <h3 class="fw-bold">Nombre de la tarea</h3>
+    <h3 class="fw-bold">{{task['name']}}</h3>
 </div>
 
 <hr>
@@ -19,17 +19,14 @@
 <div class="row">
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Fecha de entrega: </span>
-        <span class="d-inline">Poner aqui la deadline de la tarea</span>
+        <span class="d-inline">{{task['deadline_date']}}</span>
     </div>
 </div>
 
 <hr>
 
 <p>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio velit aut, doloremque ipsa harum
-    laboriosam ut
-    ducimus aperiam labore veniam quos pariatur! Consequuntur impedit nesciunt asperiores, illum ut tempore
-    doloremque.
+    {{task['instructions']}}
 </p>
 
 <hr>
@@ -39,18 +36,11 @@
     </div>
     <hr>
     <ul class="list-group">
-        <li class="list-group-item">Criterio 1: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 2: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 3: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 4: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 5: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
-        <li class="list-group-item">Criterio 6: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam,
-            aliquid. </li>
+        {% for criterion in criteria %}
+        <li class="list-group-item">
+            {{criterion['name']}}
+        </li>
+        {% endfor %}
     </ul>
 </div>
 
@@ -64,67 +54,24 @@
     <a href="#" class="list-group-item list-group-item-action">
         <div class="row">
 
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Fecha de entrega: </span>
-                <span class="d-inline">Poner aqui la deadline de la tarea</span>
+            <div class="col mr-5">
+                <span class="fw-bold d-inline">Arnold Schwarzenegger Espinoza</span>
             </div>
 
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Puntos:</span>
-                <span class="d-inline">poner aqui los puntos de la tarea */10</span>
+            <div class="col mr-5">
+
+                <span class="fw-bold d-inline"> Puntos:</span>
+                <span class="d-inline">placeholder</span>
             </div>
 
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Estado:</span>
-                <span class="d-inline">poner aqui es estado de la tarea</span>
-            </div>
-
-        </div>
-    </a>
-
-
-    <a href="#" class="list-group-item list-group-item-action">
-        <div class="row">
-
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Fecha de entrega: </span>
-                <span class="d-inline">Poner aqui la deadline de la tarea</span>
-            </div>
-
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Puntos:</span>
-                <span class="d-inline">poner aqui los puntos de la tarea */10</span>
-            </div>
-
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Estado:</span>
-                <span class="d-inline">poner aqui es estado de la tarea</span>
+            <div class="col mr-5">
+                <span class="fw-bold d-inline"> Estado:</span>
+                <span class="d-inline">placeholder</span>
             </div>
 
         </div>
     </a>
 
-
-    <a href="#" class="list-group-item list-group-item-action">
-        <div class="row">
-
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Fecha de entrega: </span>
-                <span class="d-inline">Poner aqui la deadline de la tarea</span>
-            </div>
-
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Puntos:</span>
-                <span class="d-inline">poner aqui los puntos de la tarea */10</span>
-            </div>
-
-            <div class="col-auto mr-5">
-                <span class="fw-bold d-inline">Estado:</span>
-                <span class="d-inline">poner aqui es estado de la tarea</span>
-            </div>
-
-        </div>
-    </a>
 </div>
 
 {% endblock %}

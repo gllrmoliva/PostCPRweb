@@ -1,6 +1,6 @@
 {% extends "student/base.html" %}
 
-{% block title %}poner aqui el nombre de la tarea{% endblock %}
+{% block title %}{{task['name']}}{% endblock %}
 
 {% block content %}
 
@@ -13,18 +13,18 @@
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Fecha de entrega: </span>
         <!--Ver como se llama esto en el diccionario-->
-        <span class="d-inline">{{task['deadline']}}</span>
+        <span class="d-inline">{{task['deadline_date']}}</span>
     </div>
 
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Puntos:</span>
         <!--Ver como se llama esto en el diccionario-->
-        <span class="d-inline">{{task['evaluation_points']}}/{{task['max_points']}}</span>
+        <span class="d-inline">placeholder</span>
     </div>
 
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Estado:</span>
-        <span class="d-inline">{{task['state']}}</span>
+        <span class="d-inline">placeholder </span>
     </div>
 
 </div>
@@ -32,22 +32,25 @@
 <hr>
 
 <!--Ver como se llama esto en el diccionario-->
-<p>{{task['description']}}</p>
+<p>{{task['instructions']}}</p>
 
-<!--TODO: Aqui deberia ir un if dependiendo del estado de la tarea-->
-{% if task['state'] == 'pendiente' %}
-<form action="">
+<!--TODO: Aqui deberia ir un if dependiendo del estado de la tarea, ademas deberia generalizarse con un url_for-->
+<form action="/student/t/{{task['id']}}" method="post">
     <div class="form-floating">
-        <textarea class="form-control" placeholder="Leave your homework here!" id="floatingTextarea"
-            style="height: 200px; resize: none;"></textarea>
+
+        <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
+            required></textarea>
+
         <label for="floatingTextarea">Ingresa aquí el url de tu tarea.</label>
+
     </div>
     <div class="text-end my-3">
-        <button type="submit" class="btn btn-primary btn-md">Enviar</button>
+        <a href="{{url_for('student.coursestudent', courseid = task['course_id'])}}"
+            class="btn btn-warning btn-md ">Cancelar</a>
+
+        <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
     </div>
 </form>
-{% endif %}
-
 
 
 {% endblock %}
