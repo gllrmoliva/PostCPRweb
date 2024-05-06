@@ -67,11 +67,11 @@ def signin_post():
         if 'signinstudent' in request_form and database.is_student(user):
             session['user_id'] = user['id']
             session['user_type'] = 'student'
-            return redirect(url_for('student.homestudent'))
+            return redirect(url_for('student.home'))
         elif 'signintutor' in request_form and database.is_tutor(user):
             session['user_id'] = user['id']
             session['user_type'] = 'tutor'
-            return redirect(url_for('tutor.hometutor'))
+            return redirect(url_for('tutor.home'))
         
         # Si es que por alguna razon el usuario no es tutor ni estudiante, entonces lo atajamos aquí, 
         # igualmente creo que esta función es media inutil, ya que nunca se deberia llegar hasta aquí

@@ -13,7 +13,7 @@ ver las evaluaciones dentro de cada curso, tipo seccion de evaluaciones INFODA)
 
 @student.route("/", methods = ['GET'])
 @login_required('student')
-def homestudent():
+def home():
     """
     Aquí se muestran los cursos a los que pertenece el estudiante, en esta pagina se debe:
     - Entrar a los cursos a los que pertenece el estudiante
@@ -39,13 +39,13 @@ def homestudent():
 # Lo mas probable es que esto no sea necesario
 @student.route("/", methods = ['POST'])
 @login_required('student')
-def homestudent_post():
+def home_post():
     return "se uso post en home_student"
 
 
 @student.route("/c/<courseid>", methods = ['GET'])
 @login_required('student')
-def coursestudent(courseid):
+def course(courseid):
     """
     En esta pagina se muestran las tareas dentro de un curso seleccionado en la ruta homestudent,
     ademas estas tareas muestran su fecha limite de entrega y estado. Las tareas son clickables y 
@@ -64,13 +64,13 @@ def coursestudent(courseid):
         return render_template('student/course.html', course = course, tasks=tasks)
     else:
         flash('No se puede acceder a ese curso')
-        return redirect(url_for('tutor.hometutor'))
+        return redirect(url_for('student.home'))
 
 
 
 @student.route("/c/<courseid>", methods = ['POST'])
 @login_required('student')
-def coursestudent_post(courseid):
+def course_post(courseid):
 
     # Accedemos a la base de datos
     database = db.Connection()
@@ -86,7 +86,7 @@ def coursestudent_post(courseid):
 
 @student.route("/t/<task_id>", methods = ['GET'])
 @login_required('student')
-def taskstudent(task_id):
+def task(task_id):
     """
     En esta ruta, se muestra la tarea del usuario. Aquí el usuario puede:
     - Ver los datos de la tarea (nombre, descripcion, estado, deadline, etc)
@@ -106,7 +106,7 @@ def taskstudent(task_id):
 
 @student.route("/t/<task_id>", methods = ['POST'])
 @login_required('student')
-def taskstudent_post(task_id):
+def task_post(task_id):
     """
     En esta ruta se manejara como se añadiran los datos que ofrecio el usuario en el formulario al 
     entregar la tarea a la base de datos.

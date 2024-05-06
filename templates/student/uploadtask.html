@@ -35,7 +35,7 @@
 <p>{{task['instructions']}}</p>
 
 <!--TODO: Aqui deberia ir un if dependiendo del estado de la tarea, ademas deberia generalizarse con un url_for-->
-<form action="/student/t/{{task['id']}}" method="post">
+<form action="{{url_for('student.task_post',task_id=task['id'])}}" method="post">
     <div class="form-floating">
 
         <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
@@ -45,7 +45,7 @@
 
     </div>
     <div class="text-end my-3">
-        <a href="{{url_for('student.coursestudent', courseid = task['course_id'])}}"
+        <a href="{{url_for('student.course', courseid = task['course_id'])}}"
             class="btn btn-warning btn-md ">Cancelar</a>
 
         <button type="submit" class="btn btn-primary btn-md ">Enviar</button>

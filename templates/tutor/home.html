@@ -19,7 +19,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="/tutor" method="post">
+                <form action="{{url_for('tutor.home_post')}}" method="post">
 
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="new_course_name" name="name" required>
@@ -47,7 +47,7 @@
                 <p>id: {{course['id']}}</p>
 
 
-                <a href="{{url_for('tutor.coursetutor', courseid = course['id'])}}" class="btn btn-primary">Ingresar</a>
+                <a href="{{url_for('tutor.course', courseid = course['id'])}}" class="btn btn-primary">Ingresar</a>
                 <a href="{{url_for('tutor.editcourse', courseid = course['id'])}}" class="btn btn-warning">Editar</a>
 
             </div>

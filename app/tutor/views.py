@@ -6,7 +6,7 @@ import sqlite3
 
 @tutor.route("/", methods=['GET'])
 @login_required('tutor')
-def hometutor():
+def home():
 
     # Aqui accedemos a la base de datos
     database = db.Connection()
@@ -23,7 +23,7 @@ def hometutor():
 
 @tutor.route("/", methods=['POST'])
 @login_required('tutor')
-def hometutor_post():
+def home_post():
 
     # Accedemos a la base de datos
     database = db.Connection()
@@ -44,18 +44,18 @@ def hometutor_post():
         try:
             database.add_course(request_form['name'], user)
 
-            return redirect(url_for('tutor.hometutor'))
+            return redirect(url_for('tutor.home'))
         except sqlite3.IntegrityError:
             flash('Ya existe un curso con ese nombre')
-            return redirect(url_for('tutor.hometutor'))
+            return redirect(url_for('tutor.home'))
         except Exception as e:
             flash(e)
-            return redirect(url_for('tutor.hometutor'))
+            return redirect(url_for('tutor.home'))
 
 
 @tutor.route("/c/<int:courseid>", methods=['GET'])
 @login_required('tutor')
-def coursetutor(courseid):
+def course(courseid):
 
     # Accedemos a la base de datos
     database = db.Connection()
@@ -74,12 +74,12 @@ def coursetutor(courseid):
         return render_template('tutor/course.html', course = course, tasks=tasks)
     else:
         flash('No se puede acceder a ese curso')
-        return redirect(url_for('tutor.hometutor'))
+        return redirect(url_for('tutor.home'))
 
 
 @tutor.route("/c/<int:courseid>", methods=['POST'])
 @login_required('tutor')
-def coursetutor_post(courseid):
+def course_post(courseid):
 
     # Accedemos a la base de datos
     database = db.Connection()
@@ -105,9 +105,9 @@ def coursetutor_post(courseid):
             # TODO: cambiar el error por algo mas descriptivo 
             flash(str(Error))
 
-        return redirect(url_for('tutor.coursetutor', courseid = courseid))
+        return redirect(url_for('tutor.course', courseid = courseid))
 
-    return "se hizo una peticion post a coursetutor: " + str(request_form)
+    return "se hizo una peticion post a course (tutor): " + str(request_form)
 
 
 @tutor.route("/c/<int:courseid>/edit", methods=['GET'])
@@ -128,7 +128,7 @@ def editcourse(courseid):
         return render_template('tutor/editcourse.html')
     else:
         flash('No se puede acceder a ese curso')
-        return redirect(url_for('tutor.hometutor'))
+        return redirect(url_for('tutor.home'))
 
 
 @tutor.route("/c/<int:courseid>/edit", methods=['POST'])
@@ -140,7 +140,7 @@ def editcourse_post(courseid):
 
 @tutor.route("/t/<task_id>", methods=['GET'])
 @login_required('tutor')
-def tasktutor(task_id):
+def task(task_id):
 
     # accedemos a la base de datos
     database = db.Connection()
@@ -155,5 +155,5 @@ def tasktutor(task_id):
 @tutor.route("/t/<task_id>", methods=['POST'])
 @login_required('tutor')
 #TODO hacer esta ruta
-def tasktutor_post(task_id):
+def task_post(task_id):
     return "metodo post en tasktutor"
