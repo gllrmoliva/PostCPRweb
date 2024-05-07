@@ -201,6 +201,7 @@ class Connection:
             return []
         for i in range(n):
             courses.append(self.get_course(entries[i]['course_id']))
+        
    
         return courses
     
@@ -221,13 +222,22 @@ class Connection:
    
         return students
     
-    def add_task(self, name, course):
-        course_id = course['id']
+    def add_task(self, name,instructions, course):
+        try:
+            course_id = course['id']
 
-        entry_query = "INSERT INTO Task (name, course_id) VALUES (?, ?)"
-        data = (name, course_id)
-        self.cursor.execute(entry_query, data)
-        self.connection.commit()
+            entry_query = "INSERT INTO Task (name, instructions, course_id) VALUES (?, ?, ?)"
+            data = (name, instructions, course_id)
+            self.cursor.execute(entry_query, data)
+            self.connection.commit()
+        except sqlite3.Error as Error:
+            print("sqlite3 error: ",Error)
+            raise
+        except Exception as e:
+            print("Exception: ",e)
+            raise
+        finally:
+            self.connection.commit()
 
         return self.get_task_from_pair_name_course(name, course)
     

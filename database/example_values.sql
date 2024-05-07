@@ -56,18 +56,27 @@ CROSS JOIN
     (SELECT id FROM Course WHERE name IN ("Calculus II", "Algebra II")) AS Course;
 
 -- Tareas de ejemplo
-INSERT INTO Task (name, course_id)
-SELECT "Task 1: Limits", id FROM Course WHERE name = "Calculus I";
-INSERT INTO Task (name, course_id)
-SELECT "Task 2: Derivatives", id FROM Course WHERE name = "Calculus I";
-INSERT INTO Task (name, course_id)
-SELECT "Task 1: Integrals", id FROM Course WHERE name = "Calculus II";
-INSERT INTO Task (name, course_id)
-SELECT "Task 1: Functions", id FROM Course WHERE name = "Algebra I";
-INSERT INTO Task (name, course_id)
-SELECT "Task 2: Trigonometry", id FROM Course WHERE name = "Algebra I";
-INSERT INTO Task (name, course_id)
-SELECT "Task 1: Vectors", id FROM Course WHERE name = "Algebra II";
+-- Tareas de ejemplo con descripciones
+INSERT INTO Task (name, course_id, instructions, creation_date, deadline_date)
+SELECT "Task 1: Limits", id, "Explore and understand the concept of limits in calculus.", '2024-04-28', '2024-05-15' FROM Course WHERE name = "Calculus I";
+
+INSERT INTO Task (name, course_id, instructions, creation_date, deadline_date)
+SELECT "Task 2: Derivatives", id, "Study the fundamental principles of derivatives and their applications.", '2024-04-28', '2024-05-15' FROM Course WHERE name = "Calculus I";
+
+INSERT INTO Task (name, course_id, instructions, creation_date, deadline_date)
+SELECT "Task 1: Integrals", id, "Introduction to integral calculus, focusing on basic integration techniques.", '2024-04-28', '2024-05-22' FROM Course WHERE name = "Calculus II";
+
+INSERT INTO Task (name, course_id, instructions, creation_date, deadline_date)
+SELECT "Task 1: Functions", id, "Examine different types of functions and their properties.", '2024-04-28', '2024-05-10' FROM Course WHERE name = "Algebra I";
+
+INSERT INTO Task (name, course_id, instructions, creation_date, deadline_date)
+SELECT "Task 2: Trigonometry", id, "Explore trigonometric functions and their uses in solving problems.", '2024-04-28', '2024-05-10' FROM Course WHERE name = "Algebra I";
+
+INSERT INTO Task (name, course_id, instructions, creation_date, deadline_date)
+SELECT "Task 1: Vectors", id, "Learn about vectors, their operations, and applications in various fields.", '2024-04-28', '2024-05-18' FROM Course WHERE name = "Algebra II";
+
+
+
 
 -- Criterios de ejemplo
 INSERT INTO Criterion (name, task_id)

@@ -16,7 +16,7 @@
 
 </ul>
 {% block addbutton %}{% endblock %}
-<a href="/logout" class="btn btn-danger">Cerrar sesión</a>
+<a href="{{url_for('auth.logout')}}" class="btn btn-danger">Cerrar sesión</a>
 
 {% endblock %}
 
@@ -24,21 +24,5 @@
 
 {% endblock %}
 
-<!-- ?? que es esto
-
-<script>
-    // obtener el botón por su id
-    var boton = document.getelementbyid("logout");
-
-    // agregar un evento de clic al botón
-    boton.addeventlistener("click", function () {
-        // redirigir a la url deseada
-        window.location.href = "https://www.google.com";
-    });
-</script>
-
--->
-
-<script>
-    system.log("hola");
-</script>
+{% block scripts %}
+{% endblock %}
