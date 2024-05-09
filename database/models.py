@@ -1,7 +1,7 @@
 from sqlalchemy import (Column, ForeignKey, Integer, MetaData, String, Table,create_engine,UniqueConstraint, Boolean, Date,Float)
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker, Mapped, mapped_column
 
-db_url = "sqlite:///databaseA.db"
+db_url = "sqlite:///database/databaseA.db"
 
 engine = create_engine(db_url)
 
@@ -71,7 +71,7 @@ class Submission(Base):
     student_id = Column(Integer, ForeignKey('student.student_id'), nullable=False)
     student = relationship("Student")
     review = relationship("Review")
-    task_id = Column(Integer, ForeignKey('task.id'), nullable=False)
+    task_id = Column(Integer, ForeignKey('task.task_id'), nullable=False)
     task = relationship("Task")
     __table_args__ = (UniqueConstraint('student_id', 'task_id'),)
 class Criterion(Base):
@@ -79,7 +79,7 @@ class Criterion(Base):
     criterion_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     review = relationship("Review",secondary="review_criterion",back_populates="criterion")
-    task_id = Column(Integer, ForeignKey('task.id'), nullable=False)
+    task_id = Column(Integer, ForeignKey('task.task_id'), nullable=False)
     task = relationship("Task")
     __table_args__ = (UniqueConstraint('name', 'task_id'),)
 class Task(Base):
