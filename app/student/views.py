@@ -101,7 +101,9 @@ def task(task_id):
 
     task = database.get_task(task_id)
 
-    return render_template('student/uploadtask.html', task = task)
+    # Esto ahora mismo muestra distintas cosas dependiento del estado
+    # estos son : entregado, no entregado, pendiente, evaluado
+    return render_template('student/uploadtask.html', task = task,estado = "evaluado")
 
 
 @student.route("/t/<task_id>", methods = ['POST'])
@@ -112,9 +114,45 @@ def task_post(task_id):
     entregar la tarea a la base de datos.
     """
 
-    database = db.Connection()
-    database.connect()
-
-    task = database.get_task(task_id)
-
     return "metodo post en taskstudent"
+
+@student.route("/reviews", methods = ['GET'])
+@login_required('student')
+def reviews():
+    """
+    En esta ruta se mostraran todas las tareas que deben ser evaluadas por un estudiante.
+    aquí se muestra una tabla con distintos parametros: Curso,Nombre de tarea,descripción. En esta pestaña
+    solo se mostraran las tareas que no se han revisado, luego de ser revisadas no mostraran al student.
+    """
+
+    return render_template('student/reviews.html') 
+
+
+# La variable task id se va a entregar cuando se redirija desde otra pagina
+@student.route("/review/t/<task_id>", methods = ['GET'])
+@login_required('student')
+def review_task(task_id):
+    """
+    En esta pagina se debe completar la evaluación de una tarea con respecto a los criterios establecidos
+    por el tutor.
+    """
+
+    return render_template('student/reviewtask.html', task_id = task_id) 
+
+
+@student.route("/review/t/<task_id>", methods = ['POST'])
+@login_required('student')
+def review_task_post(task_id):
+    """
+    Aquí se van a subir las respuestas dadas por el estudiante para la evaluación
+    """
+    request_form = request.form
+    lista_keys = []
+    lista_values= []
+
+    for key, values in request_form.items():
+        lista_keys.append(key)
+        lista_values.append(values)
+
+
+    return str(lista_keys) + "<hr>" + str(lista_values)

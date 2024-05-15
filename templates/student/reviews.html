@@ -1,0 +1,40 @@
+{% extends "student/base.html" %}
+
+{% block title %}Evaluar tareas{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <h3 class="fw-bold">Tareas a evaluar</h3>
+</div>
+<hr>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Curso</th>
+            <th scope="col">Tarea</td>
+            <th scope="col">Descripción</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr onclick="window.location='{{url_for('student.review_task', task_id=1)}}';" style="cursor: pointer;">
+            <th scope="row">Algebra</th>
+            <td>Guía de ejercicios n1</td>
+            <td>Completa los ejercicios de la guía número 1, que abordan los temas de ecuaciones lineales y sistemas de
+                ecuaciones. La guía incluye ejemplos y problemas para practicar.</td>
+        </tr>
+        <tr onclick="window.location='/sample';" style="cursor: pointer;">
+            <th scope="row">Inglés</th>
+            <td>Test de conocimientos</td>
+            <td>Realiza el test de conocimientos que evalúa tu comprensión de gramática, vocabulario y comprensión
+                lectora. El test consta de 50 preguntas de opción múltiple.</td>
+        </tr>
+        <tr onclick="window.location='/sample';" style="cursor: pointer;">
+            <th scope="row">Historia</th>
+            <td>Prueba n3</td>
+            <td>Presenta la tercera prueba del curso, que cubre la Revolución Industrial y sus efectos en la sociedad
+                europea del siglo XIX. La prueba incluye preguntas de desarrollo y análisis de documentos históricos.
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}
