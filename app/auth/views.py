@@ -22,9 +22,9 @@ def signin():
     if request.method == 'GET':
         if 'user_type' in session and 'user_id' in session:
             if session['user_type'] == 'tutor':
-                return redirect(url_for('tutor.hometutor'))
+                return redirect(url_for('tutor.home'))
             elif session['user_type'] == 'student':
-                return redirect(url_for('student.homestudent'))
+                return redirect(url_for('student.home'))
 
         return render_template("signin.html")
 

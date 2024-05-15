@@ -4,6 +4,7 @@ from login_required import login_required
 from database import db
 import sqlite3
 
+
 @tutor.route("/", methods=['GET'])
 @login_required('tutor')
 def home():
@@ -18,7 +19,7 @@ def home():
 
     # A render_template le damos la variable courses, ya que jinja lo usa para mostrar los cursos del
     # usuario (ver tutor/home.html para ver como es utilizado courses)
-    return render_template('tutor/home.html', courses = courses)
+    return render_template('tutor/home.html', courses=courses)
 
 
 @tutor.route("/", methods=['POST'])
@@ -37,7 +38,7 @@ def home_post():
 
     # Notemos que en tutor/home.html, los forms tienen 2 propiedades importantes name y value
     # para obtener los datos podemos hacer lo siguiente request.form['name'] = value
-    # entonces: 
+    # entonces:
     # - si form_type es create_course, intentamos crear el curso con el nombre dado. Si esto no funciona
     #   enviamos al usuario a home
     if request_form['form_type'] == 'create_course':
@@ -71,7 +72,7 @@ def course(courseid):
     # - Se envia al usuario a home y se muestra una advertencia en pantalla (flash)
     if (course in database.get_courses_from_tutor(tutor)):
         tasks = database.get_tasks_from_course(course)
-        return render_template('tutor/course.html', course = course, tasks=tasks)
+        return render_template('tutor/course.html', course=course, tasks=tasks)
     else:
         flash('No se puede acceder a ese curso')
         return redirect(url_for('tutor.home'))
@@ -99,13 +100,13 @@ def course_post(courseid):
         name = request_form['name']
         instructions = request_form['instructions']
 
-        try: 
-            database.add_task(name,instructions,course)
+        try:
+            database.add_task(name, instructions, course)
         except Exception as Error:
-            # TODO: cambiar el error por algo mas descriptivo 
+            # TODO: cambiar el error por algo mas descriptivo
             flash(str(Error))
 
-        return redirect(url_for('tutor.course', courseid = courseid))
+        return redirect(url_for('tutor.course', courseid=courseid))
 
     return "se hizo una peticion post a course (tutor): " + str(request_form)
 
@@ -150,10 +151,11 @@ def task(task_id):
     task = database.get_task(task_id)
     criteria = database.get_criteria_of_task(task)
 
-    return render_template("tutor/tasktutor.html", task = task, criteria = criteria)
+    return render_template("tutor/tasktutor.html", task=task, criteria=criteria)
+
 
 @tutor.route("/t/<task_id>", methods=['POST'])
 @login_required('tutor')
-#TODO hacer esta ruta
+# TODO hacer esta ruta
 def task_post(task_id):
     return "metodo post en tasktutor"
