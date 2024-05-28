@@ -19,9 +19,9 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-db_url = "sqlite:///databaseA.db"
+db_url = "sqlite:///database/databaseA.db"
 
-engine = create_engine(db_url)
+engine = create_engine(db_url, echo=True)
 
 
 Base = declarative_base()

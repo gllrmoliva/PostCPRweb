@@ -14,13 +14,13 @@
                 <p class="card-text">
                 <div>Profesor: {{course['tutor_name']}}</div>
 
-                <div>id: {{course['id']}}</div>
+                <div>id: {{course['course_id']}}</div>
                 </p>
 
 
                 <form action="/student" method="post">
                     <input type="hidden" name="type" value="course">
-                    <input type="hidden" name="id" value="{{ course['id'] }}">
+                    <input type="hidden" name="id" value="{{ course['course_id'] }}">
                     <button name="action" value="enter" type="submit" class="btn btn-primary">Ingresar</button>
                 </form>
 
