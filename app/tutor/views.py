@@ -95,7 +95,7 @@ def tasktutor(task_id):
 
     task = database.get_task(task_id)
     criteria = database.get_criteria_from_task(task)
-
+    print(f"TASK: {task}")
     if request.method == "GET":
         return render_template("tutor/tasktutor.html", task=task, criteria=criteria)
     elif request.method == "POST":

@@ -32,7 +32,7 @@ def homestudent():
 
     # Esto no estaba antes (gllrm)
     for course in courses:
-        course.tutor_name = database.get_user(course.tutor_id).name    
+        course.tutor_name = database.get_user(course.tutor_id).name
     # Si accedemos con el metodo get
     if request.method == "GET":
         # Renderizamos la plantilla de student home, y le pasamos los cursos sacados de la base de datos previamente
@@ -43,12 +43,14 @@ def homestudent():
         # obtenemos los datos del formulario apretado
         request_form = request.form
         # si el formulario apretado tiene un input hidden del tipo course, entonces hacermos una acción
-        if request_form['type'] == 'course':
+        if request_form["type"] == "course":
             # si la acción de formulario es entrar al curso, entonces entramos
-            if request_form['action'] == 'enter':
-                #TODO: agregar vista de que se vera en el curso
+            if request_form["action"] == "enter":
+                # TODO: agregar vista de que se vera en el curso
                 # por ahora es solo los datos del curso
-                return redirect(url_for('student.coursestudent', courseid=int(request_form['id'])))
+                return redirect(
+                    url_for("student.coursestudent", courseid=int(request_form["id"]))
+                )
 
 
 """
@@ -69,7 +71,6 @@ def coursestudent(courseid):
         tasks = database.get_tasks_from_course(course)
         return render_template("student/course.html", course=course, tasks=tasks)
 
-
     elif request.method == "POST":
         return "se hizo una peticion post a coursetutor"
 
@@ -89,7 +90,7 @@ porque se excedio el tiempo limite.
 def taskstudent(task_id):
 
     task = database.get_task(task_id)
-
+    print(f"TASK: {task}")
     if request.method == "GET":
         return render_template("student/uploadtask.html", task=task)
     elif request.method == "POST":
