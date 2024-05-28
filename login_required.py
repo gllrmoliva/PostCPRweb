@@ -3,6 +3,18 @@ from functools import wraps
 from flask import session, redirect, url_for, flash
 
 def login_required(user_type):
+    """ 
+    Verifica que el tipo de usuario sea el que se necesita para acceder a la ruta, si no es así
+    se redirige a la ruta de inicio de sesión.
+
+    Parameters:
+    - user_type: tipo de usuario que puede acceder estos pueden ser: 'student', 'tutor' o 'admin'
+
+    Returns:
+    - redirect(url_for('auth.signin')), si el usuario no tiene permisos para acceder a la página
+    - nada, si el usuario si puede acceder al sitio.
+    """
+    
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):

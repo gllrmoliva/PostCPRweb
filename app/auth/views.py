@@ -15,23 +15,27 @@ muestra un mensaje tipo no se pudo iniciar sesion. Lo mismo ocurre con estudiant
 database = Database(engine)
 
 
-@auth.route("/", methods=["GET", "POST"])
+@auth.route("/", methods = ['GET'])
 def signin():
+    """
+    En esta ruta se pueden completar los campos correo y contraseña los cuales son manejados en signin_post().
+    Solo se muestra si es que en la variable global "session" no existen los campos 'user_id' y 'user_type', si no
+    es así, te envía a la pagina home de cada tipo de usuario.
+    """
 
     # Si accedemos con el metodo get, verificamos si hay datos guardados en session, si los hay
     # te redirige inmediatamente a la pagina de tutor o student segun corresponda
     # si no hay datos guardados puedes iniciar sesion
-    if request.method == "GET":
-        if "user_type" in session and "user_id" in session:
-            if session["user_type"] == "tutor":
-                return redirect(url_for("tutor.hometutor"))
-            elif session["user_type"] == "student":
-                return redirect(url_for("student.homestudent"))
+    if "user_type" in session and "user_id" in session:
+        if session["user_type"] == "tutor":
+            return redirect(url_for("tutor.home"))
+        elif session["user_type"] == "student":
+            return redirect(url_for("student.home"))
 
-        return render_template("signin.html")
+    return render_template("signin.html")
 
-    # Al accederse con el metodo post
-    elif request.method == "POST":
+@auth.route("/", methods = ['POST'])
+def signin_post():
         # Recuperamos los datos del formulario de inicio de sesión enviados
         request_form = request.form
 
@@ -58,11 +62,11 @@ def signin():
             if "signinstudent" in request_form and database.is_student(user):
                 session["user_id"] = user.id
                 session["user_type"] = "student"
-                return redirect(url_for("student.homestudent"))
+                return redirect(url_for("student.home"))
             elif "signintutor" in request_form and database.is_tutor(user):
                 session["user_id"] = user.id
                 session["user_type"] = "tutor"
-                return redirect(url_for("tutor.hometutor"))
+                return redirect(url_for("tutor.home"))
 
             # Si es que por alguna razon el usuario no es tutor ni estudiante, entonces lo atajamos aquí,
             # igualmente creo que esta función es media inutil, ya que nunca se deberia llegar hasta aquí
@@ -76,6 +80,11 @@ def signin():
 # Ruta a la que se accede cuando se quiere cerrar sesión
 @auth.route("/logout")
 def logout():
+    """
+    Ruta a la que se accede al querer cerrar sesion, en esta se borran los datos de la variable global session
+    y luego se manda hacia la ruta singin, donde se logea el usuario
+    """
+    
     session.clear()
     flash("Sesión cerrada correctamente.", "info")
     return redirect(url_for("auth.signin"))

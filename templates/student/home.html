@@ -18,11 +18,8 @@
                 </p>
 
 
-                <form action="/student" method="post">
-                    <input type="hidden" name="type" value="course">
-                    <input type="hidden" name="id" value="{{ course['course_id'] }}">
-                    <button name="action" value="enter" type="submit" class="btn btn-primary">Ingresar</button>
-                </form>
+                <a href="{{url_for('student.course',courseid=course['course_id'])}}" type="button"
+                    class="btn btn-primary">Ingresar</a>
 
             </div>
         </div>

@@ -10,93 +10,113 @@ from database.schemas import Database
 
 database = Database(engine)
 
+@tutor.route("/", methods=['GET'])
+@login_required('tutor')
+def home():
 
-@tutor.route("/", methods=["GET", "POST"])
-@login_required("tutor")
-def hometutor():
-
-    user = database.get_user(session["user_id"])
-
+    # Recuperamos de la base de datos el usuario, para luego recuperar los cursos
+    user = database.get_user(session['user_id'])
     courses = database.get_courses_from_tutor(user)
 
-    if request.method == "GET":
-        return render_template("tutor/home.html", courses=courses)
-    elif request.method == "POST":
-        request_form = request.form
-        print("REQUEST_FORM", request_form)
-        if request_form["type"] == "course":
-            if request_form["action"] == "edit":
-                return redirect(
-                    url_for("tutor.editcourse", courseid=int(request_form["id"]))
-                )
-                return "estás editando el curso"
-            elif request_form["action"] == "enter":
-                return redirect(
-                    url_for("tutor.coursetutor", courseid=int(request_form["id"]))
-                )
-        if request_form["type"] == "create_course":
-            try:
-                database.add_course(request_form["name"], user)
+    # A render_template le damos la variable courses, ya que jinja lo usa para mostrar los cursos del
+    # usuario (ver tutor/home.html para ver como es utilizado courses)
+    return render_template('tutor/home.html', courses=courses)
 
-                return redirect(url_for("tutor.hometutor"))
-            except Exception as e:
-                flash(f"Exception {e}")
-                return redirect(url_for("tutor.hometutor"))
+@tutor.route("/", methods=['POST'])
+@login_required('tutor')
+def home_post():
+
+    # Recuperamos de la base de datos el usuario, para luego recuperar los cursos
+    user = database.get_user(session['user_id'])
+
+    # Obtenemos los datos del formulario
+    request_form = request.form
+
+    # Notemos que en tutor/home.html, los forms tienen 2 propiedades importantes name y value
+    # para obtener los datos podemos hacer lo siguiente request.form['name'] = value
+    # entonces:
+    # - si form_type es create_course, intentamos crear el curso con el nombre dado. Si esto no funciona
+    #   enviamos al usuario a home
+    if request_form['form_type'] == 'create_course':
+        try:
+            database.add_course(request_form['name'], user)
+            return redirect(url_for('tutor.home'))
+
+        except sqlite3.IntegrityError:
+            flash('Ya existe un curso con ese nombre')
+            return redirect(url_for('tutor.home'))
+        except Exception as e:
+            flash(e)
+            return redirect(url_for('tutor.home'))
 
 
-@tutor.route("/c/<int:courseid>", methods=["GET", "POST"])
-@login_required("tutor")
-def coursetutor(courseid):
+@tutor.route("/c/<int:courseid>", methods=['GET'])
+@login_required('tutor')
+def course(courseid):
 
-    tutor = database.get_user(session["user_id"])
+    # Obtenemos al usuario(tutor) y el curso (con el id)
+    tutor = database.get_user(session['user_id'])
     course = database.get_course(courseid)
 
-    if request.method == "GET":
+    # Si el tutor pertenece al curso:
+    # - se obtienen las tareas del curso y se renderiza la template tutor/course.html
+    # Si el tutor no pertenece al curso:
+    # - Se envia al usuario a home y se muestra una advertencia en pantalla (flash)
+    tasks = database.get_tasks_from_course(course)
+    return render_template("tutor/course.html", course=course, tasks=tasks)
 
-        tasks = database.get_tasks_from_course(course)
-        return render_template("tutor/course.html", course=course, tasks=tasks)
+@tutor.route("/c/<int:courseid>", methods=['POST'])
+@login_required('tutor')
+def course_post(courseid):
 
-    elif request.method == "POST":
-        request_form = request.form
-        # si se presiona el botón crear tarea y se crea una tarea
-        if request_form["type"] == "create_task":
-            name = request_form["name"]
-            instructions = request_form["instructions"]
+    course = database.get_course(courseid)
+    request_form = request.form
+    # Si se presiona el botón crear tarea:
+    # - Se recuperan los datos del formulario.
+    # - intentamos crear el curso, si no se puede, se muestra el error en pantalla
+    if request_form['form_type'] == 'create_task':
 
-            try:
-                database.add_task(name, instructions, course)
-            except Exception as Error:
-                # TODO: poner un nombre de error mas demostrativo
-                flash(Error)
+        name = request_form['name']
+        instructions = request_form['instructions']
 
-            tasks = database.get_tasks_from_course(course)
-            return render_template("tutor/course.html", course=course, tasks=tasks)
+        try:
+            database.add_task(name, instructions, course)
+        except Exception as Error:
+            # TODO: cambiar el error por algo mas descriptivo
+            flash(str(Error))
+        return redirect(url_for('tutor.course', courseid=courseid))
 
-        return "se hizo una peticion post a coursetutor"
+    return "se hizo una peticion post a course (tutor): " + str(request_form)
 
-
-@tutor.route("/c/<int:courseid>/edit", methods=["GET", "POST"])
-@login_required("tutor")
+@tutor.route("/c/<int:courseid>/edit", methods=['GET'])
+@login_required('tutor')
 def editcourse(courseid):
 
-    tutor = database.get_user(session["user_id"])
+    tutor = database.get_user(session['user_id'])
     course = database.get_course(courseid)
 
-    if request.method == "GET":
-        return render_template("tutor/editcourse.html")
+    return render_template('tutor/editcourse.html')
 
-    elif request.method == "POST":
-        return "se hizo una peticion post a editcurso"
+@tutor.route("/c/<int:courseid>/edit", methods=['POST'])
+@login_required('tutor')
+def editcourse_post(courseid):
+    request_form = request.form()
+    return "se hizo una peticion post a editcurso: " + str(request_form)
 
-
-@tutor.route("/t/<task_id>", methods=["GET", "POST"])
-@login_required("tutor")
-def tasktutor(task_id):
-
+@tutor.route("/t/<task_id>", methods=['GET'])
+@login_required('tutor')
+def task(task_id):
+    # Obtenemos la tarea y los criterios de la tarea
     task = database.get_task(task_id)
     criteria = database.get_criteria_from_task(task)
+
     print(f"TASK: {task}")
-    if request.method == "GET":
-        return render_template("tutor/tasktutor.html", task=task, criteria=criteria)
-    elif request.method == "POST":
-        return "metodo post en tasktutor"
+
+    return render_template("tutor/tasktutor.html", task=task, criteria=criteria)
+
+
+@tutor.route("/t/<task_id>", methods=['POST'])
+@login_required('tutor')
+# TODO hacer esta ruta
+def task_post(task_id):
+    return "metodo post en tasktutor"

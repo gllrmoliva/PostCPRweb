@@ -7,16 +7,20 @@
 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
     <li class="nav-item">
-        <a class="nav-link" href="/student/">Cursos</a>
+        <a class="nav-link" href="{{url_for('student.home')}}">Cursos</a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="#">Evaluaciones</a>
+        <a class="nav-link" href="#">Calificaciones</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{url_for('student.reviews')}}">Evaluar tareas</a>
     </li>
 
 </ul>
 
-<a href="/logout" class="btn btn-danger">Cerrar sesión</a>
+<a href="{{url_for('auth.logout')}}" class="btn btn-danger">Cerrar sesión</a>
 
 {% endblock %}
 

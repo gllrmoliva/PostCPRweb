@@ -11,12 +11,12 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="#">Evaluaciones</a>
+        <a class="nav-link" href="#">Evaluar</a>
     </li>
 
 </ul>
 {% block addbutton %}{% endblock %}
-<a href="/logout" class="btn btn-danger">Cerrar sesión</a>
+<a href="{{url_for('auth.logout')}}" class="btn btn-danger">Cerrar sesión</a>
 
 {% endblock %}
 
@@ -25,14 +25,4 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    // obtener el botón por su id
-    var boton = document.getelementbyid("logout");
-
-    // agregar un evento de clic al botón
-    boton.addeventlistener("click", function () {
-        // redirigir a la url deseada
-        window.location.href = "https://www.google.com";
-    });
-</script>
 {% endblock %}
