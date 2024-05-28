@@ -1,10 +1,10 @@
 {% extends "student/base.html" %}
 
-{% block title %}{{task['name']}}{% endblock %}
+{% block title %}{{task.name}}{% endblock %}
 
 {% block content %}
 
-<h3 class="fw-bold">{{task['name']}}</h3>
+<h3 class="fw-bold">{{task.name}}</h3>
 
 <hr>
 
@@ -13,7 +13,7 @@
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Fecha de entrega: </span>
         <!--Ver como se llama esto en el diccionario-->
-        <span class="d-inline">{{task['deadline_date']}}</span>
+        <span class="d-inline">{{task.deadline_date}}</span>
     </div>
 
     <div class="col-auto mr-5">
@@ -32,7 +32,7 @@
 <hr>
 
 <!--Ver como se llama esto en el diccionario-->
-<p>{{task['instructions']}}</p>
+<p>{{task.instructions}}</p>
 
 
 {% if estado == 'pendiente' %}
@@ -46,10 +46,11 @@
 
     </div>
     <div class="text-end my-3">
-        <a href="{{url_for('student.course', courseid = task['course_id'])}}"
+        <<<<<<< HEAD <a href="{{url_for('student.coursestudent', courseid = task.course_id)}}"=======<a
+            href="{{url_for('student.course', courseid = task['course_id'])}}">>>>>>> develop-sprint2
             class="btn btn-warning btn-md ">Cancelar</a>
 
-        <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
+            <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
     </div>
 </form>
 {% endif %}
