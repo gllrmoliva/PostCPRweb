@@ -1,22 +1,22 @@
 {% extends "student/base.html" %}
 
-{% block title %}Evaluando "nombre tarea"{% endblock %}
+{% block title %}{% endblock %}
 
 {% block content %}
 <div class="mb-3">
-    <h3 class="fw-bold">Nombre de tarea</h3>
+    <h3 class="fw-bold">{{task.name}}</h3>
 </div>
 <hr>
 <div class="mb-3">
-    <p>Esto es la descripción de la tarea</p>
+    <p>{{task.description}}</p>
 </div>
 <hr>
 <div class="mb-3">
     <p class="fw-bold d-inline ">Entrega: </p>
-    <a href="https://www.google.com" class="d-inline">www.google.com</a>
+    <a href="{{task.url}}" class="d-inline">{{submission.url}}</a>
 </div>
 <hr>
-<form action="{{url_for('student.review_task_post',task_id=task_id)}}" method="POST">
+<form action="{{url_for('student.review_task_post',task_id=task.task_id,review_id=review.review_id)}}" method="POST">
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -26,47 +26,32 @@
             </tr>
         </thead>
         <tbody>
+            {%for criterion in criteria%}
             <tr>
-                <th scope="row">Creatividad</th>
-                <td>Se ve que tan creativo es el pibe</td>
+                <th scope="row">{{criterion.name}}</th>
+                <td>{{criterion.description}}</td>
                 <td>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="creatividad_id" id="creatividad1" value="1"
+                        <input class="form-check-input" type="radio" name="{{criterion.name}}" id="{{criterion.criterion_id}}" value="1"
                             required>
-                        <label class="form-check-label" for="creatividad1">1</label>
+                        <label class="form-check-label" for= "{{criterion.criterion_id}}">1</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="creatividad_id" id="creatividad2" value="2">
-                        <label class="form-check-label" for="creatividad2">2</label>
+                        <input class="form-check-input" type="radio" name="{{criterion.name}}"  id="{{criterion.criterion_id}}" value="2">
+                        <label class="form-check-label" for= "{{criterion.criterion_id}}">2</label>
+
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="creatividad_id" id="creatividad3" value="3">
-                        <label class="form-check-label" for="creatividad3">3</label>
+                        <input class="form-check-input" type="radio"  name="{{criterion.name}}"  id="{{criterion.criterion_id}}" value="3">
+                        <label class="form-check-label" for= "{{criterion.criterion_id}}">3</label>
                     </div>
                 </td>
             </tr>
-            <tr>
-                <th scope="row">Legibilidad</th>
-                <td>Se ve que tan legible es el pibe</td>
-                <td>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="legibilidad_id" id="legibilidad1" value="1"
-                            required>
-                        <label class="form-check-label" for="legibilidad1">1</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="legibilidad_id" id="legibilidad2" value="2">
-                        <label class="form-check-label" for="legibilidad2">2</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="legibilidad_id" id="legibilidad3" value="3">
-                        <label class="form-check-label" for="legibilidad3">3</label>
-                    </div>
-                </td>
-            </tr>
+        {% endfor %}
+
         </tbody>
     </table>
-    <button type="submit" class="btn btn-primary">Enviar Evaluación</button>
+    <button type="submit" class="btn btn-primary" >Enviar Evaluación</button>
 </form>
 
 
