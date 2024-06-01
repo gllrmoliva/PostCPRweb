@@ -45,7 +45,7 @@ class ReviewCriterion(Base):
     __tablename__ = "review_criterion"
     rc_id = Column(Integer, primary_key=True)
     valoracion = Column(Float)
-    review_id = Column("task_id", Integer, ForeignKey("review.review_id"))
+    review_id = Column("review_id", Integer, ForeignKey("review.review_id"))
     criterion_id = Column("criterion_id", Integer, ForeignKey("criterion.criterion_id"))
 
 
@@ -116,6 +116,7 @@ class Submission(Base):
     review = relationship("Review")
     task_id = Column(Integer, ForeignKey("task.task_id"), nullable=False)
     task = relationship("Task")
+    url = Column(String)
     __table_args__ = (UniqueConstraint("student_id", "task_id"),)
 
 
