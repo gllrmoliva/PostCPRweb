@@ -213,9 +213,17 @@ class Database:
             submission_id = (
                 session.query(Review).filter(Review.review_id == review_id).first()
             ).submission_id
-
             return (
                 session.query(Submission)
                 .filter(Submission.submission_id == submission_id)
                 .first()
             )
+    def get_submissions_from_task(self, task):
+        with self.Session() as session:
+            return session.query(Submission).filter(Submission.task_id == task.task_id).all()
+    
+    def get_name_from_student(self, student_id):
+        with self.Session() as session:
+            student = session.query(Student).filter(Student.student_id == student_id).first()
+            user = session.query(User).filter(User.id == student.user_id).first()
+            return user.name

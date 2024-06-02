@@ -117,6 +117,8 @@ class Submission(Base):
     task_id = Column(Integer, ForeignKey("task.task_id"), nullable=False)
     task = relationship("Task")
     url = Column(String)
+    reviewed_by_teacher = Column(String, nullable = False, default = "PENDIENTE")
+    teacher_score = Column(Integer, nullable = True, default = None)
     __table_args__ = (UniqueConstraint("student_id", "task_id"),)
 
 
