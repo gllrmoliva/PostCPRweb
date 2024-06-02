@@ -110,10 +110,13 @@ def task(task_id):
     # Obtenemos la tarea y los criterios de la tarea
     task = database.get_task(task_id)
     criteria = database.get_criteria_from_task(task)
-
+    submissions = database.get_submissions_from_task(task)
     print(f"TASK: {task}")
-
-    return render_template("tutor/tasktutor.html", task=task, criteria=criteria)
+    data = []
+    for submission in submissions:
+        name = database.get_name_from_student(submission.student_id)
+        data.append((submission, name))
+    return render_template("tutor/tasktutor.html", task=task, criteria=criteria, data = data)
 
 
 @tutor.route("/t/<task_id>", methods=["POST"])

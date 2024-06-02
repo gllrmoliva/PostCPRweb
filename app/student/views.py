@@ -123,6 +123,7 @@ def reviews():
 @login_required("student")
 def review_task(review_id, task_id):
     if database.is_review_reviewed(task_id, session["user_id"]) is True:
+        flash("Esa entrega ya ha sido evaluada")
         return redirect(url_for("student.reviews"))
     criteria = database.get_all_criteria_from_task(task_id)
     task_to_show = database.get_task(task_id)

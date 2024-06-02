@@ -51,26 +51,28 @@
 <hr>
 
 <div class="list-group">
+
+    {% for (submission, name) in data %}
     <a href="#" class="list-group-item list-group-item-action">
         <div class="row">
 
             <div class="col mr-5">
-                <span class="fw-bold d-inline">Arnold Schwarzenegger Espinoza</span>
+                <span class="fw-bold d-inline">{{name}}</span>
             </div>
 
             <div class="col mr-5">
-
                 <span class="fw-bold d-inline"> Puntos:</span>
-                <span class="d-inline">placeholder</span>
+                <span class="d-inline">{{submission.teacher_score}}</span>
             </div>
 
             <div class="col mr-5">
                 <span class="fw-bold d-inline"> Estado:</span>
-                <span class="d-inline">placeholder</span>
+                <span class="d-inline">{{submission.reviewed_by_teacher}}</span>
             </div>
 
         </div>
     </a>
+    {% endfor %}
 
 </div>
 
