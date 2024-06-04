@@ -130,20 +130,10 @@ class Database:
             session.add(review_criterion)
             session.commit()
 
-    def is_review_reviewed(self, task_id, user_id):
+    def is_review_reviewed(self, review_id, user_id):
         with self.Session() as session:
-            submission = (
-                session.query(Submission).filter(Submission.task_id == task_id).first()
-            )
 
-            review = (
-                session.query(Review)
-                .filter(
-                    Review.submission_id == submission.submission_id
-                    and Review.reviewer_id == user_id
-                )
-                .first()
-            )
+            review = session.query(Review).filter(Review.review_id == review_id).first()
             print(f"# Is pending: {review.is_pending}\n  ")
             if review is None:
                 return False
@@ -218,12 +208,19 @@ class Database:
                 .filter(Submission.submission_id == submission_id)
                 .first()
             )
+
     def get_submissions_from_task(self, task):
         with self.Session() as session:
-            return session.query(Submission).filter(Submission.task_id == task.task_id).all()
-    
+            return (
+                session.query(Submission)
+                .filter(Submission.task_id == task.task_id)
+                .all()
+            )
+
     def get_name_from_student(self, student_id):
         with self.Session() as session:
-            student = session.query(Student).filter(Student.student_id == student_id).first()
+            student = (
+                session.query(Student).filter(Student.student_id == student_id).first()
+            )
             user = session.query(User).filter(User.id == student.user_id).first()
             return user.name

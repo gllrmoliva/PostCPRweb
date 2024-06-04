@@ -122,7 +122,7 @@ def reviews():
 @student.route("/review/t/<task_id>/r/<review_id>", methods=["GET"])
 @login_required("student")
 def review_task(review_id, task_id):
-    if database.is_review_reviewed(task_id, session["user_id"]) is True:
+    if database.is_review_reviewed(review_id, session["user_id"]) is True:
         flash("Esa entrega ya ha sido evaluada")
         return redirect(url_for("student.reviews"))
     criteria = database.get_all_criteria_from_task(task_id)
