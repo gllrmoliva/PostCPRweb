@@ -108,6 +108,7 @@ def editcourse_post(courseid):
 @login_required("tutor")
 def task(task_id):
     # Obtenemos la tarea y los criterios de la tarea
+    # TODO ¿Agregar un campo Descripción a tabla Criterion?
     task = database.get_task(task_id)
     criteria = database.get_criteria_from_task(task)
     submissions = database.get_submissions_from_task(task)
@@ -118,6 +119,15 @@ def task(task_id):
         data.append((submission, name))
     return render_template("tutor/tasktutor.html", task=task, criteria=criteria, data = data)
 
+# Necesita método POST para modificar tasks existentes supongo?
+@tutor.route("/t/<task_id>/edit", methods=["GET"])
+@login_required("tutor")
+def edit_task(task_id):
+    # Obtenemos la tarea y los criterios de la tarea
+    task = database.get_task(task_id)
+    criteria = database.get_criteria_from_task(task)
+    
+    return render_template("tutor/tasktutor_edit.html", task=task, criteria=criteria)
 
 @tutor.route("/t/<task_id>", methods=["POST"])
 @login_required("tutor")
