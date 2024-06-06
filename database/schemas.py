@@ -83,20 +83,6 @@ class Database:
         with self.Session() as session:
             return session.query(Criterion).filter(Criterion.task_id == task_id).all()
 
-    def get_submission_from_task(self, task_id, user_id):
-        with self.Session() as session:
-            student_id = (
-                session.query(Student).filter(Student.user_id == user_id).first()
-            )
-            return (
-                session.query(Submission)
-                .filter(
-                    Submission.task_id == task_id
-                    and Submission.student_id == student_id
-                )
-                .first()
-            )
-
     def create_review(self, date, submission, user_id, is_pending=True):
         with self.Session() as session:
             review = Review(
@@ -168,18 +154,17 @@ class Database:
                 tasks.append(task)
             return tasks
 
-    def mark_submission_as_reviewed(self, task_id, user_id):
+    def mark_submission_as_reviewed(self, submission, date, teacher_score):
         with self.Session() as session:
-            student = session.query(Student).filter(Student.user_id == user_id).first()
-            submission = (
+            submission_1 = (
                 session.query(Submission)
-                .filter(
-                    Submission.student == student.student_id,
-                    Submission.task_id == task_id,
-                )
+                .filter(Submission.submission_id == submission.submission_id)
                 .first()
             )
-            return None
+            submission_1.date = date
+            submission_1.reviewed_by_teacher = "REVISADO"
+            submission_1.teacher_score = teacher_score
+            session.commit()
 
     def mark_review_as_reviewed(self, submission, user_id):
         with self.Session() as session:
@@ -224,3 +209,21 @@ class Database:
             )
             user = session.query(User).filter(User.id == student.user_id).first()
             return user.name
+
+    def get_submission(self, submission_id):
+        with self.Session() as session:
+            return (
+                session.query(Submission)
+                .filter(Submission.submission_id == submission_id)
+                .first()
+            )
+
+    def get_review_by_submission(self, submission_id, user_id):
+        with self.Session() as session:
+            return (
+                session.query(Review)
+                .filter(
+                    Review.submission_id == submission_id, Review.reviewer_id == user_id
+                )
+                .first()
+            )

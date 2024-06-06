@@ -13,6 +13,7 @@
             <th scope="col">Curso</th>
             <th scope="col">Tarea</td>
             <th scope="col">Descripción</td>
+            <th scope="col">Pendiente</td>
         </tr>
     </thead>
     <tbody>
@@ -21,7 +22,8 @@
             <th scope="row">{{course.name}}
             </th>
             <td>{{task.name}}</td>
-            <td>{{task.description}}.</td>
+            <td>{{task.description}}</td>
+            <td>{{review.is_pending}}</td>
 
         </tr>
         {% endfor %}
