@@ -145,9 +145,7 @@ def review_task_post(task_id, review_id):
     Aquí se van a subir las respuestas dadas por el estudiante para la evaluación
     """
     date1 = date.today()
-    submission = database.get_submission_from_task(
-        task_id=task_id, user_id=session["user_id"]
-    )
+    submission = database.get_submission_by_review(review_id)
     user_id = session["user_id"]
     database.mark_review_as_reviewed(submission=submission, user_id=user_id)
     request_form = request.form
@@ -155,4 +153,4 @@ def review_task_post(task_id, review_id):
     for criterion_name, score in request_form.items():
         criterion = database.get_criterion_by_name(criterion_name, task_id)
         database.create_review_criterion(review_id, criterion.criterion_id, score)
-    return "Debería retornar una vista de evaluacion valorada exitosamente con un botón a tasks o home, o algo así"
+    return redirect(url_for("student.reviews"))

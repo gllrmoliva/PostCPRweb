@@ -7,6 +7,7 @@ from database.models import engine
 from sqlalchemy.orm import sessionmaker
 from database.models import *
 from database.schemas import Database
+from datetime import date
 
 database = Database(engine)
 
@@ -104,9 +105,9 @@ def editcourse_post(courseid):
     return "se hizo una peticion post a editcurso: " + str(request_form)
 
 
-@tutor.route("/t/<task_id>", methods=["GET"])
+@tutor.route("c/<course_id>/t/<task_id>", methods=["GET"])
 @login_required("tutor")
-def task(task_id):
+def task(course_id, task_id):
     # Obtenemos la tarea y los criterios de la tarea
     task = database.get_task(task_id)
     criteria = database.get_criteria_from_task(task)
@@ -115,12 +116,78 @@ def task(task_id):
     data = []
     for submission in submissions:
         name = database.get_name_from_student(submission.student_id)
-        data.append((submission, name))
-    return render_template("tutor/tasktutor.html", task=task, criteria=criteria, data = data)
+        review_id = database.get_review_by_submission(
+            submission.submission_id, user_id=session["user_id"]
+        ).review_id
+        review = database.get_review(review_id)
+        data.append((review_id, review, submission, name))
+    course = database.get_course(course_id=course_id)
+    return render_template(
+        "tutor/tasktutor.html", course=course, task=task, criteria=criteria, data=data
+    )
 
 
-@tutor.route("/t/<task_id>", methods=["POST"])
+@tutor.route("c/<course_id>/t/<task_id>", methods=["POST"])
 @login_required("tutor")
 # TODO hacer esta ruta
 def task_post(task_id):
     return "metodo post en tasktutor"
+
+
+@tutor.route("c/<course_id>/t/<task_id>/r/<review_id>", methods=["GET"])
+@login_required("tutor")
+def submission(course_id, task_id, review_id):
+
+    task = database.get_task(task_id)
+    submission = database.get_submission_by_review(review_id)
+    course = database.get_course(course_id=course_id)
+    criteria = database.get_criteria_from_task(task)
+    if database.is_review_reviewed(review_id, session["user_id"]) is True:
+        data = []
+        flash("Esa entrega ya ha sido evaluada")
+        submissions = database.get_submissions_from_task(task)
+        for submission in submissions:
+            name = database.get_name_from_student(submission.student_id)
+            review_id = database.get_review_by_submission(
+                submission.submission_id, user_id=session["user_id"]
+            ).review_id
+            review = database.get_review(review_id)
+            data.append((review_id, review, submission, name))
+        return render_template(
+            "tutor/tasktutor.html",
+            course=course,
+            task=task,
+            criteria=criteria,
+            data=data,
+        )
+    return render_template(
+        "tutor/review.html",
+        task=task,
+        review_id=review_id,
+        submission=submission,
+        course=course,
+        criteria=criteria,
+    )
+
+
+@tutor.route("c/<course_id>/t/<task_id>/r/<review_id>", methods=["POST"])
+@login_required("tutor")
+def review_post(course_id, task_id, review_id):
+    # Información para lógica del endpoint
+    date1 = date.today()
+    submission = database.get_submission_by_review(review_id)
+    request_form = request.form
+    user_id = session["user_id"]
+    database.mark_review_as_reviewed(submission=submission, user_id=user_id)
+    print(f"request form: {request_form}")
+    teacher_score = 0
+
+    for criterion_name, score in request_form.items():
+        criterion = database.get_criterion_by_name(criterion_name, task_id)
+        database.create_review_criterion(review_id, criterion.criterion_id, score)
+        teacher_score += int(score)
+    database.mark_submission_as_reviewed(
+        submission=submission, date=date1, teacher_score=teacher_score
+    )
+
+    return redirect(url_for("tutor.task", course_id=course_id, task_id=task_id))
