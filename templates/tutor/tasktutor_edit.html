@@ -1,0 +1,107 @@
+{% extends "tutor/base.html" %}
+
+{% block addbutton %}
+<button type="button" class="btn btn-warning me-2">Editar tarea</button>
+{% endblock %}
+
+
+{% block content %}
+
+<div>
+    <h3 class="fw-bold">Editar tarea</h3>
+</div>
+
+<hr>
+
+<form role="form">
+    <!-- Campo nombre de tarea -->
+    <div class="form-group" style="margin-bottom:8px;">
+        <label for="inputEditTaskName">Nombre de la tarea</label>
+        <input type="task_name" class="form-control" id="inputEditTaskName" value="{{task.name}}">
+    </div>
+
+    <!-- Campo instrucciones -->
+    <div class="form-group" style="margin-bottom:8px;">
+        <label for="inputEditTaskInstructions">Instrucciones</label>
+        <textarea class="form-control" id="inputEditTaskInstructions" rows="3">{{task.instructions}}</textarea>
+    </div>
+
+    <!-- Aquí habrá que cambiar el formato con el que se ingresan fechas, para que no sea sólo campo de texto -->
+    <div class="form-group" style="margin-bottom:8px;">
+        <label for="inputEditTaskDeadline">Fecha de entrega</label>
+        <input class="form-control" id="inputEditTaskDeadline" value="{{task.deadline_date}}">
+    </div>
+
+    <!-- Tabla de criterios -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Criterio</th>
+                <th scope="col">Descripción</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Iterar sobre criterios de task; insertar una fila por criterio. TODO: Descripciones en db? -->
+            {% for criterion in criteria %}
+            <tr>
+                <td>{{criterion.name}}</td>
+                <td>Descripción de criterio</td>
+                <td>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#criterionEdit{{criterion.criterion_id}}">Editar</button>
+                    <button type="button" class="btn btn-danger">Eliminar</button>
+                </td>
+
+                <!-- Modal (pop-up) de edición criterio. Lo incluí dentro del for loop de Jinja para que muestre los nombres correctos en el pop-up (no sé si esto es correcto)
+                Al ID de cada modal le agregué criteiron.criterion_id al final para lograr eso (¿así cada botón Editar se mapearía a un modal distinto?)
+                -->
+                <div class="modal fade" id="criterionEdit{{criterion.criterion_id}}" tabindex="-1" role="dialog" aria-labelledby="criterionEditModalTitle" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="createcourseModalLabel">Editar criterio</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="form-group" style="margin-bottom: 16px;">
+                                        <label for="editCriterionName">Nombre del criterio</label>
+                                        <input type="criterion_name" class="form-control" id="editCriterionName" value="{{criterion.name}}">
+                                    </div>
+                                    <div class="form-group" style="margin-bottom:8px;">
+                                        <label for="editCriterionDesc">Descripción</label>
+                                        <textarea class="form-control" id="editCriterionDesc" rows="3"></textarea>
+                                    </div>
+            
+                                    <button name="action" value="create" type="submit" class="btn btn-primary">Guardar</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+    <div class="form-group" style="margin-top:16px;">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="button" class="btn btn-secondary">Cancelar</button>
+    </div>
+</form>
+
+
+{% endblock %}
+
+{% block scripts %}
+const myModal = document.getElementById('myModal')
+const myInput = document.getElementById('myInput')
+
+myModal.addEventListener('shown.bs.modal', () => {
+  myInput.focus()
+})
+
+{% endblock %}
