@@ -1,4 +1,5 @@
-{% extends "student/base.html" %}
+{% extends "tutor/base.html" %}
+
 
 {% block title %}{% endblock %}
 
@@ -16,10 +17,10 @@
     <a href="{{submission.url}}" class="d-inline">{{submission.url}}</a>
 </div>
 <hr>
-<form action="{{url_for('student.review_task_post',task_id=task.task_id,review_id=review.review_id)}}" method="POST">
+<form action="{{url_for('tutor.review_post', review_id=review_id,task_id=task.task_id,course_id=task.course_id)}}" method="POST">
     <table class="table table-bordered">
         <thead>
-            <tr>
+            <tr> 
                 <th scope="col">Criterio</th>
                 <th scope="col">Descripción</th>
                 <th scope="col" style="width: 15%;">Puntaje</th>
