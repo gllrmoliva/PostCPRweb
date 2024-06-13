@@ -5,7 +5,9 @@
 
 
 {% block addbutton %}
-<button type="button" class="btn btn-warning me-2">Editar tarea</button>
+<form  action="{{url_for('tutor.edit_task', course_id = task.course_id ,task_id = task.task_id)}}">
+<button type="submit" class="btn btn-warning me-2">Editar tarea</button>
+</form>
 {% endblock %}
 
 

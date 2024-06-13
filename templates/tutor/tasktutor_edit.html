@@ -46,7 +46,7 @@
             {% for criterion in criteria %}
             <tr>
                 <td>{{criterion.name}}</td>
-                <td>Descripción de criterio</td>
+                <td>{{criterion.description}}</td>
                 <td>
                     <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#criterionEdit{{criterion.criterion_id}}">Editar</button>
                     <button type="button" class="btn btn-danger">Eliminar</button>
@@ -87,7 +87,7 @@
 
     <hr>
 
-    <div class="form-group" style="margin-top:16px;">
+    <div class="form-group" style="margin-top:16px;" action = "{{url_for('tutor.edit_task_post', course_id = task.course_id ,task_id = task.task_id)}}">
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
         <button type="button" class="btn btn-secondary">Cancelar</button>
     </div>
