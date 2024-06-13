@@ -6,7 +6,7 @@ from database import db
 from database.models import engine
 from sqlalchemy.orm import sessionmaker
 from database.models import *
-from database.schemas import Database
+from database.functions import Database
 from datetime import date
 
 """

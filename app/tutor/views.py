@@ -6,7 +6,7 @@ import sqlite3
 from database.models import engine
 from sqlalchemy.orm import sessionmaker
 from database.models import *
-from database.schemas import Database
+from database.functions import Database
 from datetime import date
 
 database = Database(engine)
@@ -128,14 +128,19 @@ def task(course_id, task_id):
     )
 
 # Necesita método POST para modificar tasks existentes supongo?
-@tutor.route("/t/<task_id>/edit", methods=["GET"])
+@tutor.route("c/<course_id>/t/<task_id>/edit", methods=["GET"])
 @login_required("tutor")
-def edit_task(task_id):
+def edit_task(course_id, task_id):
     # Obtenemos la tarea y los criterios de la tarea
     task = database.get_task(task_id)
     criteria = database.get_criteria_from_task(task)
     
     return render_template("tutor/tasktutor_edit.html", task=task, criteria=criteria)
+
+@tutor.route("c/<course_id>/t/<task_id>/edit", methods=["POST"])
+@login_required("tutor")
+def edit_task_post(course_id, task_id):
+    return request.form
 
 @tutor.route("c/<course_id>/t/<task_id>", methods=["POST"])
 @login_required("tutor")
@@ -183,10 +188,11 @@ def submission(course_id, task_id, review_id):
 @tutor.route("c/<course_id>/t/<task_id>/r/<review_id>", methods=["POST"])
 @login_required("tutor")
 def review_post(course_id, task_id, review_id):
+    request_form = request.form
+
     # Información para lógica del endpoint
     date1 = date.today()
     submission = database.get_submission_by_review(review_id)
-    request_form = request.form
     user_id = session["user_id"]
     database.mark_review_as_reviewed(submission=submission, user_id=user_id)
     print(f"request form: {request_form}")
