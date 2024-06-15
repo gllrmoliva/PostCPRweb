@@ -23,3 +23,9 @@ class Equal_Weight:
                 reviewer = random.choice(self.students)
                 while reviewer.student_id == student.student_id:
                     reviewer = random.choice(self.students)
+
+    def final_review(self):
+        for student in self.students:
+            reviews = self.database.get_all_reviews_from_task_and_student(
+                task_id=self.task.task_id, student_id=student.student_id
+            )

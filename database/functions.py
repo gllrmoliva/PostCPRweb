@@ -227,3 +227,18 @@ class Database:
                 )
                 .first()
             )
+
+    def get_all_reviews_from_task_and_student(self, task_id, student_id):
+        with self.Session() as session:
+            submission = (
+                session.query(Submission)
+                .filter(
+                    Submission.task_id == task_id, Submission.student_id == student_id
+                )
+                .first()
+            )
+            return (
+                session.query(Review)
+                .filter(Review.submission_id == submission.submission_id)
+                .all()
+            )
