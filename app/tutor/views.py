@@ -94,15 +94,49 @@ def editcourse(courseid):
 
     tutor = database.get_user(session["user_id"])
     course = database.get_course(courseid)
-
-    return render_template("tutor/editcourse.html")
-
+    # TODO una función que me los datos de los alumnos dentro de un curso, tienen que ser los datos 
+    # guardados dentro de Usuario (nombre, id, correo, etc)
+    return render_template("tutor/editcourse.html", course = course)
 
 @tutor.route("/c/<int:courseid>/edit", methods=["POST"])
 @login_required("tutor")
 def editcourse_post(courseid):
-    request_form = request.form()
-    return "se hizo una peticion post a editcurso: " + str(request_form)
+
+    tutor = database.get_user(session["user_id"])
+    course = database.get_course(courseid)
+
+    request_form = request.form
+
+    if request_form["form_type"] == "add_student":
+
+        email = request_form["email"]
+        # TODO: Aquí deberia exitir una función que añada un usuario a un curso, si el usuario existe 
+        # dentro de la DB, que lo añada y retorne true, si no existe que retorne False. Esto para más adelante 
+        # tirar un error si no se pudo añadir al usuario porque no existe. Notar que a un usuario no se le 
+        # puede añadir dos veces al mismo curso y que cuando se añade un usuario cuando ya hay tareas creadas, al
+        # nuevo usuario se le deben agregar las tarea del curso. Esto igualmente podria crear errores si la tarea ya tiene un 
+        # tiempo limite, igualmente ver :)
+        flash("DEBUG: Se agrego un nuevo usuario")
+        return redirect(url_for("tutor.editcourse", courseid=courseid))
+
+    elif request_form["form_type"] == "delete_student":
+        email = request_form["email"]
+        # TODO: Aquí borrar al usuario del curso y todo lo relacionado entremedio
+
+        flash(f"DEBUG: El usuario {email} se ha eliminado del curso")
+        return redirect(url_for("tutor.editcourse", courseid=courseid))
+
+    elif request_form["form_type"] == "edit_course_name":
+        # TODO: Aquí se deberia cambiar el nombre del curso, dentro de la DB 
+        # Manejar cuando hayan dos cursos con nombre igual¿? y cuando se ponga el mismo nombre al curso otra vez
+
+        new_name = request_form["course_name"]
+
+        flash(f"DEBUG: el curso ha cambiado de nombre a {new_name}")
+        return redirect(url_for("tutor.editcourse", courseid=courseid))
+
+    return "se hizo una péticion post en editcourse y paso algo raro: " + str(request_form)
+
 
 
 @tutor.route("c/<course_id>/t/<task_id>", methods=["GET"])
