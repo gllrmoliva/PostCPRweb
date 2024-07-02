@@ -68,9 +68,11 @@ def task(task_id):
     porque se excedio el tiempo limite.
     """
 
+    # TODO: las tareas no tienen estado, deberian tener estados: Submitted, Not Submitted, Pending y Reviewed
+
     task = database.get_task(task_id)
 
-    print(f"TASK: {task}")
+    print(f"TASK: {str(task)}")
     # Esto ahora mismo muestra distintas cosas dependiento del estado
     # estos son : entregado, no entregado, pendiente, evaluado
     return render_template("student/uploadtask.html", task=task, estado="evaluado")
@@ -103,6 +105,9 @@ def task_post(task_id):
 @student.route("/reviews", methods=["GET"])
 @login_required("student")
 def reviews():
+    # Se pasan todas las review que review que tiene que revisar un usuario (estudiante). 
+    # además de los atributos, Igual tengo una duda: ¿los review no guardan por defecto su curso dentro de los 
+    # atributos?
     reviews_to_review = database.get_reviews_to_review(session["user_id"])
     tasks_to_review = database.get_tasks_to_review(reviews_to_review)
     data = []

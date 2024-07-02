@@ -13,12 +13,13 @@
             <th scope="col">Curso</th>
             <th scope="col">Tarea</td>
             <th scope="col">Descripción</td>
-            <th scope="col">Pendiente</td>
         </tr>
     </thead>
     <tbody>
         {% for (review, task, course) in data %}
-        <tr onclick="window.location='{{url_for('student.review_task', task_id=task.task_id, review_id=review.review_id)}}';" style="cursor: pointer;">
+        {% if review.is_pending == true %}
+        <tr onclick="window.location='{{url_for('student.review_task', task_id=task.task_id, review_id=review.review_id)}}';"
+            style="cursor: pointer;">
             <th scope="row">{{course.name}}
             </th>
             <td>{{task.name}}</td>
@@ -26,6 +27,7 @@
             <td>{{review.is_pending}}</td>
 
         </tr>
+        {% endif %}
         {% endfor %}
 
     </tbody>
