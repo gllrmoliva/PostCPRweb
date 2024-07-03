@@ -159,3 +159,20 @@ def review_task_post(task_id, review_id):
         criterion = database.get_criterion_by_name(criterion_name, task_id)
         database.create_review_criterion(review_id, criterion.criterion_id, score)
     return redirect(url_for("student.reviews"))
+
+@student.route("/grades", methods=["GET"])
+@login_required("student")
+def grades():
+    """
+    En esta vista se mostraran las calificaciones obtenidas por un estudiante
+    """
+
+    student = database.get_user(session["user_id"])
+
+    courses = database.get_courses_from_student(student)
+    # Esto es cerdo pero weno
+    tasks = {}
+    for course in courses:
+        tasks[course.course_id] = database.get_tasks_from_course(course)
+
+    return render_template("student/grades.html",courses = courses, tasks = tasks)

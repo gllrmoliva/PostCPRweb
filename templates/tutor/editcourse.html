@@ -4,14 +4,6 @@
 {% block title %}{{course.name}}{% endblock %}
 
 {% block content %}
-Aquí se deberian poder editar los cursos:
-- Cambiar nombre del curso
-- Que se muestren los alumnos dentro del curso, al lado de cada usuario se deberian mostrar
-un boton eliminar este permite eliminar al usuario (obvio)
-- Agregar Usuarios esto puede ser una modal view en el que se tenga que añadir el correo del alumno, tendra que ser uno
-porque sino se peta (quizas en futuro que sea correos separados por comas¿¿??)
-<hr>
-
 <form action="{{ url_for('tutor.editcourse_post', courseid=course.course_id) }}" method="post">
 
     <div class="mb-3 d-flex align-items-center"> <!-- Utilizamos d-flex para hacer los elementos en línea -->
