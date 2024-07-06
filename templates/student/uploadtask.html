@@ -46,11 +46,10 @@
 
     </div>
     <div class="text-end my-3">
-        <<<<<<< HEAD <a href="{{url_for('student.coursestudent', courseid = task.course_id)}}"=======<a
-            href="{{url_for('student.course', courseid = task['course_id'])}}">>>>>>> develop-sprint2
+        <a href="{{url_for('student.course', courseid = task['course_id'])}}"
             class="btn btn-warning btn-md ">Cancelar</a>
 
-            <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
+        <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
     </div>
 </form>
 {% endif %}
@@ -75,7 +74,7 @@
     <div class="form-floating">
 
         <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
-            disabled>aquí debe ir lo que entrego el estudiante</textarea>
+            disabled>{{submission.url}}</textarea>
 
         <label for="floatingTextarea">url de tu entrega.</label>
     </div>

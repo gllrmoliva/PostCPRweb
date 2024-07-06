@@ -70,10 +70,30 @@ def task(task_id):
 
     task = database.get_task(task_id)
 
+    student_as_user_id = session["user_id"]
+    submissions = database.get_submissions_from_task(task)
+    task_has_been_submited = False
+
+    for s in submissions:
+        temp = database.get_student_as_user_from_submission(s)
+
+        if (student_as_user_id == temp.id):
+            submission = s
+            task_has_been_submited = True
+    
     print(f"TASK: {task}")
-    # Esto ahora mismo muestra distintas cosas dependiento del estado
-    # estos son : entregado, no entregado, pendiente, evaluado
-    return render_template("student/uploadtask.html", task=task, estado="evaluado")
+
+    # Caso 1: No entregado                  TO-DO
+    if (task_has_been_submited == False):
+        print("Ooops")
+
+    # Caso 2 y 3: Entregado
+    else:
+        # Caso 2: Entregado y no revisado   TO-DO
+
+        # Caso 3: Entregado y revisado
+        return render_template("student/uploadtask.html", task=task, submission=submission,  estado="evaluado")
+
 
 
 @student.route("/c/<courseid>", methods=["POST"])

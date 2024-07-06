@@ -217,6 +217,15 @@ class Database:
                 .filter(Submission.submission_id == submission_id)
                 .first()
             )
+    
+    ## el mati
+    def get_student_as_user_from_submission(self, submission):
+        with self.Session() as session:
+            student = (
+                session.query(Student).filter(Student.student_id == submission.student_id).first()
+            )
+            user = session.query(User).filter(User.id == student.user_id).first()
+            return user
 
     def get_review_by_submission(self, submission_id, user_id):
         with self.Session() as session:
