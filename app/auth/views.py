@@ -31,6 +31,8 @@ def signin():
             return redirect(url_for("tutor.home"))
         elif session["user_type"] == "student":
             return redirect(url_for("student.home"))
+        elif session["user_type"] == 'admin':
+            return redirect(url_for("admin.home"))
 
     return render_template("signin.html")
 
@@ -51,7 +53,14 @@ def signin_post():
         # Si el usuario no existe o la contraseña no es la misma que en la base de datos
         # renderizamos signin.html, pero esta vez mostrando un mensaje, esto lo hacemos a traves del comando
         # flash, el cual luego es manejado en el html con jinja
-        if not user or not (user.password == password):
+
+        #FIXME: Por ahora los datos de admin estan en el codigo (muy mal)
+        if email == "admin@admin.com" and password == "admin":
+                session["user_id"] = -1 
+                session["user_type"] = "admin"
+                return redirect(url_for("admin.home"))
+
+        elif not user or not (user.password == password):
             flash("Email o Contraseña equivocado, intente con otro")
             return redirect(url_for("auth.signin"))
         else:

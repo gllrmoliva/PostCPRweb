@@ -1,0 +1,103 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<!--
+TODO:
+Aquí se deberia:
+- Añadir nuevos usuarios:
+    - Dar rango a usuarios: Estudiante / Tutor, por defecto debe ser Estudiante
+    - Quizas al imprimir los usuarios imprimir a los profesores primero y despues a los estudiantes
+    - Seria bueno que las contraseñas iniciales 
+
+- Modificar el rango de usuarios:
+    - Se debe poder cambiar entre Tutor y Estudiante, posiblemente un seleccionable
+
+- Eliminar Usuarios:
+    - Al eliminar los usuarios de deberian eliminar todas las relaciones que tengan que ver con este.
+
+- Algun botón para restablecer la contraseña (Dejaria la misma contraseña inicial), esto por si un usuario 
+se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña a todas las vistas (menos Admin)"
+
+-->
+
+<!-- ventana emergente para añadir usuario(modal window)-->
+<div class="modal fade" id="newuserModal" tabindex="-1" aria-labelledby="newuserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="newuserModalLabel">Crear Usuario</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="#" method="post">
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="new_user_name" name="name" required>
+                        <label for="new_user_name">Nombre</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="new_user_mail" name="mail" required>
+                        <label for="new_user_mail">Correo</label>
+                    </div>
+
+                    <input type="hidden" name="form_type" value="create_new_user">
+                    <button name="action" value="create" type="submit" class="btn btn-primary">Crear</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="d-flex justify-content-between">
+    <h1>Usuarios</h1>
+    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newuserModal">Crear
+        Usuario
+    </button>
+</div>
+<hr>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Correo</th>
+            <th scope="col" style="width: 570px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th class="align-middle" scope="row">1</th>
+            <td class="align-middle">Juanito alimaña</td>
+            <td class="align-middle">mail@mail.com</td>
+            <td class="align-middle">
+                <form action="{{url_for('admin.home_post')}}" method="post">
+
+                    <!--Checkbox reestablecer contraseña-->
+                    <input class="form-check-input align-middle" type="checkbox" name="reset_password"
+                        id="flexCheckDefault">
+                    <label class="form-check-label align-middle" for="flexCheckDefault">
+                        Restablecer contraseña
+                    </label>
+
+                    <!--selector entre estudiante o usuario-->
+                    <select class="mx-2 align-middle" style="width: 150px;" name="user_type">
+                        <!--TODO: esto sirve para mostrar si es student o tutor-->
+                        <option value="student" {% if 1==1 %}selected{% endif %}>Estudiante</option>
+                        <option value="tutor" {% if 1==1 %}selected{% endif %}>Tutor</option>
+                    </select>
+
+                    <!-- Botones Modificar/Eliminar-->
+                    <button type="submit" name="modify" class="btn btn-primary">Modificar</button>
+                    <button type="submit" name="delete" class="btn btn-danger">Eliminar</button>
+
+                    <!-- Variables ocultar para utilizar en post-->
+                    <input type="hidden" name="form_type" value="edit_user">
+                    <input type="hidden" name="user_id" value="ID DEL USUARIO">
+
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}
