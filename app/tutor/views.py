@@ -82,7 +82,12 @@ def course_post(courseid):
 
         name = request_form["name"]
         instructions = request_form["instructions"]
+        date = request_form["date"]
+        deadline = request_form["deadline"]
+        #TODO: al crear una tarea se debe añadir una fecha de entrega y una fecha limite de revision
+        # El formato de estas es: YYYY-MM-DD
         database.create_task(name, instructions, course)
+
         return redirect(url_for("tutor.course", courseid=courseid))
 
     return "se hizo una peticion post a course (tutor): " + str(request_form)
