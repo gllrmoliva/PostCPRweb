@@ -53,17 +53,17 @@
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Correo</th>
-            <th scope="col"></th>
+            <th scope="col" style="width: 100px;"></th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <th scope="row">1</th>
-            <td>STUDENT</td>
-            <td>student1@mail.com</td>
-            <td>
+            <th scope="row" class="align-middle">1</th>
+            <td class="align-middle">STUDENT</td>
+            <td class="align-middle">student1@mail.com</td>
+            <td class="align-middle">
                 <form action="{{ url_for('tutor.editcourse_post', courseid=course.course_id) }}" method="post">
-                    <button type="submitt" class="btn btn-danger">Eliminar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
                     <input type="hidden" name="form_type" value="delete_student">
                     <input type="hidden" name="email" value="EMAIL DE USUARIO">
                 </form>
