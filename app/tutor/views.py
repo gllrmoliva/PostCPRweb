@@ -154,6 +154,7 @@ def task(course_id, task_id):
     submissions = database.get_submissions_from_task(task)
     print(f"TASK: {task}")
     data = []
+
     for submission in submissions:
         name = database.get_name_from_student(submission.student_id)
         review_id = database.get_review_by_submission(
@@ -161,10 +162,25 @@ def task(course_id, task_id):
         ).review_id
         review = database.get_review(review_id)
         data.append((review_id, review, submission, name))
+
     course = database.get_course(course_id=course_id)
+
     return render_template(
         "tutor/tasktutor.html", course=course, task=task, criteria=criteria, data=data
     )
+
+@tutor.route("/post/t/", methods=["POST"])
+@login_required("tutor")
+# TODO hacer esta ruta
+def task_post():
+    form = request.form
+    if form['action'] == 'calculate_grades':
+        # Agregar aquí función que calcula las notas con el algoritmo
+        flash(f"DEBUG: Las notas han sido calculadas {str(form)}")
+        pass
+    return redirect(url_for('tutor.task', course_id = form['course_id'], task_id = form['task_id']))
+
+
 
 # Necesita método POST para modificar tasks existentes supongo?
 @tutor.route("c/<course_id>/t/<task_id>/edit", methods=["GET"])
@@ -181,11 +197,6 @@ def edit_task(course_id, task_id):
 def edit_task_post(course_id, task_id):
     return request.form
 
-@tutor.route("c/<course_id>/t/<task_id>", methods=["POST"])
-@login_required("tutor")
-# TODO hacer esta ruta
-def task_post(task_id):
-    return "metodo post en tasktutor"
 
 
 @tutor.route("c/<course_id>/t/<task_id>/r/<review_id>", methods=["GET"])
@@ -196,24 +207,12 @@ def submission(course_id, task_id, review_id):
     submission = database.get_submission_by_review(review_id)
     course = database.get_course(course_id=course_id)
     criteria = database.get_criteria_from_task(task)
+
     if database.is_review_reviewed(review_id, session["user_id"]) is True:
         data = []
         flash("Esa entrega ya ha sido evaluada")
-        submissions = database.get_submissions_from_task(task)
-        for submission in submissions:
-            name = database.get_name_from_student(submission.student_id)
-            review_id = database.get_review_by_submission(
-                submission.submission_id, user_id=session["user_id"]
-            ).review_id
-            review = database.get_review(review_id)
-            data.append((review_id, review, submission, name))
-        return render_template(
-            "tutor/tasktutor.html",
-            course=course,
-            task=task,
-            criteria=criteria,
-            data=data,
-        )
+        return redirect(url_for("tutor.task",course_id=course_id,task_id = task_id))
+
     return render_template(
         "tutor/review.html",
         task=task,
