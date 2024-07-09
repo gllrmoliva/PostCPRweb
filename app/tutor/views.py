@@ -194,8 +194,42 @@ def edit_task(course_id, task_id):
 
 @tutor.route("c/<course_id>/t/<task_id>/edit", methods=["POST"])
 @login_required("tutor")
-def edit_task_post(course_id, task_id):
-    return request.form
+def edit_task_post(course_id, task_id): 
+
+    lista_debug = []
+        # Obtener los datos del formulario
+    task_name = request.form.get('task_name')
+    task_instructions = request.form.get('task_instructions')
+    deadline_date = request.form.get('deadline_date')
+    review_deadline_date = request.form.get('review_deadline_date')
+
+    # Recuperamos los criterios que hay en la tarea
+    task = database.get_task(task_id)
+    criteria = database.get_criteria_from_task(task)
+
+    # Editar los criterios existentes
+    for criterion in criteria:
+        if request.form.get(f'delete_criterion_{criterion.criterion_id}') == "1":
+            # AQUI SE DEBERIA ELIMINAR EL CRITERIO DE LA BASE DE DATOS
+            pass
+        else:
+            criterion_name = request.form.get(f'criterion_name_{criterion.criterion_id}')
+            criterion_description = request.form.get(f'criterion_description_{criterion.criterion_id}')
+            lista_debug.append([criterion_name,criterion_description])
+            # Actualizar el criterio en la base de datos
+            # Aquí actualizar en base de datos
+    
+    # Crear nuevos criterios
+    new_criterion_names = request.form.getlist('new_criterion_name[]')
+    new_criterion_descriptions = request.form.getlist('new_criterion_description[]')
+
+    for name, description in zip(new_criterion_names, new_criterion_descriptions):
+        if name and description:  # Asegurarse de que no estén vacíos
+            lista_debug.append([name,description])
+            # Aqui crear criterio en base de datos
+            pass
+    
+    return f"Los criterios ahora son: {str(lista_debug)}"
 
 
 

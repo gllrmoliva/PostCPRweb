@@ -15,7 +15,9 @@
 
 <hr>
 
-<form role="form">
+<form role="form" action="{{ url_for('tutor.edit_task_post', course_id=task.course_id, task_id=task.task_id) }}"
+    method="post">
+
     <!-- Campo nombre de tarea -->
     <div class="form-group" style="margin-bottom:8px;">
         <label for="inputEditTaskName">Nombre de la tarea</label>
@@ -30,13 +32,14 @@
 
     <div class="form-group" style="margin-bottom:8px;">
         <label for="new_task_date">Fecha de entrega</label>
-        <input type="date" class="form-control" id="new_task_date" name="date" value="{{ task.deadline_date }}"
+        <input type="date" class="form-control" id="new_task_date" name="deadline_date" value="{{ task.deadline_date }}"
             required>
     </div>
 
     <div class="form-group" style="margin-bottom:8px;">
-        <label for="new_task_date">Fecha límite de revisión</label>
-        <input type="date" class="form-control" id="new_task_date" name="date" value="AQUI DEBE IR FECHA" required>
+        <label for="new_deadline_date">Fecha límite de revisión</label>
+        <input type="date" class="form-control" id="new_deadline_date" name="review_deadline_date"
+            value="AQUI DEBE IR FECHA" required>
     </div>
     <!-- Tabla de criterios -->
     <table class="table table-bordered">
@@ -44,58 +47,33 @@
             <tr>
                 <th scope="col">Criterio</th>
                 <th scope="col">Descripción</th>
-                <th class="justify-content-center" scope="col" style="width: 200px;"></th>
+                <th class="justify-content-center" scope="col" style="width: 100px;"></th>
             </tr>
         </thead>
         <tbody>
             <!-- Iterar sobre criterios de task; insertar una fila por criterio. TODO: Descripciones en db? -->
             {% for criterion in criteria %}
             <tr>
-                <td>{{criterion.name}}</td>
-                <td>{{criterion.description}}</td>
-                <td>
-                    <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                        data-bs-target="#criterionEdit{{criterion.criterion_id}}">Editar</button>
-                    <button type="button" class="btn btn-danger">Eliminar</button>
+                <td class="align-middle">
+                    <input type="text" class="form-control" name="criterion_name_{{ criterion.criterion_id }}"
+                        value="{{ criterion.name }}">
                 </td>
-
-                <!-- Modal (pop-up) de edición criterio. Lo incluí dentro del for loop de Jinja para que muestre los nombres correctos en el pop-up (no sé si esto es correcto)
-                Al ID de cada modal le agregué criteiron.criterion_id al final para lograr eso (¿así cada botón Editar se mapearía a un modal distinto?)
-                -->
-                <div class="modal fade" id="criterionEdit{{criterion.criterion_id}}" tabindex="-1" role="dialog"
-                    aria-labelledby="criterionEditModalTitle" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="createcourseModalLabel">Editar criterio</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form>
-                                    <div class="form-group" style="margin-bottom: 16px;">
-                                        <label for="editCriterionName">Nombre del criterio</label>
-                                        <input type="criterion_name" class="form-control" id="editCriterionName"
-                                            value="{{criterion.name}}">
-                                    </div>
-                                    <div class="form-group" style="margin-bottom:8px;">
-                                        <label for="editCriterionDesc">Descripción</label>
-                                        <textarea class="form-control" id="editCriterionDesc" rows="3"></textarea>
-                                    </div>
-
-                                    <button name="action" value="create" type="submit"
-                                        class="btn btn-primary">Guardar</button>
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Cerrar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <td>
+                    <textarea class="form-control" name="criterion_description_{{ criterion.criterion_id }}"
+                        rows="3">{{ criterion.description }}</textarea>
+                </td>
+                <td class="align-middle">
+                    <button type="button" class="btn btn-danger" onclick="markForDeletion(this)">Eliminar</button>
+                    <input type="hidden" name="delete_criterion_{{ criterion.criterion_id }}" value="0">
+                </td>
             </tr>
             {% endfor %}
         </tbody>
+
     </table>
+    <!--Aquí va el botoón-->
+    <button type="button" class="btn btn-success" id="addCriterionBtn">Agregar criterio</button>
+
 
     <hr>
 
@@ -110,13 +88,38 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    const myModal = document.getElementById('myModal')
-    const myInput = document.getElementById('myInput')
 
-    myModal.addEventListener('shown.bs.modal', () => {
-        myInput.focus()
-    })
+<script>
+    document.getElementById('addCriterionBtn').addEventListener('click', function () {
+        // Crear una nueva fila
+        var table = document.querySelector('.table tbody');
+        var newRow = document.createElement('tr');
+
+        newRow.innerHTML = `
+            <td class="align-middle"><input type="text" class="form-control" name="new_criterion_name[]" placeholder="Nombre del criterio"></td>
+            <td class="align-middle"><textarea class="form-control" name="new_criterion_description[]" placeholder="Descripción"></textarea></td>
+            <td class="align-middle">
+                <button type="button" class="btn btn-danger btn-remove">Eliminar</button>
+            </td>
+        `;
+
+        // Agregar la nueva fila a la tabla
+        table.appendChild(newRow);
+
+        // Agregar evento de eliminar fila
+        newRow.querySelector('.btn-remove').addEventListener('click', function () {
+            newRow.remove();
+        });
+    });
+</script>
+
+<script>
+    function markForDeletion(button) {
+        var row = button.closest('tr');
+        var hiddenInput = row.querySelector('input[type="hidden"]');
+        hiddenInput.value = "1"; // Marcar para eliminar
+        row.style.display = 'none'; // Opcional: ocultar visualmente la fila
+    }
 </script>
 
 {% endblock %}
