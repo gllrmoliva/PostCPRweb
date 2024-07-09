@@ -71,7 +71,7 @@
         </tbody>
 
     </table>
-    <!--Aquí va el botoón-->
+    <!--Aquí va el botón-->
     <button type="button" class="btn btn-success" id="addCriterionBtn">Agregar criterio</button>
 
 
@@ -80,7 +80,8 @@
     <div class="form-group" style="margin-top:16px;"
         action="{{url_for('tutor.edit_task_post', course_id = task.course_id ,task_id = task.task_id)}}">
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <button type="button" class="btn btn-secondary">Cancelar</button>
+        <a class="btn btn-secondary"
+            href="{{url_for('tutor.task',course_id = task.course_id, task_id = task.task_id )}}">Cancelar</a>
     </div>
 </form>
 

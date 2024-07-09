@@ -190,7 +190,7 @@ def edit_task(course_id, task_id):
     task = database.get_task(task_id)
     criteria = database.get_criteria_from_task(task)
     
-    return render_template("tutor/tasktutor_edit.html", task=task, criteria=criteria)
+    return render_template("tutor/tasktutor_edit.html",task=task, criteria=criteria)
 
 @tutor.route("c/<course_id>/t/<task_id>/edit", methods=["POST"])
 @login_required("tutor")
