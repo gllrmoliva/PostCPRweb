@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Cuenta{% endblock %}
+{% block content %}
+<h2 class="mb-4">Ajustes de Cuenta</h2>
+<div class="card">
+    <div class="card-header">
+        Información de Usuario
+    </div>
+    <div class="card-body">
+        <form action="" method="post">
+
+            <div class="form-group my-1">
+                <label for="username">Nombre de Usuario</label>
+                <input type="text" class="form-control" name="username" id="username" placeholder="Nombre de Usuario"
+                    value="usuario_actual">
+            </div>
+
+            <div class="form-group my-1">
+                <label for="email">Correo Electrónico</label>
+                <input type="email" class="form-control" name="email" id="email" placeholder="Correo Electrónico"
+                    value="correo@ejemplo.com" readonly>
+            </div>
+
+            <div class="form-group my-1">
+                <label for="currentPassword">Contraseña Actual</label>
+                <input type="password" class="form-control" name="currentPassword" id="currentPassword"
+                    placeholder="Contraseña Actual" required>
+            </div>
+
+            <div class="form-group my-1">
+                <label for="newPassword">Nueva Contraseña</label>
+                <input type="password" class="form-control" name="newPassword" id="newPassword"
+                    placeholder="Nueva Contraseña">
+            </div>
+
+            <div class="form-group my-1">
+                <label for="confirmPassword">Confirmar Nueva Contraseña</label>
+                <input type="password" class="form-control" name="confirmPassword" id="confirmPassword"
+                    placeholder="Confirmar Nueva Contraseña">
+            </div>
+
+            <div class="my-3">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <a href="/" class="btn btn-secondary">Volver</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}

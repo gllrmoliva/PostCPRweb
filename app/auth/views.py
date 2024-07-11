@@ -97,3 +97,25 @@ def logout():
     session.clear()
     flash("Sesión cerrada correctamente.", "info")
     return redirect(url_for("auth.signin"))
+
+
+# Ruta a la que se accede cuando se quiere cerrar sesión
+@auth.route("/account", methods = ['GET'])
+def account():
+    if "user_type" in session and "user_id" in session:
+        return render_template("account.html")
+    else:
+        flash("Para acceder a esta página debes iniciar sesión")
+
+    return redirect(url_for("auth.signin"))
+
+@auth.route("/account", methods = ['POST'])
+def account_post():
+    """
+    La contraseña se debe cambiar solo si la contraseña vieja es la que esta en el sistema, sino debe tirar error
+    Si nueva contraseña se deja en blanco no se cambia la contraseña. Además de la contraseña solo el nombre de usuario
+    se debe cambiar.
+    """
+    
+    form = request.form
+    return str(form)
