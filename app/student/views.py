@@ -2,11 +2,9 @@ from . import student
 from flask import render_template, request, redirect, url_for, session, flash
 
 from login_required import login_required
-from database import db
-from database.models import engine
 from sqlalchemy.orm import sessionmaker
-from database.models import *
-from database.functions import Database
+from database.model import *
+from database.studentdatabase import StudentDatabase
 from datetime import date
 
 """
@@ -16,48 +14,41 @@ Ir a la vision de cursos, ir a la vision de evaluaciones (probablemente tambien 
 ver las evaluaciones dentro de cada curso, tipo seccion de evaluaciones INFODA)
 """
 
-database = Database(engine)
-
+database = StudentDatabase()
+database.init()
 
 @student.route("/", methods=["GET"])
-@login_required("student")
+@login_required("STUDENT")
 def home():
-    user = database.get_user(session["user_id"])
     """
     Aquí se muestran los cursos a los que pertenece el estudiante, en esta pagina se debe:
     - Entrar a los cursos a los que pertenece el estudiante
     """
 
-    # aqui tambien obtenemos los cursos del estudiante
-    courses = database.get_courses_from_student(user)
+    student = database.set_student(session["user_id"])
 
-    # Esto no estaba antes (gllrm)
-    for course in courses:
-        print(f"{course}")
-        course.tutor_name = database.get_user(course.tutor_id).name
-
-    return render_template("student/home.html", courses=courses)
+    return render_template("student/home.html", courses=student.courses)
 
 
-@student.route("/c/<courseid>", methods=["GET"])
-@login_required("student")
-def course(courseid):
+@student.route("/c/<course_id>", methods=["GET"])
+@login_required("STUDENT")
+def course(course_id):
     """
     En esta pagina se muestran las tareas dentro de un curso seleccionado en la ruta homestudent,
     ademas estas tareas muestran su fecha limite de entrega y estado. Las tareas son clickables y
     te llevan a la pagina de la tarea (ruta: task_student)
     """
 
-    student = database.get_user(session["user_id"])
-    course = database.get_course(courseid)
+    student = database.set_student(session["user_id"])
+    course = database.get_from_id(Course, course_id)
 
-    tasks = database.get_tasks_from_course(course)
-
-    return render_template("student/course.html", course=course, tasks=tasks)
+    return render_template("student/course.html",
+                           course=course,
+                           task_completion_status=database.task_completion_status)
 
 
 @student.route("/t/<task_id>", methods=["GET"])
-@login_required("student")
+@login_required("STUDENT")
 def task(task_id):
     """
     En esta ruta, se muestra la tarea del usuario. Aquí el usuario puede:
@@ -68,41 +59,27 @@ def task(task_id):
     porque se excedio el tiempo limite.
     """
 
-    task = database.get_task(task_id)
+    student = database.set_student(session["user_id"])
+    task = database.get_from_id(Task, task_id)
+    state = database.task_completion_status(task)
+    submission = database.get_submission(task)
 
-    student_as_user_id = session["user_id"]
-    submissions = database.get_submissions_from_task(task)
-    task_has_been_submited = False
-
-    for s in submissions:
-        temp = database.get_student_as_user_from_submission(s)
-
-        if (student_as_user_id == temp.id):
-            submission = s
-            task_has_been_submited = True
-    
-    print(f"TASK: {task}")
-
-    # Caso 1: No entregado                  TO-DO
-    if (task_has_been_submited == False):
-        print("Ooops")
-
-    # Caso 2 y 3: Entregado
-    else:
-        # Caso 2: Entregado y no revisado   TO-DO
-
-        # Caso 3: Entregado y revisado
-        return render_template("student/uploadtask.html", task=task, submission=submission,  estado="evaluado")
+    # TODO : Los siguientes estados: 
+    # REVISADO
+    return render_template("student/uploadtask.html",
+                           task=task,
+                           submission=submission,
+                           estado=state,
+                           task_max_score=database.task_max_score(task))
 
 
 
-@student.route("/c/<courseid>", methods=["POST"])
-@login_required("student")
-def course_post(courseid):
+@student.route("/c/<course_id>", methods=["POST"])
+@login_required("STUDENT")
+def course_post(course_id):
 
-    # Accedemos a la base de datos
-    student = database.get_user(session["user_id"])
-    course = database.get_course(courseid)
+    # ¿cuando accedemos a aca?? - mati
+    print("Holaaaaaaaaaaaaaaa!!!")
 
     # puede que esta ruta no sea necesaria, ya que redirigimos a los cursos a traves de href en
     # html
@@ -110,18 +87,30 @@ def course_post(courseid):
 
 
 @student.route("/t/<task_id>", methods=["POST"])
-@login_required("student")
+@login_required("STUDENT")
 def task_post(task_id):
     """
     En esta ruta se manejara como se añadiran los datos que ofrecio el usuario en el formulario al
     entregar la tarea a la base de datos.
     """
 
-    return "metodo post en taskstudent"
+    # Obtenemos las variables a usar
+    student = database.set_student(session["user_id"])
+    task = database.get_from_id(Task, task_id)
+    request_form = request.form
+    submission_url = request_form['submission_url']
+
+    # Ingresamos la tarea a la base de datos
+    new_submission = Submission(url=submission_url, student=student, task=task) # TODO: añadir fecha
+    database.add(new_submission)
+    database.commit_changes()
+
+    flash("Tarea entregada exitosamente.")
+    return redirect(url_for('student.course', course_id=task.course.id))
 
 
 @student.route("/reviews", methods=["GET"])
-@login_required("student")
+@login_required("STUDENT")
 def reviews():
     reviews_to_review = database.get_reviews_to_review(session["user_id"])
     tasks_to_review = database.get_tasks_to_review(reviews_to_review)
@@ -140,7 +129,7 @@ def reviews():
 
 # La variable task id se va a entregar cuando se redirija desde otra pagina
 @student.route("/review/t/<task_id>/r/<review_id>", methods=["GET"])
-@login_required("student")
+@login_required("STUDENT")
 def review_task(review_id, task_id):
     if database.is_review_reviewed(review_id, session["user_id"]) is True:
         flash("Esa entrega ya ha sido evaluada")
@@ -159,7 +148,7 @@ def review_task(review_id, task_id):
 
 
 @student.route("/review/t/<task_id>/r/<review_id>", methods=["POST"])
-@login_required("student")
+@login_required("STUDENT")
 def review_task_post(task_id, review_id):
     """
     Aquí se van a subir las respuestas dadas por el estudiante para la evaluación

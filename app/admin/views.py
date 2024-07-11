@@ -1,7 +1,6 @@
 from . import admin
 from flask import render_template, request, redirect, url_for, session, flash
 from login_required import login_required
-from database import db
 
 """
 Todas las rutas que están aquí tienen el prefijo "/admin"

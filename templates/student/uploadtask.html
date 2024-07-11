@@ -19,7 +19,7 @@
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Puntos:</span>
         <!--Ver como se llama esto en el diccionario-->
-        <span class="d-inline">placeholder</span>
+        <span class="d-inline">{{task_max_score}}</span>
     </div>
 
     <div class="col-auto mr-5">
@@ -35,18 +35,18 @@
 <p>{{task.instructions}}</p>
 
 
-{% if estado == 'pendiente' %}
-<form action="{{url_for('student.task_post',task_id=task['id'])}}" method="post">
+{% if estado == 'PENDIENTE' %}
+<form action="{{url_for('student.task_post',task_id=task.id)}}" method="post">
     <div class="form-floating">
 
-        <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
+        <textarea class="form-control" name="submission_url" id="floatingTextarea" style="height: 200px; resize: none;"
             required></textarea>
 
         <label for="floatingTextarea">Ingresa aquí el url de tu entrega.</label>
 
     </div>
     <div class="text-end my-3">
-        <a href="{{url_for('student.course', courseid = task['course_id'])}}"
+        <a href="{{url_for('student.course', course_id = task.course.id)}}"
             class="btn btn-warning btn-md ">Cancelar</a>
 
         <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
@@ -54,26 +54,26 @@
 </form>
 {% endif %}
 
-{% if estado == 'entregado' or estado == 'no entregado'%}
-<form action="{{url_for('student.task_post',task_id=task['id'])}}">
+{% if estado == 'ENVIADO'%}
+<form action="{{url_for('student.task_post',task_id=task.id)}}">
     <div class="form-floating">
 
-        <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
-            disabled>aquí debe ir lo que entrego el estudiante</textarea>
+        <textarea class="form-control" name="submission_url" id="floatingTextarea" style="height: 200px; resize: none;"
+            disabled>{{submission.url}}</textarea>
 
         <label for="floatingTextarea">url de tu entrega.</label>
     </div>
 </form>
 <div class="text-end my-3">
-    <a href="{{url_for('student.course', courseid = task['course_id'])}}" class="btn btn-primary btn-md">Volver</a>
+    <a href="{{url_for('student.course', course_id = task.course.id)}}" class="btn btn-primary btn-md">Volver</a>
 </div>
 {% endif %}
 
-{% if estado == 'evaluado'%}
-<form action="{{url_for('student.task_post',task_id=task['id'])}}">
+{% if estado == 'REVISADO'%}
+<form action="{{url_for('student.task_post',task_id=task.id)}}">
     <div class="form-floating">
 
-        <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
+        <textarea class="form-control" name="submission_url" id="floatingTextarea" style="height: 200px; resize: none;"
             disabled>{{submission.url}}</textarea>
 
         <label for="floatingTextarea">url de tu entrega.</label>
@@ -125,7 +125,7 @@
 </div>
 
 <div class="text-end my-3">
-    <a href="{{url_for('student.course', courseid = task['course_id'])}}" class="btn btn-primary btn-md">Volver</a>
+    <a href="{{url_for('student.course', course_id = task.course.id)}}" class="btn btn-primary btn-md">Volver</a>
 </div>
 
 {% endif %}

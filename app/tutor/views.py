@@ -1,19 +1,17 @@
 from . import tutor
 from flask import render_template, request, redirect, url_for, session, flash
 from login_required import login_required
-from database import db
 import sqlite3
-from database.models import engine
 from sqlalchemy.orm import sessionmaker
-from database.models import *
-from database.functions import Database
+from database.model import *
+from database.database import Database
 from datetime import date
 
-database = Database(engine)
-
+database = Database()
+database.init()
 
 @tutor.route("/", methods=["GET"])
-@login_required("tutor")
+@login_required("TUTOR")
 def home():
 
     # Recuperamos de la base de datos el usuario, para luego recuperar los cursos
@@ -26,7 +24,7 @@ def home():
 
 
 @tutor.route("/", methods=["POST"])
-@login_required("tutor")
+@login_required("TUTOR")
 def home_post():
 
     # Recuperamos de la base de datos el usuario, para luego recuperar los cursos
@@ -54,7 +52,7 @@ def home_post():
 
 
 @tutor.route("/c/<int:courseid>", methods=["GET"])
-@login_required("tutor")
+@login_required("TUTOR")
 def course(courseid):
 
     # Obtenemos al usuario(tutor) y el curso (con el id)
@@ -70,7 +68,7 @@ def course(courseid):
 
 
 @tutor.route("/c/<int:courseid>", methods=["POST"])
-@login_required("tutor")
+@login_required("TUTOR")
 def course_post(courseid):
 
     course = database.get_course(courseid)
@@ -89,7 +87,7 @@ def course_post(courseid):
 
 
 @tutor.route("/c/<int:courseid>/edit", methods=["GET"])
-@login_required("tutor")
+@login_required("TUTOR")
 def editcourse(courseid):
 
     tutor = database.get_user(session["user_id"])
@@ -99,14 +97,14 @@ def editcourse(courseid):
 
 
 @tutor.route("/c/<int:courseid>/edit", methods=["POST"])
-@login_required("tutor")
+@login_required("TUTOR")
 def editcourse_post(courseid):
     request_form = request.form()
     return "se hizo una peticion post a editcurso: " + str(request_form)
 
 
 @tutor.route("c/<course_id>/t/<task_id>", methods=["GET"])
-@login_required("tutor")
+@login_required("TUTOR")
 def task(course_id, task_id):
     # Obtenemos la tarea y los criterios de la tarea
     # TODO ¿Agregar un campo Descripción a tabla Criterion?
@@ -129,7 +127,7 @@ def task(course_id, task_id):
 
 # Necesita método POST para modificar tasks existentes supongo?
 @tutor.route("c/<course_id>/t/<task_id>/edit", methods=["GET"])
-@login_required("tutor")
+@login_required("TUTOR")
 def edit_task(course_id, task_id):
     # Obtenemos la tarea y los criterios de la tarea
     task = database.get_task(task_id)
@@ -138,12 +136,12 @@ def edit_task(course_id, task_id):
     return render_template("tutor/tasktutor_edit.html", task=task, criteria=criteria)
 
 @tutor.route("c/<course_id>/t/<task_id>/edit", methods=["POST"])
-@login_required("tutor")
+@login_required("TUTOR")
 def edit_task_post(course_id, task_id):
     return request.form
 
 @tutor.route("c/<course_id>/t/<task_id>", methods=["POST"])
-@login_required("tutor")
+@login_required("TUTOR")
 # TODO hacer esta ruta
 def task_post(task_id):
     return "metodo post en tasktutor"
