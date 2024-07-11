@@ -4,7 +4,7 @@ from flask import render_template, request, redirect, url_for, session, flash
 from login_required import login_required
 from sqlalchemy.orm import sessionmaker
 from database.model import *
-from database.studentdatabase import StudentDatabase
+from database.student_database import StudentDatabase
 from datetime import date
 
 """
@@ -72,7 +72,8 @@ def task(task_id):
                            submission=submission,
                            estado=state,
                            task_max_score=database.task_max_score(task),
-                           criteria = criteria)
+                           criterion_score=database.criterion_score,
+                           task_score=database.task_score(task))
 
 
 

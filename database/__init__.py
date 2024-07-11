@@ -1,3 +1,3 @@
 from . import model
 from . import database
-from . import studentdatabase
+from . import student_database

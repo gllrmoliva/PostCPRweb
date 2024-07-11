@@ -29,6 +29,7 @@ class Database:
 
     def clear(self):
         Base.metadata.drop_all(self.engine)
+        Base.metadata.create_all(self.engine)
 
     # Devuelve una instancia de User en caso exitoso. Devuelve None en caso de fallo.
     def login_student(self, email, password):
@@ -59,27 +60,7 @@ class Database:
     
     # Suma el puntaje de todos los criterios de una tarea
     def task_max_score(self, task):
-        return len(task.criteria)
-    
-    # Valores por defecto para testear cosas
-    def insert_default_values(self):
-        john = Student(email="john@stu.com", password="1234", name="John")
-        mike = Student(email="mike@ßstu.com", password="1234", name="Michael")
-        alice = Tutor(email="alice@tut.com", password="1234", name="Alice")
-
-        math = Course(name="Math")
-        math.tutor = alice
-        math.students.append(john)
-        math.students.append(mike)
-
-        task = Task(name="Sum", instructions="2+2=?", course=math)
-        crit1 = Criterion(name="Grammar", task=task)
-        crit2 = Criterion(name="Puntuality", task=task)
-
-        sub = Submission(url="solution.com", student=john, task=task)
-
-        review = Review(submission=sub, reviewer=mike)
-        cr1 = CriterionReview(criterion=crit1, review=review, score=0.9)
-        cr2 = CriterionReview(criterion=crit2, review=review, score=1.0)
-
-        self.session.add_all([john, alice, math, task, sub, review, cr1, cr2])
+        max_score = 0
+        for criterion in task.criteria:
+            max_score += criterion.max_score
+        return max_score

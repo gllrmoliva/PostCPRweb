@@ -19,7 +19,7 @@
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Puntos:</span>
         <!--Ver como se llama esto en el diccionario-->
-        <span class="d-inline">{{task_max_score}}</span>
+        <span class="d-inline">{{'%0.2f' % task_max_score}}</span>
     </div>
 
     <div class="col-auto mr-5">
@@ -66,18 +66,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for criterion in criteria%}
+            {% for criterion in task.criteria%}
             <tr>
                 <th scope="row">{{criterion.name}}</th>
-                <td>Placeholder</td>
-                <td>XXXX</td>
+                <td>{{criterion.description}}</td>
+                <td>{{'%0.2f' % criterion.max_score}}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
                 <th scope="row" colspan="2">Total</th>
-                <td>XXXX</td>
+                <td>{{'%0.2f' % task_max_score}}</td>
             </tr>
         </tfoot>
     </table>
@@ -107,18 +107,18 @@
                 </tr>
             </thead>
             <tbody>
-                {% for criterion in criteria%}
+                {% for criterion in task.criteria%}
                 <tr>
                     <th scope="row">{{criterion.name}}</th>
-                    <td>Placeholder</td>
-                    <td>XXXX</td>
+                    <td>{{criterion.description}}</td>
+                    <td>{{'%0.2f' % criterion.max_score}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
             <tfoot>
                 <tr>
                     <th scope="row" colspan="2">Total</th>
-                    <td>XXXX</td>
+                    <td>{{'%0.2f' % task_max_score}}</td>
                 </tr>
             </tfoot>
         </table>
@@ -155,20 +155,20 @@
             </tr>
         </thead>
         <tbody>
-            {% for criterion in criteria%}
+            {% for criterion in task.criteria%}
             <tr>
                 <th scope="row">{{criterion.name}}</th>
-                <td>Placeholder</td>
-                <td>XXXX</td>
-                <td>XXXX</td>
+                <td>{{criterion.description}}</td>
+                <td>{{'%0.2f' % criterion.max_score}}</td>
+                <td>{{'%0.2f' % criterion_score(criterion)}}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
                 <th scope="row" colspan="2">Total</th>
-                <td>XXXX</td>
-                <td>XXXX</td>
+                <td>{{'%0.2f' % task_max_score}}</td>
+                <td>{{'%0.2f' % task_score}}</td>
             </tr>
         </tfoot>
     </table>

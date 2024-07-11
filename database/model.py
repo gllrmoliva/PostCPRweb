@@ -112,7 +112,8 @@ class Criterion(Base):
     # Atributos no relacionales
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
-    # description: Mapped[str] = mapped_column(nullable=False)
+    description: Mapped[str | None] = mapped_column()
+    max_score: Mapped[float] = mapped_column(nullable=False, default=1.0)
 
     # Atributos relacionales
     task_id: Mapped[int] = mapped_column(ForeignKey("task_table.id"), nullable=False)
