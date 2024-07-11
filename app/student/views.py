@@ -63,6 +63,7 @@ def task(task_id):
     task = database.get_from_id(Task, task_id)
     state = database.task_completion_status(task)
     submission = database.get_submission(task)
+    criteria = task.criteria
 
     # TODO : Los siguientes estados: 
     # REVISADO
@@ -70,7 +71,8 @@ def task(task_id):
                            task=task,
                            submission=submission,
                            estado=state,
-                           task_max_score=database.task_max_score(task))
+                           task_max_score=database.task_max_score(task),
+                           criteria = criteria)
 
 
 
