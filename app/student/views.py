@@ -115,54 +115,66 @@ def task_post(task_id):
 @student.route("/reviews", methods=["GET"])
 @login_required("STUDENT")
 def reviews():
-    reviews_to_review = database.get_reviews_to_review(session["user_id"])
-    tasks_to_review = database.get_tasks_to_review(reviews_to_review)
-    data = []
-    for i in range(len(reviews_to_review)):
-        data.append(
-            (
-                reviews_to_review[i],
-                tasks_to_review[i],
-                database.get_course(tasks_to_review[i].course_id),
-            )
-        )
 
-    return render_template("student/reviews.html", data=data)
+    # Obtenemos las variables a usar
+    student = database.set_student(session["user_id"])
+
+    return render_template("student/reviews.html", reviews=student.reviews)
 
 
 # La variable task id se va a entregar cuando se redirija desde otra pagina
-@student.route("/review/t/<task_id>/r/<review_id>", methods=["GET"])
+@student.route("/review/r/<review_id>", methods=["GET"])
 @login_required("STUDENT")
-def review_task(review_id, task_id):
-    if database.is_review_reviewed(review_id, session["user_id"]) is True:
-        flash("Esa entrega ya ha sido evaluada")
+def review_task(review_id):
+
+    # Obtenemos las variables a usar
+    student = database.set_student(session["user_id"])
+    review = database.get_from_id(Review, review_id)
+
+    if not review.is_pending:
+        flash("Esta entrega ya ha sido evaluada")
         return redirect(url_for("student.reviews"))
-    criteria = database.get_all_criteria_from_task(task_id)
-    task_to_show = database.get_task(task_id)
-    review = database.get_review(review_id)
-    submission = database.get_submission_by_review(review_id)
+    
     return render_template(
         "student/reviewtask.html",
-        task=task_to_show,
-        criteria=criteria,
         review=review,
-        submission=submission,
     )
 
 
-@student.route("/review/t/<task_id>/r/<review_id>", methods=["POST"])
+@student.route("/review/r/<review_id>", methods=["POST"])
 @login_required("STUDENT")
-def review_task_post(task_id, review_id):
+def review_task_post(review_id):
     """
     Aquí se van a subir las respuestas dadas por el estudiante para la evaluación
     """
-    date1 = date.today()
-    submission = database.get_submission_by_review(review_id)
-    user_id = session["user_id"]
-    database.mark_review_as_reviewed(submission=submission, user_id=user_id)
-    request_form = request.form
-    print(f"request form: {request_form}")
-    for criterion_name, score in request_form.items():
-        criterion = database.get_criterion_by_name(criterion_name, task_id)
-        database.create_review_criterion(review_id, criterion.criterion_id, score)
+
+    # Obtenemos las variables a usar
+    student = database.set_student(session["user_id"])
+    review = database.get_from_id(Review, review_id)
+    request_form = request.form   
+    # date1 = date.today()
+
+    # Creamos la revisión de cada criterio
+    criterion_review_list = []
+
+    for criterion in review.submission.task.criteria:
+        if str(criterion.id) in request_form:
+            # Corresponde al valor entregado en el request, va desde 0 a 1 siempre
+            input_score = float(request_form[str(criterion.id)]) # El diccionario tiene valores en formato string
+
+            actual_score = input_score * criterion.max_score
+
+            # Creamos la revisión del criterio actual
+            criterion_review = CriterionReview(review=review, criterion=criterion, score=actual_score)
+            criterion_review_list.append(criterion_review)
+
+        else:   # Idealmente nunca se deberia llegar a esta parte del codigo
+            flash("Es necesario evaluar todos los criterios de la tarea")
+            return redirect(url_for('student.review_task', review_id=review_id))
+    
+    database.add_all(criterion_review_list)
+    review.is_pending = False
+    database.commit_changes()
+    flash("Revision enviada exitosamente")
+
     return redirect(url_for("student.reviews"))

@@ -22,6 +22,10 @@ class Database:
     # Añade una instancia a la base de datos. IMPORTANTE: No hace commit automaticamente.
     def add(self, entry):
         self.session.add(entry)
+    
+    # Añade un conjunto de instancias a la base de datos. IMPORTANTE: No hace commit automaticamente.
+    def add_all(self, entries):
+        self.session.add_all(entries)
 
     # Cualquier cambio primero es ingresado en un espacio intermedio (Session). Con este metodo se ingresan a la base de datos.
     def commit_changes(self):
