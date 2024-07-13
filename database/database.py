@@ -2,11 +2,16 @@ from database.model import *
 
 from sqlalchemy import (
     create_engine,
-    MetaData
+    MetaData,
+    exc
 )
 from sqlalchemy.orm import (
     Session
 )
+
+class IntegrityException(Exception):
+    pass
+
 
 # Clase con métodos que acceden a la base de datos a traves de la lógica orientada a objetos de SQLAlchemy
 class Database:
@@ -29,7 +34,16 @@ class Database:
 
     # Cualquier cambio primero es ingresado en un espacio intermedio (Session). Con este metodo se ingresan a la base de datos.
     def commit_changes(self):
-        self.session.commit()
+        try:
+            self.session.commit()
+        except exc.IntegrityError:
+            raise IntegrityException()
+        except Exception as e:
+            raise e
+    
+    # Desecha los cambios no commiteados. Muy util si ocurre una excepción al hacer commit.
+    def rollback_changes(self):
+        self.session.rollback()
 
     def clear(self):
         Base.metadata.drop_all(self.engine)

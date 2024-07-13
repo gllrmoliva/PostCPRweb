@@ -1,34 +1,34 @@
 from . import tutor
 from flask import render_template, request, redirect, url_for, session, flash
+
 from login_required import login_required
-import sqlite3
-from sqlalchemy.orm import sessionmaker
 from database.model import *
-from database.database import Database
+from database.database import IntegrityException
+from database.tutor_database import TutorDatabase
 from datetime import date
 
-database = Database()
+#import sqllite3    Se utilizaba para manejar excepciones, pero creo que importar un DBMS en frontend no es buena idea
+
+database = TutorDatabase()
 database.init()
 
 @tutor.route("/", methods=["GET"])
 @login_required("TUTOR")
 def home():
 
-    # Recuperamos de la base de datos el usuario, para luego recuperar los cursos
-    user = database.get_user(session["user_id"])
-    courses = database.get_courses_from_tutor(user)
+    # Es necesario vincular el tutor a la base de datos en cada ruta
+    tutor = database.set_tutor(session["user_id"])
 
     # A render_template le damos la variable courses, ya que jinja lo usa para mostrar los cursos del
     # usuario (ver tutor/home.html para ver como es utilizado courses)
-    return render_template("tutor/home.html", courses=courses)
+    return render_template("tutor/home.html", courses=tutor.courses)
 
 
 @tutor.route("/", methods=["POST"])
 @login_required("TUTOR")
 def home_post():
 
-    # Recuperamos de la base de datos el usuario, para luego recuperar los cursos
-    user = database.get_user(session["user_id"])
+    tutor = database.set_tutor(session["user_id"])
 
     # Obtenemos los datos del formulario
     request_form = request.form
@@ -39,39 +39,41 @@ def home_post():
     # - si form_type es create_course, intentamos crear el curso con el nombre dado. Si esto no funciona
     #   enviamos al usuario a home
     if request_form["form_type"] == "create_course":
-        try:
-            database.add_course(request_form["name"], user)
-            return redirect(url_for("tutor.home"))
 
-        except sqlite3.IntegrityError:
-            flash("Ya existe un curso con ese nombre")
+        try:
+            new_course = Course(name = request_form["name"], tutor = tutor)
+            database.add(new_course)
+            database.commit_changes()
             return redirect(url_for("tutor.home"))
-        except Exception as e:
+        
+        except IntegrityException:
+            flash("Ya existe un curso de mismo nombre")
+            database.rollback_changes()
+            return redirect(url_for("tutor.home"))
+        
+        except Exception as e:  # Idealmente no se deberia llegar acá
             flash(e)
             return redirect(url_for("tutor.home"))
 
 
-@tutor.route("/c/<int:courseid>", methods=["GET"])
+@tutor.route("/c/<course_id>", methods=["GET"])
 @login_required("TUTOR")
-def course(courseid):
+def course(course_id):
 
-    # Obtenemos al usuario(tutor) y el curso (con el id)
-    tutor = database.get_user(session["user_id"])
-    course = database.get_course(courseid)
+    # Obtenemos las variables a usar
+    tutor = database.set_tutor(session["user_id"])
+    course = database.get_from_id(Course, course_id)
 
-    # Si el tutor pertenece al curso:
-    # - se obtienen las tareas del curso y se renderiza la template tutor/course.html
-    # Si el tutor no pertenece al curso:
-    # - Se envia al usuario a home y se muestra una advertencia en pantalla (flash)
-    tasks = database.get_tasks_from_course(course)
-    return render_template("tutor/course.html", course=course, tasks=tasks)
+    # TODO Verificar que el tutor de la sesión es efectivamente el tutor del curso
+
+    return render_template("tutor/course.html", course=course)
 
 
-@tutor.route("/c/<int:courseid>", methods=["POST"])
+@tutor.route("/c/<course_id>", methods=["POST"])
 @login_required("TUTOR")
-def course_post(courseid):
+def course_post(course_id):
 
-    course = database.get_course(courseid)
+    course = database.get_course(course_id)
     request_form = request.form
     # Si se presiona el botón crear tarea:
     # - Se recuperan los datos del formulario.
@@ -81,24 +83,24 @@ def course_post(courseid):
         name = request_form["name"]
         instructions = request_form["instructions"]
         database.create_task(name, instructions, course)
-        return redirect(url_for("tutor.course", courseid=courseid))
+        return redirect(url_for("tutor.course", course_id=course_id))
 
     return "se hizo una peticion post a course (tutor): " + str(request_form)
 
 
-@tutor.route("/c/<int:courseid>/edit", methods=["GET"])
+@tutor.route("/c/<course_id>/edit", methods=["GET"])
 @login_required("TUTOR")
-def editcourse(courseid):
+def editcourse(course_id):
 
     tutor = database.get_user(session["user_id"])
-    course = database.get_course(courseid)
+    course = database.get_course(course_id)
 
     return render_template("tutor/editcourse.html")
 
 
-@tutor.route("/c/<int:courseid>/edit", methods=["POST"])
+@tutor.route("/c/<course_id>/edit", methods=["POST"])
 @login_required("TUTOR")
-def editcourse_post(courseid):
+def editcourse_post(course_id):
     request_form = request.form()
     return "se hizo una peticion post a editcurso: " + str(request_form)
 

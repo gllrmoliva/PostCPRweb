@@ -81,7 +81,7 @@ class Course(Base):
 
     # Atributos no relacionales
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
 
     # Atributos relacionales
     tutor_id: Mapped[int] = mapped_column(ForeignKey("tutor_table.id"), nullable=False)

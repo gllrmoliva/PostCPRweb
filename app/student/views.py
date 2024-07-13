@@ -2,7 +2,6 @@ from . import student
 from flask import render_template, request, redirect, url_for, session, flash
 
 from login_required import login_required
-from sqlalchemy.orm import sessionmaker
 from database.model import *
 from database.student_database import StudentDatabase
 from datetime import date
@@ -25,6 +24,7 @@ def home():
     - Entrar a los cursos a los que pertenece el estudiante
     """
 
+    # Es necesario vincular el estudiante a la base de datos en cada ruta
     student = database.set_student(session["user_id"])
 
     return render_template("student/home.html", courses=student.courses)
