@@ -5,7 +5,7 @@ from login_required import login_required
 from database.model import *
 from database.database import IntegrityException
 from database.tutor_database import TutorDatabase
-from datetime import date
+from database.time import Time
 
 #import sqllite3    Se utilizaba para manejar excepciones, pero creo que importar un DBMS en frontend no es buena idea
 
@@ -73,22 +73,32 @@ def course(course_id):
 @login_required("TUTOR")
 def course_post(course_id):
 
-    course = database.get_course(course_id)
+    # Obtenemos las variables a usar
+    tutor = database.set_tutor(session["user_id"])
+    course = database.get_from_id(Course, course_id)
     request_form = request.form
+
     # Si se presiona el botón crear tarea:
     # - Se recuperan los datos del formulario.
     # - intentamos crear el curso, si no se puede, se muestra el error en pantalla
     if request_form["form_type"] == "create_task":
 
-        name = request_form["name"]
-        instructions = request_form["instructions"]
-        date = request_form["date"]
-        deadline = request_form["deadline"]
-        #TODO: al crear una tarea se debe añadir una fecha de entrega y una fecha limite de revision
-        # El formato de estas es: YYYY-MM-DD
-        database.create_task(name, instructions, course)
+        # Creamos la nueva tarea con las variables entregas en el formulario
+        task = Task(
+            name = request_form["name"],
+            instructions = request_form["instructions"],
+            deadline_date = Time.string_to_object(request_form["deadline_date"]),
+            review_deadline_date = Time.string_to_object(request_form["review_deadline_date"]),
+
+            course = course,
+        )
+
+        database.add(task)
+        database.commit_changes()
+
         return redirect(url_for("tutor.course", course_id=course_id))
 
+    # No se deberia llegar nunca a esta linea
     return "se hizo una peticion post a course (tutor): " + str(request_form)
 
 
@@ -96,19 +106,20 @@ def course_post(course_id):
 @login_required("TUTOR")
 def editcourse(course_id):
 
-    tutor = database.get_user(session["user_id"])
-    course = database.get_course(course_id)
+    # Obtenemos las variables a usar
+    tutor = database.set_tutor(session["user_id"])
+    course = database.get_from_id(Course, course_id)
 
-    return render_template("tutor/editcourse.html")
+    return render_template("tutor/editcourse.html", course=course)
 
 
 @tutor.route("/c/<course_id>/edit", methods=["POST"])
 @login_required("TUTOR")
 def editcourse_post(course_id):
 
-    tutor = database.get_user(session["user_id"])
-    course = database.get_course(course_id)
-
+    # Obtenemos las variables a usar
+    tutor = database.set_tutor(session["user_id"])
+    course = database.get_from_id(Course, course_id)
     request_form = request.form
 
     if request_form["form_type"] == "add_student":
@@ -131,13 +142,22 @@ def editcourse_post(course_id):
         return redirect(url_for("tutor.editcourse", courseid=course_id))
 
     elif request_form["form_type"] == "edit_course_name":
-        # TODO: Aquí se deberia cambiar el nombre del curso, dentro de la DB 
-        # Manejar cuando hayan dos cursos con nombre igual¿? y cuando se ponga el mismo nombre al curso otra vez
 
-        new_name = request_form["course_name"]
-
-        flash(f"DEBUG: el curso ha cambiado de nombre a {new_name}")
-        return redirect(url_for("tutor.editcourse", courseid=course_id))
+        try:
+            new_name = request_form["course_name"]
+            course.name = new_name
+            database.commit_changes()
+            flash("Nombre del curso cambiado exitosamente")
+            return redirect(url_for("tutor.editcourse", course_id=course_id))
+        
+        except IntegrityException:
+            flash("Ya existe un curso de mismo nombre")
+            database.rollback_changes()
+            return redirect(url_for("tutor.editcourse", course_id=course_id))
+        
+        except Exception as e:  # Idealmente no se deberia llegar acá
+            flash(e)
+            return redirect(url_for("tutor.editcourse", course_id=course_id))
 
     return "se hizo una péticion post en editcourse y paso algo raro: " + str(request_form)
 

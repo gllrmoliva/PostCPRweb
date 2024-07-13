@@ -98,6 +98,7 @@ class Task(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     instructions: Mapped[str | None] = mapped_column()
     deadline_date: Mapped[date | None] = mapped_column()
+    review_deadline_date: Mapped[date | None] = mapped_column()
 
     # Atributos relacionales
     course_id: Mapped[int] = mapped_column(ForeignKey("course_table.id"), nullable=False)
