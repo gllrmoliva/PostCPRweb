@@ -23,11 +23,13 @@ def signin():
     # Si accedemos con el metodo get, verificamos si hay datos guardados en session, si los hay
     # te redirige inmediatamente a la pagina de tutor o student segun corresponda
     # si no hay datos guardados puedes iniciar sesion
-    if "user_type" in session and "user" in session:
+    if "user_type" in session and "user_id" in session:
         if session["user_type"] == "TUTOR":
             return redirect(url_for("tutor.home"))
         elif session["user_type"] == "STUDENT":
             return redirect(url_for("student.home"))
+        elif session["user_type"] == 'ADMIN':
+            return redirect(url_for("admin.home"))
 
     return render_template("signin.html")
 
@@ -42,11 +44,14 @@ def signin_post():
         # Iniciamos la base de datos, además aqui se estan creando las tablas y añadiendo datos de prueba
             # yo aqui no veo nada xd???
 
-        # tengo miedo sobre que pasa si no se cierra la sesión
 
         # Diferenciamos si el usuario inicia sesión como estudiante o como tutor    TODO: y como admin
         # Login como estudiante
-        if "signinstudent" in request_form:
+        if email == "admin@admin.com" and password == "admin":
+                session["user_id"] = -1 
+                session["user_type"] = "ADMIN"
+                return redirect(url_for("admin.home"))
+        elif "signinstudent" in request_form:
             student = database.login_student(email, password)
             # Login incorrecto
             if (student == None):
@@ -118,3 +123,25 @@ def logout():
     session.clear()
     flash("Sesión cerrada correctamente.", "info")
     return redirect(url_for("auth.signin"))
+
+
+# Ruta a la que se accede cuando se quiere cerrar sesión
+@auth.route("/account", methods = ['GET'])
+def account():
+    if "user_type" in session and "user_id" in session:
+        return render_template("account.html")
+    else:
+        flash("Para acceder a esta página debes iniciar sesión")
+
+    return redirect(url_for("auth.signin"))
+
+@auth.route("/account", methods = ['POST'])
+def account_post():
+    """
+    La contraseña se debe cambiar solo si la contraseña vieja es la que esta en el sistema, sino debe tirar error
+    Si nueva contraseña se deja en blanco no se cambia la contraseña. Además de la contraseña solo el nombre de usuario
+    se debe cambiar.
+    """
+    
+    form = request.form
+    return str(form)

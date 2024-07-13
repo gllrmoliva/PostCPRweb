@@ -19,7 +19,8 @@
     <tbody>
         {% for review in reviews %}
         {% if review.is_pending %}
-        <tr onclick="window.location='{{url_for('student.review_task', review_id=review.id)}}';" style="cursor: pointer;">
+        <tr onclick="window.location='{{url_for('student.review_task', review_id=review.id)}}';"
+            style="cursor: pointer;">
             <th scope="row">{{review.submission.task.course.name}}
             </th>
             <td>{{review.submission.task.name}}</td>
@@ -46,7 +47,8 @@
     <tbody>
         {% for review in reviews %}
         {% if not review.is_pending %}
-        <tr onclick="window.location='{{url_for('student.review_task', review_id=review.id)}}';" style="cursor: pointer;">
+        <tr onclick="window.location='{{url_for('student.review_task', review_id=review.id)}}';"
+            style="cursor: pointer;">
             <th scope="row">{{review.submission.task.course.name}}
             </th>
             <td>{{review.submission.task.name}}</td>
@@ -58,4 +60,3 @@
     </tbody>
 </table>
 {% endblock %}
-

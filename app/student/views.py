@@ -178,3 +178,20 @@ def review_task_post(review_id):
     flash("Revision enviada exitosamente")
 
     return redirect(url_for("student.reviews"))
+
+@student.route("/grades", methods=["GET"])
+@login_required("STUDENT")
+def grades():
+    """
+    En esta vista se mostraran las calificaciones obtenidas por un estudiante
+    """
+
+    student = database.get_user(session["user_id"])
+
+    courses = database.get_courses_from_student(student)
+    # Esto es cerdo pero weno
+    tasks = {}
+    for course in courses:
+        tasks[course.course_id] = database.get_tasks_from_course(course)
+
+    return render_template("student/grades.html",courses = courses, tasks = tasks)

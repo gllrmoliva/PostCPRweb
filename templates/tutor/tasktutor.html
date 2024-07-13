@@ -5,8 +5,8 @@
 
 
 {% block addbutton %}
-<form  action="{{url_for('tutor.edit_task', course_id = task.course_id ,task_id = task.task_id)}}">
-<button type="submit" class="btn btn-warning me-2">Editar tarea</button>
+<form action="{{url_for('tutor.edit_task', course_id = task.course_id ,task_id = task.task_id)}}">
+    <button type="submit" class="btn btn-warning me-2">Editar tarea</button>
 </form>
 {% endblock %}
 
@@ -22,6 +22,10 @@
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Fecha de entrega: </span>
         <span class="d-inline">{{task.deadline_date}}</span>
+    </div>
+    <div class="col-auto mr-5">
+        <span class="fw-bold d-inline">Fecha límite de revisión: </span>
+        <span class="d-inline">YYYY-MM-DD</span>
     </div>
 </div>
 
@@ -48,14 +52,25 @@
 
 <hr>
 
-<h3 class="fw-bold">Entregas</h3>
+<div class="d-flex justify-content-between align-items-center">
+    <h3 class="fw-bold mb-0">Entregas</h3>
 
+    <!--TODO: Tiene sentido que esto solo se muestre pasada la fecha limite-->
+    <form action="{{url_for('tutor.task_post')}}" method="POST" class="mb-0">
+        <button type="submit" class="btn btn-primary">Calcular puntajes</button>
+
+        <input type="hidden" name="action" value="calculate_grades">
+        <input type="hidden" name="task_id" value="{{task.task_id}}">
+        <input type="hidden" name="course_id" value="{{course.course_id}}">
+    </form>
+</div>
 <hr>
 
 <div class="list-group">
 
     {% for (review_id,review,submission,name) in data %}
-    <a href="{{url_for('tutor.submission',task_id=task.task_id,course_id=task.course_id,review_id=review_id)}}" class="list-group-item list-group-item-action">
+    <a href="{{url_for('tutor.submission',task_id=task.task_id,course_id=task.course_id,review_id=review_id)}}"
+        class="list-group-item list-group-item-action">
         <div class="row">
 
             <div class="col mr-5">

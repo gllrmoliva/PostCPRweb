@@ -29,7 +29,15 @@
                         <label for="new_task_name">Nombre de la tarea</label>
                     </div>
 
-                    <div class="mb-3">Aqui faltaria sistema para añadir fecha</div>
+                    <div class="form-floating mb-3">
+                        <input type="date" class="form-control" id="new_task_date" name="date" required>
+                        <label for="new_task_date">Fecha de entrega</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="date" class="form-control" id="new_task_deadline" name="deadline" required>
+                        <label for="new_task_date">Fecha límite de revisión</label>
+                    </div>
 
                     <div class="form-floating mb-3">
                         <textarea class="form-control" name="instructions" id="new_task_instructions"
@@ -54,7 +62,8 @@
 
     <!-- ruta = -->
 
-    <a href="{{url_for('tutor.task', task_id = task.id, course_id = course.id)}}" class="list-group-item list-group-item-action">
+    <a href="{{url_for('tutor.task', task_id = task.id, course_id = course.id)}}"
+        class="list-group-item list-group-item-action">
 
         <div class="containerr">
             <div class="row align-items-start">
@@ -62,10 +71,13 @@
                     <span class="fw-bold">{{task.name}}</span>
                 </div>
                 <div class="col">
-                </div>
-                <div class="col text-end">
                     <span class="fw-bold">Fecha de entrega: </span>
                     <span>{{task.deadline_date}}</span>
+                </div>
+                <div class="col">
+                    <span class="fw-bold">Fecha de revisión: </span>
+                    <!--TODO:Añadir en base de datos la fecha de revision como fecha-->
+                    <span>YYYY-MM-DD</span>
                 </div>
             </div>
         </div>
