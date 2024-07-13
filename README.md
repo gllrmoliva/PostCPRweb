@@ -34,6 +34,7 @@ Para crear tu entorno virtual ejecuta en tu bash el siguiente comando:
 ```
 python -m venv venv
 ```
+## Inicia el entorno virtual, para esto ver el inicio del README
 
 ## Instalar librerias
 
