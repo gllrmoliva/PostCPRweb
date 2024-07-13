@@ -1,7 +1,7 @@
 {% extends "student/base.html" %}
 
 
-{% block title %}{{course['name']}}{% endblock %}
+{% block title %}{{course.name}}{% endblock %}
 
 {% block content %}
 <h1>Tareas</h1>
@@ -10,16 +10,16 @@
 
     <!-- ruta = -->
 
-    <a href="{{url_for('student.taskstudent', task_id = task['id'])}}" class="list-group-item list-group-item-action">
+    <a href="{{url_for('student.task', task_id = task['task_id'])}}" class="list-group-item list-group-item-action">
 
         <div class="containerr">
             <div class="row align-items-start">
                 <div class="col">
-                    <span class="fw-bold">{{task['name']}}</span>
+                    <span class="fw-bold">{{task.name}}</span>
                 </div>
                 <div class="col text-end mx-5">
                     <span class="fw-bold">Fecha de entrega: </span>
-                    <span>{{task['deadline_date']}}</span>
+                    <span>{{task.deadline_date}}</span>
                 </div>
                 <div class="col text-end mx-5">
                     <span class="fw-bold">Estado: </span>

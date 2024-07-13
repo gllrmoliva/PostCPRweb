@@ -1,0 +1,35 @@
+{% extends "student/base.html" %}
+
+{% block title %}Evaluar tareas{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <h3 class="fw-bold">Tareas a evaluar</h3>
+</div>
+<hr>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Curso</th>
+            <th scope="col">Tarea</td>
+            <th scope="col">Descripción</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (review, task, course) in data %}
+        {% if review.is_pending == true %}
+        <tr onclick="window.location='{{url_for('student.review_task', task_id=task.task_id, review_id=review.review_id)}}';"
+            style="cursor: pointer;">
+            <th scope="row">{{course.name}}
+            </th>
+            <td>{{task.name}}</td>
+            <td>{{task.description}}</td>
+            <td>{{review.is_pending}}</td>
+
+        </tr>
+        {% endif %}
+        {% endfor %}
+
+    </tbody>
+</table>
+{% endblock %}

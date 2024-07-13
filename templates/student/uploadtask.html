@@ -1,10 +1,10 @@
 {% extends "student/base.html" %}
 
-{% block title %}{{task['name']}}{% endblock %}
+{% block title %}{{task.name}}{% endblock %}
 
 {% block content %}
 
-<h3 class="fw-bold">{{task['name']}}</h3>
+<h3 class="fw-bold">{{task.name}}</h3>
 
 <hr>
 
@@ -13,7 +13,7 @@
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Fecha de entrega: </span>
         <!--Ver como se llama esto en el diccionario-->
-        <span class="d-inline">{{task['deadline_date']}}</span>
+        <span class="d-inline">{{task.deadline_date}}</span>
     </div>
 
     <div class="col-auto mr-5">
@@ -24,7 +24,7 @@
 
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Estado:</span>
-        <span class="d-inline">placeholder </span>
+        <span class="d-inline">{{estado}}</span>
     </div>
 
 </div>
@@ -32,25 +32,103 @@
 <hr>
 
 <!--Ver como se llama esto en el diccionario-->
-<p>{{task['instructions']}}</p>
+<p>{{task.instructions}}</p>
 
-<!--TODO: Aqui deberia ir un if dependiendo del estado de la tarea, ademas deberia generalizarse con un url_for-->
-<form action="/student/t/{{task['id']}}" method="post">
+
+{% if estado == 'pendiente' %}
+<form action="{{url_for('student.task_post',task_id=task['id'])}}" method="post">
     <div class="form-floating">
 
         <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
             required></textarea>
 
-        <label for="floatingTextarea">Ingresa aquí el url de tu tarea.</label>
+        <label for="floatingTextarea">Ingresa aquí el url de tu entrega.</label>
 
     </div>
     <div class="text-end my-3">
-        <a href="{{url_for('student.coursestudent', courseid = task['course_id'])}}"
+        <<<<<<< HEAD <a href="{{url_for('student.coursestudent', courseid = task.course_id)}}"=======<a
+            href="{{url_for('student.course', courseid = task['course_id'])}}">>>>>>> develop-sprint2
             class="btn btn-warning btn-md ">Cancelar</a>
 
-        <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
+            <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
+    </div>
+</form>
+{% endif %}
+
+{% if estado == 'entregado' or estado == 'no entregado'%}
+<form action="{{url_for('student.task_post',task_id=task['id'])}}">
+    <div class="form-floating">
+
+        <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
+            disabled>aquí debe ir lo que entrego el estudiante</textarea>
+
+        <label for="floatingTextarea">url de tu entrega.</label>
+    </div>
+</form>
+<div class="text-end my-3">
+    <a href="{{url_for('student.course', courseid = task['course_id'])}}" class="btn btn-primary btn-md">Volver</a>
+</div>
+{% endif %}
+
+{% if estado == 'evaluado'%}
+<form action="{{url_for('student.task_post',task_id=task['id'])}}">
+    <div class="form-floating">
+
+        <textarea class="form-control" name="submition" id="floatingTextarea" style="height: 200px; resize: none;"
+            disabled>aquí debe ir lo que entrego el estudiante</textarea>
+
+        <label for="floatingTextarea">url de tu entrega.</label>
     </div>
 </form>
 
+<div class="my-4">
+    <div class="mb-3">
+        <h3 class="fw-bold">Evaluación</h3>
+    </div>
+    <hr>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Criterio</th>
+                <th scope="col">Descripción</th>
+                <th scope="col" style="width: 8%;">Puntaje máximo</th>
+                <th scope="col" style="width: 8%;">Puntaje obtenido</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">Criterio 1</th>
+                <td>este es el criterio 1</td>
+                <td>3</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <th scope="row">Criterio 2</th>
+                <td>este es el criterio 2</td>
+                <td>3</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <th scope="row">Criterio 3</th>
+                <td>este es el criterio 3</td>
+                <td>3</td>
+                <td>3</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="2">Total</th>
+                <td>9</td>
+                <td>6</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="text-end my-3">
+    <a href="{{url_for('student.course', courseid = task['course_id'])}}" class="btn btn-primary btn-md">Volver</a>
+</div>
+
+{% endif %}
 
 {% endblock %}

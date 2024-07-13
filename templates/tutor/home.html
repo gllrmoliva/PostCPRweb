@@ -19,14 +19,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="/tutor" method="post">
+                <form action="{{url_for('tutor.home_post')}}" method="post">
 
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="new_course_name" name="name" required>
                         <label for="new_course_name">Nombre del curso</label>
                     </div>
 
-                    <input type="hidden" name="type" value="create_course">
+                    <input type="hidden" name="form_type" value="create_course">
                     <button name="action" value="create" type="submit" class="btn btn-primary">Crear</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </form>
@@ -44,14 +44,13 @@
                 <h5 class="card-title fw-bold">{{course['name']}}</h5>
 
                 <!--esto es para debug, para ver si los id corresponden-->
-                <p>id: {{course['id']}}</p>
+                <p>id: {{course['course_id']}}</p>
 
-                <form action="/tutor" method="post">
-                    <input type="hidden" name="type" value="course">
-                    <input type="hidden" name="id" value="{{course['id']}}">
-                    <button name="action" value="enter" type="submit" class="btn btn-primary">Ingresar</button>
-                    <button name="action" value="edit" type="submit" class="btn btn-danger">Editar</button>
-                </form>
+
+                <a href="{{url_for('tutor.course', courseid = course['course_id'])}}"
+                    class="btn btn-primary">Ingresar</a>
+                <a href="{{url_for('tutor.editcourse', courseid = course['course_id'])}}"
+                    class="btn btn-warning">Editar</a>
 
             </div>
         </div>

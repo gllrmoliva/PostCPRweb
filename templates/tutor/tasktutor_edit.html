@@ -1,0 +1,126 @@
+{% extends "tutor/base.html" %}
+
+{% block title %}Editar tarea{% endblock %}
+
+{% block addbutton %}
+<button type="button" class="btn btn-warning me-2">Editar tarea</button>
+{% endblock %}
+
+
+{% block content %}
+
+<div>
+    <h3 class="fw-bold">Editar tarea</h3>
+</div>
+
+<hr>
+
+<form role="form" action="{{ url_for('tutor.edit_task_post', course_id=task.course_id, task_id=task.task_id) }}"
+    method="post">
+
+    <!-- Campo nombre de tarea -->
+    <div class="form-group" style="margin-bottom:8px;">
+        <label for="inputEditTaskName">Nombre de la tarea</label>
+        <input type="task_name" class="form-control" id="inputEditTaskName" value="{{task.name}}">
+    </div>
+
+    <!-- Campo instrucciones -->
+    <div class="form-group" style="margin-bottom:8px;">
+        <label for="inputEditTaskInstructions">Instrucciones</label>
+        <textarea class="form-control" id="inputEditTaskInstructions" rows="3">{{task.instructions}}</textarea>
+    </div>
+
+    <div class="form-group" style="margin-bottom:8px;">
+        <label for="new_task_date">Fecha de entrega</label>
+        <input type="date" class="form-control" id="new_task_date" name="deadline_date" value="{{ task.deadline_date }}"
+            required>
+    </div>
+
+    <div class="form-group" style="margin-bottom:8px;">
+        <label for="new_deadline_date">Fecha límite de revisión</label>
+        <input type="date" class="form-control" id="new_deadline_date" name="review_deadline_date"
+            value="AQUI DEBE IR FECHA" required>
+    </div>
+    <!-- Tabla de criterios -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Criterio</th>
+                <th scope="col">Descripción</th>
+                <th class="justify-content-center" scope="col" style="width: 100px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Iterar sobre criterios de task; insertar una fila por criterio. TODO: Descripciones en db? -->
+            {% for criterion in criteria %}
+            <tr>
+                <td class="align-middle">
+                    <input type="text" class="form-control" name="criterion_name_{{ criterion.criterion_id }}"
+                        value="{{ criterion.name }}">
+                </td>
+                <td>
+                    <textarea class="form-control" name="criterion_description_{{ criterion.criterion_id }}"
+                        rows="3">{{ criterion.description }}</textarea>
+                </td>
+                <td class="align-middle">
+                    <button type="button" class="btn btn-danger" onclick="markForDeletion(this)">Eliminar</button>
+                    <input type="hidden" name="delete_criterion_{{ criterion.criterion_id }}" value="0">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+    <!--Aquí va el botón-->
+    <button type="button" class="btn btn-success" id="addCriterionBtn">Agregar criterio</button>
+
+
+    <hr>
+
+    <div class="form-group" style="margin-top:16px;"
+        action="{{url_for('tutor.edit_task_post', course_id = task.course_id ,task_id = task.task_id)}}">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a class="btn btn-secondary"
+            href="{{url_for('tutor.task',course_id = task.course_id, task_id = task.task_id )}}">Cancelar</a>
+    </div>
+</form>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    document.getElementById('addCriterionBtn').addEventListener('click', function () {
+        // Crear una nueva fila
+        var table = document.querySelector('.table tbody');
+        var newRow = document.createElement('tr');
+
+        newRow.innerHTML = `
+            <td class="align-middle"><input type="text" class="form-control" name="new_criterion_name[]" placeholder="Nombre del criterio"></td>
+            <td class="align-middle"><textarea class="form-control" name="new_criterion_description[]" placeholder="Descripción"></textarea></td>
+            <td class="align-middle">
+                <button type="button" class="btn btn-danger btn-remove">Eliminar</button>
+            </td>
+        `;
+
+        // Agregar la nueva fila a la tabla
+        table.appendChild(newRow);
+
+        // Agregar evento de eliminar fila
+        newRow.querySelector('.btn-remove').addEventListener('click', function () {
+            newRow.remove();
+        });
+    });
+</script>
+
+<script>
+    function markForDeletion(button) {
+        var row = button.closest('tr');
+        var hiddenInput = row.querySelector('input[type="hidden"]');
+        hiddenInput.value = "1"; // Marcar para eliminar
+        row.style.display = 'none'; // Opcional: ocultar visualmente la fila
+    }
+</script>
+
+{% endblock %}
