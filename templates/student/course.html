@@ -6,11 +6,11 @@
 {% block content %}
 <h1>Tareas</h1>
 <div class="list-group">
-    {%for task in tasks %}
+    {%for task in course.tasks %}
 
     <!-- ruta = -->
 
-    <a href="{{url_for('student.task', task_id = task['task_id'])}}" class="list-group-item list-group-item-action">
+    <a href="{{url_for('student.task', task_id = task.id)}}" class="list-group-item list-group-item-action">
 
         <div class="containerr">
             <div class="row align-items-start">
@@ -23,7 +23,7 @@
                 </div>
                 <div class="col text-end mx-5">
                     <span class="fw-bold">Estado: </span>
-                    <span>placeholder</span>
+                    <span>{{task_completion_status(task)}}</span>
                 </div>
             </div>
         </div>

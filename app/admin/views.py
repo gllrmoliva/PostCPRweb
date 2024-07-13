@@ -2,26 +2,20 @@ from . import admin
 from flask import render_template, request, redirect, url_for, session, flash
 
 from login_required import login_required
-from database import db
-from database.models import engine
-from sqlalchemy.orm import sessionmaker
-from database.models import *
-from database.functions import Database
 from datetime import date
 
 """
 Todas las rutas que están aquí tienen el prefijo "/admin"
 """
 
-database = Database(engine)
 
 @admin.route("/", methods=["GET"])
-@login_required('admin')
+@login_required('ADMIN')
 def home():
     return render_template("admin/home.html")
 
 @admin.route("/", methods=["POST"])
-@login_required('admin') 
+@login_required('ADMIN') 
 def home_post():
     form = request.form
     # En caso de que se quiera crear un nuevo usuario
