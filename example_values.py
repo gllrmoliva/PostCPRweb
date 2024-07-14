@@ -97,8 +97,8 @@ def insert_default_values(database):
 
     # Agregamos todo a la base de datos
     # ¡Ojo! Por comportamiento de "cascada" basta con ingresar un elemento el cual recursivamente exista una relación con el resto.
-    database.session.add(jack)
-    database.session.add(biologia)
+    database._session.add(jack)
+    database._session.add(biologia)
 
 if __name__ == "__main__":
     db = Database()

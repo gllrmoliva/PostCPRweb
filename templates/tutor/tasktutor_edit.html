@@ -15,56 +15,73 @@
 
 <hr>
 
-<form role="form" action="{{ url_for('tutor.edit_task_post', course_id=task.course_id, task_id=task.task_id) }}"
+<form role="form" action="{{ url_for('tutor.edit_task_post', task_id=task.id) }}"
     method="post">
 
     <!-- Campo nombre de tarea -->
     <div class="form-group" style="margin-bottom:8px;">
         <label for="inputEditTaskName">Nombre de la tarea</label>
-        <input type="task_name" class="form-control" id="inputEditTaskName" value="{{task.name}}">
+        <input type="text" class="form-control" id="inputEditTaskName" name="name" value="{{task.name}}">
     </div>
 
     <!-- Campo instrucciones -->
     <div class="form-group" style="margin-bottom:8px;">
         <label for="inputEditTaskInstructions">Instrucciones</label>
-        <textarea class="form-control" id="inputEditTaskInstructions" rows="3">{{task.instructions}}</textarea>
+        <textarea class="form-control" id="inputEditTaskInstructions" name="instructions" rows="3">{{task.instructions}}</textarea>
     </div>
 
     <div class="form-group" style="margin-bottom:8px;">
         <label for="new_task_date">Fecha de entrega</label>
-        <input type="date" class="form-control" id="new_task_date" name="deadline_date" value="{{ task.deadline_date }}"
+        <input type="date" class="form-control" id="new_task_date" name="deadline_date" value="{{task.deadline_date}}"
             required>
     </div>
 
     <div class="form-group" style="margin-bottom:8px;">
         <label for="new_deadline_date">Fecha límite de revisión</label>
         <input type="date" class="form-control" id="new_deadline_date" name="review_deadline_date"
-            value="AQUI DEBE IR FECHA" required>
+            value={{task.review_deadline_date}} required>
     </div>
+    <hr>
+
     <!-- Tabla de criterios -->
+
+    <div>
+        <h3 class="fw-bold">Editar criterios</h3>
+    </div>
+    <div>
+        <h6 class="fw-normal">Agregar, eliminar o modificar el puntaje de un criterio dejará
+            las revisiones actuales de la tarea como obsoletas y se desecharan del sistema.</h6>
+    </div>
+    <hr>
+
     <table class="table table-bordered">
         <thead>
             <tr>
                 <th scope="col">Criterio</th>
-                <th scope="col">Descripción</th>
+                <th scope="col" style="width: 50%;">Descripción</th>
+                <th scope="col" style="width: 12%;">Puntaje máximo</th>
                 <th class="justify-content-center" scope="col" style="width: 100px;"></th>
             </tr>
         </thead>
         <tbody>
             <!-- Iterar sobre criterios de task; insertar una fila por criterio. TODO: Descripciones en db? -->
-            {% for criterion in criteria %}
+            {% for criterion in task.criteria %}
             <tr>
                 <td class="align-middle">
-                    <input type="text" class="form-control" name="criterion_name_{{ criterion.criterion_id }}"
+                    <input type="text" class="form-control" name="criterion_name_{{criterion.id}}"
                         value="{{ criterion.name }}">
                 </td>
                 <td>
-                    <textarea class="form-control" name="criterion_description_{{ criterion.criterion_id }}"
+                    <textarea class="form-control" name="criterion_description_{{criterion.id}}"
                         rows="3">{{ criterion.description }}</textarea>
+                </td>
+                <td>
+                    <input type="number" step="0.1" class="form-control" name="criterion_max_score_{{criterion.id}}"
+                        value="{{ criterion.max_score }}">
                 </td>
                 <td class="align-middle">
                     <button type="button" class="btn btn-danger" onclick="markForDeletion(this)">Eliminar</button>
-                    <input type="hidden" name="delete_criterion_{{ criterion.criterion_id }}" value="0">
+                    <input type="hidden" name="delete_criterion_{{ criterion.id }}" value="0">
                 </td>
             </tr>
             {% endfor %}
@@ -78,10 +95,10 @@
     <hr>
 
     <div class="form-group" style="margin-top:16px;"
-        action="{{url_for('tutor.edit_task_post', course_id = task.course_id ,task_id = task.task_id)}}">
+        action="{{url_for('tutor.edit_task_post', task_id = task.id)}}">
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
         <a class="btn btn-secondary"
-            href="{{url_for('tutor.task',course_id = task.course_id, task_id = task.task_id )}}">Cancelar</a>
+            href="{{url_for('tutor.task',task_id = task.id )}}">Cancelar</a>
     </div>
 </form>
 
@@ -99,6 +116,7 @@
         newRow.innerHTML = `
             <td class="align-middle"><input type="text" class="form-control" name="new_criterion_name[]" placeholder="Nombre del criterio"></td>
             <td class="align-middle"><textarea class="form-control" name="new_criterion_description[]" placeholder="Descripción"></textarea></td>
+            <td class="align-middle"><input type="number" step="0.1" class="form-control" name="new_criterion_max_score[]" placeholder="Puntaje máximo del criterio"></td>
             <td class="align-middle">
                 <button type="button" class="btn btn-danger btn-remove">Eliminar</button>
             </td>

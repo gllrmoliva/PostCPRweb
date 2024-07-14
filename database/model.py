@@ -119,6 +119,9 @@ class Criterion(Base):
     # Atributos relacionales
     task_id: Mapped[int] = mapped_column(ForeignKey("task_table.id"), nullable=False)
     task: Mapped[Task] = relationship(back_populates="criteria")
+    criterion_reviews: Mapped[List[CriterionReview]] = relationship(back_populates="criterion",
+                                                                    cascade="all, delete-orphan")
+                                                                    # No existe instancia de CriterionReview que no tenga una instancia de Criterion asociada
 
 # Describe la entrega de un estudiante de una tarea. No confundir con la revisión de una entrega
 class Submission(Base):
@@ -150,7 +153,9 @@ class Review(Base):
     submission: Mapped[Submission] = relationship(back_populates="reviews")
     reviewer_id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), nullable=False)
     reviewer: Mapped[User] = relationship(back_populates="reviews")
-    criterion_reviews: Mapped[List[CriterionReview]] = relationship(back_populates="review")
+    criterion_reviews: Mapped[List[CriterionReview]] = relationship(back_populates="review",
+                                                                    cascade="all, delete-orphan")
+                                                                    # No existe instancia de CriterionReview que no tenga una instancia de Review asociada
 
 # Describe la evaluación de un criterio en la revisión de una entrega
 class CriterionReview(Base):
@@ -161,6 +166,6 @@ class CriterionReview(Base):
 
     # Atributos no relacionales
     criterion_id: Mapped[int] = mapped_column(ForeignKey("criterion_table.id"), primary_key=True)
-    criterion: Mapped[Criterion] = relationship()
+    criterion: Mapped[Criterion] = relationship(back_populates="criterion_reviews")
     review_id: Mapped[int] = mapped_column(ForeignKey("review_table.id"), primary_key=True)
     review: Mapped[Review] = relationship(back_populates="criterion_reviews")
