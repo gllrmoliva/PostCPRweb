@@ -155,10 +155,10 @@ class Review(Base):
 class CriterionReview(Base):
     __tablename__ = "criterion_review_table"
 
-    # Atributos relacionales
+    # Atributos no relacionales
     score: Mapped[float] = mapped_column(nullable=False)
 
-    # Atributos no relacionales
+    # Atributos relacionales
     criterion_id: Mapped[int] = mapped_column(ForeignKey("criterion_table.id"), primary_key=True)
     criterion: Mapped[Criterion] = relationship()
     review_id: Mapped[int] = mapped_column(ForeignKey("review_table.id"), primary_key=True)
