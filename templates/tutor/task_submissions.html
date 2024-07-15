@@ -50,18 +50,14 @@
             </td>
         </tr>
         <tr>
-            <td scope="row" class="align-middle">Juanito Alimaña</th>
-            <td class="align-middle">jualimana@mail.com</td>
-            <td class="align-middle">100</td>
-            <td class="align-middle">XX</td>
-            <td class="align-middle">
+            <td scope="row" colspan="5" class="align-middle text-center">
                 <!--Aquí deberiamos ver si los estudiantes pueden solicitar correción-->
                 <form action="{{url_for('tutor.task_submissions_post', course_id = course_id
                                                                    , task_id = task_id
                                                                    , submission_id = 'submission.id')}}" method="post">
 
-                    <button type="submit" name="accept" class="btn btn-success border">Aceptar revisión</button>
-                    <button type="submit" name="review" class="btn btn-primary border">Corregir</button>
+                    <button type="submit" name="accept_all" class="btn btn-success border">Aceptar todas las
+                        revisiones</button>
                 </form>
             </td>
         </tr>

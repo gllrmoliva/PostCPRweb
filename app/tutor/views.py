@@ -247,6 +247,8 @@ def task_submissions_post(course_id, task_id, submission_id):
     form = request.form
     if "accept" in form:
         flash("Se acepto wuaaat")
+    elif "accept_all" in form:
+        flash("Se acepto TODO wuuaaaaat")
     elif "review" in form:
         flash("Se review wuaaaat")
     # Esto de aca abajo es provicional uwu
