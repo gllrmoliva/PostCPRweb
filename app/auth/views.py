@@ -10,6 +10,8 @@ si el usuario existe, si es así verificamos la contraseña y que sea tutor. Si 
 muestra un mensaje tipo no se pudo iniciar sesion. Lo mismo ocurre con estudiante.
 """
 
+# Los valores por defecto de la BDD originalmente eran insertados desde un archivo .py ejecutado desde el root del proyecto, sólo los dejé acá porque vi que esta era la primera incialización de ``Database`` - Martín
+
 database = Database()
 database.init()
 
