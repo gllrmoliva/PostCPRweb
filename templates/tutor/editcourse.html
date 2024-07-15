@@ -4,7 +4,7 @@
 {% block title %}{{course.name}}{% endblock %}
 
 {% block content %}
-<form action="{{ url_for('tutor.editcourse_post', courseid=course.course_id) }}" method="post">
+<form action="{{ url_for('tutor.editcourse_post', course_id=course.id) }}" method="post">
 
     <div class="mb-3 d-flex align-items-center"> <!-- Utilizamos d-flex para hacer los elementos en línea -->
 
@@ -31,7 +31,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="{{url_for('tutor.editcourse_post', courseid = course.course_id)}}" method="post">
+                <form action="{{url_for('tutor.editcourse_post', course_id = course.id)}}" method="post">
 
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="student_email" name="email" required>
@@ -50,25 +50,27 @@
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Correo</th>
             <th scope="col" style="width: 100px;"></th>
         </tr>
     </thead>
     <tbody>
+        {% for student in course.students %}
         <tr>
-            <th scope="row" class="align-middle">1</th>
-            <td class="align-middle">STUDENT</td>
-            <td class="align-middle">student1@mail.com</td>
+            <th scope="row" class="align-middle">{{student.name}}</th>
+            <td class="align-middle">{{student.email}}</td>
             <td class="align-middle">
-                <form action="{{ url_for('tutor.editcourse_post', courseid=course.course_id) }}" method="post">
+                <form action="{{ url_for('tutor.editcourse_post', course_id=course.id) }}" method="post">
                     <button type="submit" class="btn btn-danger">Eliminar</button>
                     <input type="hidden" name="form_type" value="delete_student">
-                    <input type="hidden" name="email" value="EMAIL DE USUARIO">
+                    <!--Esto es para tener un metodo para eliminar un usuario de un curso por su email, igualmente
+                    se podria hacer por id supongo-->
+                    <input type="hidden" name="email" value="{{student.email}}">
                 </form>
             </td>
         </tr>
+        {% endfor %}
     </tbody>
 </table>
 

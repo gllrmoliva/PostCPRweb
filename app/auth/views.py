@@ -2,6 +2,7 @@ from . import auth
 from flask import render_template, request, redirect, url_for, flash, session
 
 from database.database import Database
+from database.database import User
 
 """
 Aquí se puede iniciar sesión como estudiante o tutor. Si se apreta el botón iniciar sesión como tutor, se verifica
@@ -129,7 +130,8 @@ def logout():
 @auth.route("/account", methods = ['GET'])
 def account():
     if "user_type" in session and "user_id" in session:
-        return render_template("account.html")
+        user = database.get_from_id(User, session["user_id"])
+        return render_template("account.html", user=user)
     else:
         flash("Para acceder a esta página debes iniciar sesión")
 
@@ -141,7 +143,50 @@ def account_post():
     La contraseña se debe cambiar solo si la contraseña vieja es la que esta en el sistema, sino debe tirar error
     Si nueva contraseña se deja en blanco no se cambia la contraseña. Además de la contraseña solo el nombre de usuario
     se debe cambiar.
+    - puse que se pudiera cambiar el correo tambien jeje - el mati
     """
+
+    # Obtenemos al usuario
+    if "user_type" in session and "user_id" in session:
+        user = database.get_from_id(User, session["user_id"])
+    else:
+        flash("Para acceder a esta página debes iniciar sesión")
+        return redirect(url_for("auth.signin"))
     
     form = request.form
-    return str(form)
+
+    # La contraseña nueva no se ingresó dos veces
+    if form["newPassword"] != form["confirmPassword"]:
+        flash("La confirmación de la contraseña nueva no coincide. Ingresé la contraseña nueva dos veces")
+        return redirect(url_for("auth.account"))
+    
+    # La contraseña antigua es incorrecta
+    if form["currentPassword"] != user.password:
+        flash("La contraseña actual ingresada es incorrecta")
+        return redirect(url_for("auth.account"))
+    
+    name_changed = False
+    email_changed = False
+    password_changed  = False
+
+    if form["username"] != user.name:
+        user.name = form["username"]
+        name_changed = True
+    if form["email"] != user.email:
+        user.email = form["email"]
+        email_changed = True
+    if form["newPassword"] != user.password:
+        user.password = form["newPassword"]
+        password_changed = True
+
+    database.commit_changes()
+
+    flash_message = ""
+    if name_changed: flash_message += "Nombre cambiado exitosamente. "
+    if email_changed: flash_message += "Correo electrónico cambiado exitosamente."
+    if password_changed: flash_message += "Contraseña cambiada exitosamente. "
+
+    if flash_message != "":
+        flash(flash_message)
+
+    return redirect(url_for("auth.account"))
