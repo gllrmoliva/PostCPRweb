@@ -50,7 +50,6 @@
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Correo</th>
             <th scope="col" style="width: 100px;"></th>
@@ -59,8 +58,7 @@
     <tbody>
         {% for student in course.students %}
         <tr>
-            <th scope="row" class="align-middle">{{student.id}}</th>
-            <td class="align-middle">{{student.name}}</td>
+            <th scope="row" class="align-middle">{{student.name}}</th>
             <td class="align-middle">{{student.email}}</td>
             <td class="align-middle">
                 <form action="{{ url_for('tutor.editcourse_post', course_id=course.id) }}" method="post">
@@ -68,7 +66,7 @@
                     <input type="hidden" name="form_type" value="delete_student">
                     <!--Esto es para tener un metodo para eliminar un usuario de un curso por su email, igualmente
                     se podria hacer por id supongo-->
-                    <input type="hidden" name="email" value="{{student.mail}}">
+                    <input type="hidden" name="email" value="{{student.email}}">
                 </form>
             </td>
         </tr>

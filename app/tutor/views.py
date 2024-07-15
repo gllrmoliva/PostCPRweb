@@ -143,11 +143,33 @@ def editcourse_post(course_id):
         return redirect(url_for("tutor.editcourse", course_id=course_id))
 
     elif request_form["form_type"] == "delete_student":
-        email = request_form["email"]
-        # TODO: Aquí borrar al usuario del curso y todo lo relacionado entremedio
 
-        flash(f"DEBUG: El usuario {email} se ha eliminado del curso")
-        return redirect(url_for("tutor.editcourse", courseid=course_id))
+        student = database.get_student_from_email(request_form["email"])
+        
+        # Para eliminar un estudiante de un curso se debe:
+        #   1. Quitar al estudiante del curso
+        #   2. Eliminar las revisiones de dicho curso que ha hecho el estudiante
+        #   3. Eliminar las entregas de dicho curso que ha hecho el estudiante
+        #   3.1. Elimninar las revisiones de cada una de estas entregas
+        
+        # (2)
+        for review in student.reviews:
+            if review.submission.task.course == course:
+                database.delete(review)
+        
+        # (3) y (3.1)
+        for submission in student.submissions:
+            if submission.task.course == course:
+                database.delete_all(submission.reviews) # (3.1)
+                database.delete(submission)
+        
+        # (1)
+        course.students.remove(student)
+
+        database.commit_changes()
+        flash("Se ha removido al estudiante del curso exitosamente")
+
+        return redirect(url_for("tutor.editcourse", course_id=course_id))
 
     elif request_form["form_type"] == "edit_course_name":
 
@@ -192,7 +214,7 @@ def task_post():
         # Agregar aquí función que calcula las notas con el algoritmo
         flash(f"DEBUG: Las notas han sido calculadas {str(form)}")
         pass
-    return redirect(url_for('tutor.task', course_id = form['course_id'], task_id = form['task_id']))
+    return redirect(url_for('tutor.task', task_id = form['task_id']))
 
 
 # Necesita método POST para modificar tasks existentes supongo?
@@ -269,7 +291,7 @@ def edit_task_post(task_id):
     database.commit_changes()
 
     if (major_changes):
-        flash("Se modificó la tarea exitosamente. Se desecharon las revisiones obsoletas")
+        flash("Se modificó la tarea exitosamente y se desecharon las revisiones obsoletas")
     else:
         flash("Se modificó la tarea exitosamente")
 
@@ -277,49 +299,87 @@ def edit_task_post(task_id):
 
 
 
-@tutor.route("c/<course_id>/t/<task_id>/r/<review_id>", methods=["GET"])
+@tutor.route("/s/<submission_id>", methods=["GET"])
 @login_required("TUTOR")
-def submission(course_id, task_id, review_id):
+def submission(submission_id):
 
-    task = database.get_task(task_id)
-    submission = database.get_submission_by_review(review_id)
-    course = database.get_course(course_id=course_id)
-    criteria = database.get_criteria_from_task(task)
+    # Obtenemos las variables a usar
+    tutor = database.set_tutor(session["user_id"])
+    submission = database.get_from_id(Submission, submission_id)
 
-    if database.is_review_reviewed(review_id, session["user_id"]) is True:
-        data = []
-        flash("Esa entrega ya ha sido evaluada")
-        return redirect(url_for("tutor.task",course_id=course_id,task_id = task_id))
+    # Revisamos si ya existe una revisión del tutor
+    status = "NO REVISADO"
+    tutor_review = None
+    score = 0
+    for review in submission.reviews:
+        if review.reviewer == tutor:
+            status = "REVISADO"
+            tutor_review = review
+            for criterion_review in review.criterion_reviews:
+                score += criterion_review.score
 
     return render_template(
-        "tutor/review.html",
-        task=task,
-        review_id=review_id,
+        "tutor/submission.html",
         submission=submission,
-        course=course,
-        criteria=criteria,
+        estado = status,
+        review=tutor_review,
+        score = score,
+        task_max_score = database.task_max_score(submission.task)
     )
 
 
-@tutor.route("c/<course_id>/t/<task_id>/r/<review_id>", methods=["POST"])
+@tutor.route("/s/<submission_id>", methods=["POST"])
 @login_required("TUTOR")
-def review_post(course_id, task_id, review_id):
-    request_form = request.form
+def review_submission(submission_id):
 
-    # Información para lógica del endpoint
-    date1 = date.today()
-    submission = database.get_submission_by_review(review_id)
-    user_id = session["user_id"]
-    database.mark_review_as_reviewed(submission=submission, user_id=user_id)
-    print(f"request form: {request_form}")
-    teacher_score = 0
+    if (False):
+        # Información para lógica del endpoint
+        date1 = date.today()
+        submission = database.get_submission_by_review(review_id)
+        user_id = session["user_id"]
+        database.mark_review_as_reviewed(submission=submission, user_id=user_id)
+        print(f"request form: {request_form}")
+        teacher_score = 0
 
-    for criterion_name, score in request_form.items():
-        criterion = database.get_criterion_by_name(criterion_name, task_id)
-        database.create_review_criterion(review_id, criterion.criterion_id, score)
-        teacher_score += int(score)
-    database.mark_submission_as_reviewed(
-        submission=submission, date=date1, teacher_score=teacher_score
-    )
+        for criterion_name, score in request_form.items():
+            criterion = database.get_criterion_by_name(criterion_name, task_id)
+            database.create_review_criterion(review_id, criterion.criterion_id, score)
+            teacher_score += int(score)
+        database.mark_submission_as_reviewed(
+            submission=submission, date=date1, teacher_score=teacher_score
+        )
 
-    return redirect(url_for("tutor.task", course_id=course_id, task_id=task_id))
+        return redirect(url_for("tutor.task", course_id=course_id, task_id=task_id))
+
+    # Obtenemos las variables a usar
+    tutor = database.set_tutor(session["user_id"])
+    submission = database.get_from_id(Submission, submission_id)
+    review = Review(submission = submission, reviewer = tutor)
+    request_form = request.form   
+    # date1 = date.today()
+
+    # Creamos la revisión de cada criterio
+    criterion_review_list = []
+
+    for criterion in review.submission.task.criteria:
+        if str(criterion.id) in request_form:
+            # Corresponde al valor entregado en el request, va desde 0 a 1 siempre
+            input_score = float(request_form[str(criterion.id)]) # El diccionario tiene valores en formato string
+
+            actual_score = input_score * criterion.max_score
+
+            # Creamos la revisión del criterio actual
+            criterion_review = CriterionReview(review=review, criterion=criterion, score=actual_score)
+            criterion_review_list.append(criterion_review)
+
+        else:   # Idealmente nunca se deberia llegar a esta parte del codigo
+            flash("Es necesario evaluar todos los criterios de la tarea")
+            return redirect(url_for("tutor.submission", submission_id))
+    
+    database.add(review)
+    database.add_all(criterion_review_list)
+    review.is_pending = False
+    database.commit_changes()
+    flash("Revision enviada exitosamente")
+
+    return redirect(url_for("tutor.submission", submission_id=submission_id))

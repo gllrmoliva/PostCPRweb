@@ -76,7 +76,6 @@
 
         <input type="hidden" name="action" value="calculate_grades">
         <input type="hidden" name="task_id" value="{{task.id}}">
-        <input type="hidden" name="course_id" value="{{task.course_id}}">
     </form>
 </div>
 <hr>
@@ -84,28 +83,16 @@
 <div class="list-group">
 
     {%for submission in task.submissions%}
-        {% for review in submission.reviews %}
-        <a href="{{url_for('tutor.submission',task_id=task.id,course_id=task.course_id,review_id=review.id)}}"
-            class="list-group-item list-group-item-action">
-            <div class="row">
+    <a href="{{url_for('tutor.submission', submission_id = submission.id)}}"
+        class="list-group-item list-group-item-action">
+        <div class="row">
 
-                <div class="col mr-5">
-                    <span class="fw-bold d-inline">{{submission.student.name}}</span>
-                </div>
-
-                <div class="col mr-5">
-                    <span class="fw-bold d-inline"> Puntos:</span>
-                    <span class="d-inline">submission.teacher_score</span>
-                </div>
-
-                <div class="col mr-5">
-                    <span class="fw-bold d-inline"> Estado:</span>
-                    <span class="d-inline">submission.reviewed_by_teacher</span>
-                </div>
-
+            <div class="col mr-5">
+                <span class="fw-bold d-inline">{{submission.student.name}}</span>
             </div>
-        </a>
-        {% endfor %}
+            
+        </div>
+    </a>
     {% endfor %}
 
 </div>

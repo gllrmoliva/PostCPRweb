@@ -9,7 +9,7 @@
 <div class="accordion" id="accordionPanel">
 
     <!--Para todos los cursos de un estudiante-->
-    {% for course in courses %}
+    {% for course in student.courses %}
     <div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#course1"
@@ -24,11 +24,19 @@
                     <!--Para todas las tareas dentro de un curso-->
                     <!--Esto esta mal hecho, pero es que faltan funciones :/ -->
                     <tbody>
-                        {% for task in tasks[course.course_id] %}
+                        {% for task in course.tasks %}
                         <tr>
                             <th scope="row">{{task.name}}</th>
-                            <td>Fecha de entrega</td>
-                            <td>Calificación</td>
+                            <td>Fecha de entrega: {{task.deadline_date}}</td>
+                            {% if task_completion_status(task) == 'REVISADO'%}
+                                <td>Calificación: {{'%0.2f' % task_score(task)}} / {{task_max_score(task)}} </td>
+                            {% endif %}
+                            {% if task_completion_status(task) == 'PENDIENTE'%}
+                                <td>Entrega pendiente</td>
+                            {% endif %}
+                            {% if task_completion_status(task) == 'ENVIADO'%}
+                                <td>Revisión pendiente</td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
