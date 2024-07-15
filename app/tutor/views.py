@@ -298,6 +298,30 @@ def edit_task_post(task_id):
     return redirect(url_for("tutor.course", course_id=task.course.id))
 
 
+@tutor.route("/c/<course_id>/t/<task_id>/submissions", methods=["GET"])
+@login_required("TUTOR")
+def task_submissions(course_id, task_id):
+    # Aquí necesitamos a los estudiantes de un curso, los puntajes obtenidos en la tarea, 
+    return render_template("tutor/task_submissions.html",
+                           course_id = course_id,
+                           task_id= task_id) 
+
+
+@tutor.route("/c/<course_id>/t/<task_id>/s/<submission_id>", methods=["POST"])
+@login_required("TUTOR")
+def task_submissions_post(course_id, task_id, submission_id):
+
+    form = request.form
+    if "accept" in form:
+        flash("Se acepto wuaaat")
+    elif "accept_all" in form:
+        flash("Se acepto TODO wuuaaaaat")
+    elif "review" in form:
+        flash("Se review wuaaaat")
+    # Esto de aca abajo es provicional uwu
+    return redirect(url_for('tutor.task_submissions',
+                     course_id = course_id, 
+                     task_id = task_id))
 
 @tutor.route("/s/<submission_id>", methods=["GET"])
 @login_required("TUTOR")
