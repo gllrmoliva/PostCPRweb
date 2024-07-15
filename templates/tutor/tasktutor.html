@@ -5,7 +5,7 @@
 
 
 {% block addbutton %}
-<form action="{{url_for('tutor.edit_task', course_id = task.course_id ,task_id = task.task_id)}}">
+<form action="{{url_for('tutor.edit_task', task_id = task.id)}}">
     <button type="submit" class="btn btn-warning me-2">Editar tarea</button>
 </form>
 {% endblock %}
@@ -25,7 +25,11 @@
     </div>
     <div class="col-auto mr-5">
         <span class="fw-bold d-inline">Fecha límite de revisión: </span>
-        <span class="d-inline">YYYY-MM-DD</span>
+        <span class="d-inline">{{task.review_deadline_date}}</span>
+    </div>
+    <div class="col-auto mr-5">
+        <span class="fw-bold d-inline">Puntaje máximo: </span>
+        <span class="d-inline">{{'%0.2f' % task_max_score}}</span>
     </div>
 </div>
 
@@ -41,13 +45,24 @@
         <h3 class="fw-bold">Criterios</h3>
     </div>
     <hr>
-    <ul class="list-group">
-        {% for criterion in criteria %}
-        <li class="list-group-item">
-            {{criterion.name}}
-        </li>
-        {% endfor %}
-    </ul>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Criterio</th>
+                <th scope="col">Descripción</th>
+                <th scope="col" style="width: 8%;">Puntaje máximo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for criterion in task.criteria%}
+            <tr>
+                <th scope="row">{{criterion.name}}</th>
+                <td>{{criterion.description}}</td>
+                <td>{{'%0.2f' % criterion.max_score}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <hr>
@@ -60,33 +75,22 @@
         <button type="submit" class="btn btn-primary">Calcular puntajes</button>
 
         <input type="hidden" name="action" value="calculate_grades">
-        <input type="hidden" name="task_id" value="{{task.task_id}}">
-        <input type="hidden" name="course_id" value="{{course.course_id}}">
+        <input type="hidden" name="task_id" value="{{task.id}}">
     </form>
 </div>
 <hr>
 
 <div class="list-group">
 
-    {% for (review_id,review,submission,name) in data %}
-    <a href="{{url_for('tutor.submission',task_id=task.task_id,course_id=task.course_id,review_id=review_id)}}"
+    {%for submission in task.submissions%}
+    <a href="{{url_for('tutor.submission', submission_id = submission.id)}}"
         class="list-group-item list-group-item-action">
         <div class="row">
 
             <div class="col mr-5">
-                <span class="fw-bold d-inline">{{name}}</span>
+                <span class="fw-bold d-inline">{{submission.student.name}}</span>
             </div>
-
-            <div class="col mr-5">
-                <span class="fw-bold d-inline"> Puntos:</span>
-                <span class="d-inline">{{submission.teacher_score}}</span>
-            </div>
-
-            <div class="col mr-5">
-                <span class="fw-bold d-inline"> Estado:</span>
-                <span class="d-inline">{{submission.reviewed_by_teacher}}</span>
-            </div>
-
+            
         </div>
     </a>
     {% endfor %}

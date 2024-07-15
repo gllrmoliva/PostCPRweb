@@ -4,7 +4,6 @@ from flask import render_template, request, redirect, url_for, session, flash
 from login_required import login_required
 from database.model import *
 from database.student_database import StudentDatabase
-from datetime import date
 
 """
 Cosas basicas sobre la interfaz de Estudiante:
@@ -63,7 +62,6 @@ def task(task_id):
     task = database.get_from_id(Task, task_id)
     state = database.task_completion_status(task)
     submission = database.get_submission(task)
-    criteria = task.criteria
 
     # TODO : Los siguientes estados: 
     # REVISADO
@@ -179,6 +177,7 @@ def review_task_post(review_id):
 
     return redirect(url_for("student.reviews"))
 
+# TODO
 @student.route("/grades", methods=["GET"])
 @login_required("STUDENT")
 def grades():
@@ -186,12 +185,9 @@ def grades():
     En esta vista se mostraran las calificaciones obtenidas por un estudiante
     """
 
-    student = database.get_user(session["user_id"])
+    student = database.set_student(session["user_id"])
 
-    courses = database.get_courses_from_student(student)
-    # Esto es cerdo pero weno
-    tasks = {}
-    for course in courses:
-        tasks[course.course_id] = database.get_tasks_from_course(course)
-
-    return render_template("student/grades.html",courses = courses, tasks = tasks)
+    return render_template("student/grades.html", student = student
+                                                , task_completion_status = database.task_completion_status
+                                                , task_score = database.task_score
+                                                , task_max_score = database.task_max_score)
