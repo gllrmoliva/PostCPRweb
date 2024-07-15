@@ -1,8 +1,9 @@
 from .context import database
 from database.database import *
-from database.example_values import insert_default_values
+from example_values_test import insert_default_values
 from trustsystem.PCPRtrustrank import get_conflictsorted_submissions
 
+# FIXME: esto en realidad no crea una db nueva, instancia un objeto Database que está modificando los mismos datos de ./database/database_0.db (oops)
 def create_test_db(database: Database):
     database.init()
     database.clear()
