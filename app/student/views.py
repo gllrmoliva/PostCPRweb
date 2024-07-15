@@ -63,7 +63,6 @@ def task(task_id):
     task = database.get_from_id(Task, task_id)
     state = database.task_completion_status(task)
     submission = database.get_submission(task)
-    criteria = task.criteria
 
     # TODO : Los siguientes estados: 
     # REVISADO
@@ -179,6 +178,7 @@ def review_task_post(review_id):
 
     return redirect(url_for("student.reviews"))
 
+# TODO
 @student.route("/grades", methods=["GET"])
 @login_required("STUDENT")
 def grades():
