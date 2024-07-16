@@ -4,16 +4,26 @@
 {% block title %}{{task.name}}{% endblock %}
 
 
-{% block addbutton %}
-<form action="{{url_for('tutor.edit_task', task_id = task.id)}}">
-    <button type="submit" class="btn btn-warning me-2">Editar tarea</button>
-</form>
-{% endblock %}
-
 
 {% block content %}
-<div>
-    <h3 class="fw-bold">{{task.name}}</h3>
+<div class="d-flex justify-content-between align-items-center mb-0">
+    <h3 class="fw-bold align-middle">{{task.name}}</h3>
+
+    <div class="d-flex">
+
+        <form action="{{url_for('tutor.task_post')}}" method="POST" class="mx-1">
+            <button type="submit" class="btn btn-success align-middle" name="assign_reviews">Asignar
+                Revisiones</button>
+            <input type="hidden" name="task_id" value="{{task.id}}">
+        </form>
+
+        <a href="{{url_for('tutor.task_submissions',course_id = task.course_id ,task_id = task.id)}}"
+            class="btn btn-primary mx-1">Aceptar Revisiones</a>
+
+        <form action="{{url_for('tutor.edit_task', task_id = task.id)}}" class="aling-middle mx-1">
+            <button type="submit" class="btn btn-warning me-2">Editar tarea</button>
+        </form>
+    </div>
 </div>
 
 <hr>
@@ -42,7 +52,7 @@
 <hr>
 <div class="my-4">
     <div class="mb-3">
-        <h3 class="fw-bold">Criterios</h3>
+        <h4 class="fw-bold">Criterios</h4>
     </div>
     <hr>
     <table class="table table-bordered table-hover">
@@ -65,36 +75,31 @@
     </table>
 </div>
 
-<hr>
-
-<div class="d-flex justify-content-between align-items-center">
-    <h3 class="fw-bold mb-0">Entregas</h3>
-
-    <!--TODO: Tiene sentido que esto solo se muestre pasada la fecha limite-->
-    <form action="{{url_for('tutor.task_post')}}" method="POST" class="mb-0">
-        <button type="submit" class="btn btn-primary">Calcular puntajes</button>
-
-        <input type="hidden" name="action" value="calculate_grades">
-        <input type="hidden" name="task_id" value="{{task.id}}">
-    </form>
+<div class="d-flex justify-content-between align-items-center mb-0">
+    <h4 class="fw-bold my-1 align-middle">Entregas</h4>
 </div>
 <hr>
-
 <div class="list-group">
-
     {%for submission in task.submissions%}
-    <a href="{{url_for('tutor.submission', submission_id = submission.id)}}"
+    <div href="{{url_for('tutor.submission', submission_id = submission.id)}}"
         class="list-group-item list-group-item-action">
-        <div class="row">
 
-            <div class="col mr-5">
+        <div class="row mb-0">
+
+            <div class="d-flex justify-content-between align-items-center">
+
                 <span class="fw-bold d-inline">{{submission.student.name}}</span>
+                <form action="{{url_for('tutor.task_post', task_id = task.id)}}" method="post">
+                    <button type="submit" name="delete_submission" class="btn btn-danger">Eliminar entrega</button>
+                    <input type="hidden" name="task_id" value="{{task.id}}">
+                    <input type="hidden" name="submission_id" value="{{submission.id}}">
+                </form>
             </div>
-            
-        </div>
-    </a>
-    {% endfor %}
 
+        </div>
+    </div>
+    {% endfor %}
 </div>
+<a href="{{url_for('tutor.course',course_id = task.course_id )}}" class="btn btn-secondary mt-2">Volver</a>
 
 {% endblock %}

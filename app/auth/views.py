@@ -38,49 +38,54 @@ def signin():
 
 @auth.route("/", methods = ['POST'])
 def signin_post():
-        # Recuperamos los datos del formulario de inicio de sesión enviados
-        request_form = request.form
+    """
+    En esta ruta se reciben los datos con los cuales quiere acceder el usuario. 
+    Se inicia sesión si son correctos.
+    """
+        
+    # Recuperamos los datos del formulario de inicio de sesión enviados
+    request_form = request.form
 
-        email = request_form["email"]
-        password = request_form["password"]
-        print(f"{email} {password}")
-        # Iniciamos la base de datos, además aqui se estan creando las tablas y añadiendo datos de prueba
-            # yo aqui no veo nada xd???
+    email = request_form["email"]
+    password = request_form["password"]
+    print(f"{email} {password}")
+    # Iniciamos la base de datos, además aqui se estan creando las tablas y añadiendo datos de prueba
+        # yo aqui no veo nada xd???
 
 
-        # Diferenciamos si el usuario inicia sesión como estudiante o como tutor    TODO: y como admin
-        # Login como estudiante
-        if email == "admin@admin.com" and password == "admin":
-                session["user_id"] = -1 
-                session["user_type"] = "ADMIN"
-                return redirect(url_for("admin.home"))
-        elif "signinstudent" in request_form:
-            student = database.login_student(email, password)
-            # Login incorrecto
-            if (student == None):
-                flash("Email o Contraseña equivocado, intente con otro")
-                return redirect(url_for("auth.signin"))
-            # Login correcto
-            else:
-                session["user_id"] = student.id
-                session["user_type"] = "STUDENT"
-                return redirect(url_for("student.home"))
-        # Login como tutor
-        elif "signintutor" in request_form:
-            tutor = database.login_tutor(email, password)
-            # Login incorrecto
-            if (tutor == None):
-                flash("Email o Contraseña equivocado, intente con otro")
-                return redirect(url_for("auth.signin"))
-            # Login correcto
-            else:
-                session["user_id"] = tutor.id
-                session["user_type"] = "TUTOR"
-                return redirect(url_for("tutor.home"))
-        # no sé en que caso se llegaria a aca, pero por si acaso
-        else:
-            flash("Inicio de sesión invalido")
+    # Diferenciamos si el usuario inicia sesión como estudiante o como tutor    TODO: y como admin
+    # Login como estudiante
+    if email == "admin@admin.com" and password == "admin":
+            session["user_id"] = -1 
+            session["user_type"] = "ADMIN"
+            return redirect(url_for("admin.home"))
+    elif "signinstudent" in request_form:
+        student = database.login_student(email, password)
+        # Login incorrecto
+        if (student == None):
+            flash("Email o Contraseña equivocado, intente con otro")
             return redirect(url_for("auth.signin"))
+        # Login correcto
+        else:
+            session["user_id"] = student.id
+            session["user_type"] = "STUDENT"
+            return redirect(url_for("student.home"))
+    # Login como tutor
+    elif "signintutor" in request_form:
+        tutor = database.login_tutor(email, password)
+        # Login incorrecto
+        if (tutor == None):
+            flash("Email o Contraseña equivocado, intente con otro")
+            return redirect(url_for("auth.signin"))
+        # Login correcto
+        else:
+            session["user_id"] = tutor.id
+            session["user_type"] = "TUTOR"
+            return redirect(url_for("tutor.home"))
+    # no sé en que caso se llegaria a aca, pero por si acaso
+    else:
+        flash("Inicio de sesión invalido")
+        return redirect(url_for("auth.signin"))
 
         # deprecated
         if (False):
@@ -131,6 +136,13 @@ def logout():
 # Ruta a la que se accede cuando se quiere cerrar sesión
 @auth.route("/account", methods = ['GET'])
 def account():
+    """
+    En esta ruta se introducen los cambios que un usuario quiere hacer en su cuenta. Estos son:
+    1. Cambio de Username
+    2. Cambio de Correo
+    3. Cambio de Contraseña
+    """
+    
     if "user_type" in session and "user_id" in session:
         user = database.get_from_id(User, session["user_id"])
         return render_template("account.html", user=user)
@@ -142,10 +154,13 @@ def account():
 @auth.route("/account", methods = ['POST'])
 def account_post():
     """
-    La contraseña se debe cambiar solo si la contraseña vieja es la que esta en el sistema, sino debe tirar error
-    Si nueva contraseña se deja en blanco no se cambia la contraseña. Además de la contraseña solo el nombre de usuario
-    se debe cambiar.
-    - puse que se pudiera cambiar el correo tambien jeje - el mati
+    La función recibe un formulario con las peticiones de cambios del usuario. Los cambios que se pueden realizar
+    son:
+    1. Cambiar el nombre del usuario
+    2. Cambiar el correo del usuario
+    3. Cambiar la contraseña
+    Para hacer cualquiera de estar acciones se debe confirmar con la contraseña actual del usuario.
+    Nota: Si no se completa el campo "nueva contraseña" la contraseña no se cambia.
     """
 
     # Obtenemos al usuario
@@ -177,7 +192,7 @@ def account_post():
     if form["email"] != user.email:
         user.email = form["email"]
         email_changed = True
-    if form["newPassword"] != user.password:
+    if form["newPassword"] != user.password and form["newPassword"] != "":
         user.password = form["newPassword"]
         password_changed = True
 

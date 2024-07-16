@@ -2,9 +2,6 @@
 
 {% block title %}Editar tarea{% endblock %}
 
-{% block addbutton %}
-<button type="button" class="btn btn-warning me-2">Editar tarea</button>
-{% endblock %}
 
 
 {% block content %}
@@ -15,8 +12,7 @@
 
 <hr>
 
-<form role="form" action="{{ url_for('tutor.edit_task_post', task_id=task.id) }}"
-    method="post">
+<form role="form" action="{{ url_for('tutor.edit_task_post', task_id=task.id) }}" method="post">
 
     <!-- Campo nombre de tarea -->
     <div class="form-group" style="margin-bottom:8px;">
@@ -27,7 +23,8 @@
     <!-- Campo instrucciones -->
     <div class="form-group" style="margin-bottom:8px;">
         <label for="inputEditTaskInstructions">Instrucciones</label>
-        <textarea class="form-control" id="inputEditTaskInstructions" name="instructions" rows="3">{{task.instructions}}</textarea>
+        <textarea class="form-control" id="inputEditTaskInstructions" name="instructions"
+            rows="3">{{task.instructions}}</textarea>
     </div>
 
     <div class="form-group" style="margin-bottom:8px;">
@@ -94,11 +91,9 @@
 
     <hr>
 
-    <div class="form-group" style="margin-top:16px;"
-        action="{{url_for('tutor.edit_task_post', task_id = task.id)}}">
+    <div class="form-group" style="margin-top:16px;" action="{{url_for('tutor.edit_task_post', task_id = task.id)}}">
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <a class="btn btn-secondary"
-            href="{{url_for('tutor.task',task_id = task.id )}}">Cancelar</a>
+        <a class="btn btn-secondary" href="{{url_for('tutor.task',task_id = task.id )}}">Cancelar</a>
     </div>
 </form>
 

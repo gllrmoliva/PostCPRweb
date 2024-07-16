@@ -1,15 +1,10 @@
 {% extends "base.html" %}
 
-
 {% block title %}Admin{% endblock %}
 
 {% block navbar %}
+
 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-    <li class="nav-item">
-        <a class="nav-link" href="#">Item 1</a>
-    </li>
-
 </ul>
 
 <a href="{{url_for('auth.logout')}}" class="btn btn-danger">Cerrar sesión</a>
