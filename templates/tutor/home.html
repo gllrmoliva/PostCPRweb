@@ -3,10 +3,6 @@
 {% block title %}Home{% endblock %}
 
 
-{% block addbutton %}
-<button type="button" class="btn btn-primary mx-2" data-bs-toggle="modal" data-bs-target="#createcourseModal">Crear
-    Curso</button>
-{% endblock %}
 
 {% block content %}
 <!-- ventana emergente de crear curso (modal window)-->
@@ -35,17 +31,24 @@
     </div>
 </div>
 
+<!--Titulo y botón-->
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Cursos</h2>
+    <div class="d-flex">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createcourseModal">Crear
+            Curso</button>
+    </div>
+</div>
+<hr>
 <!--Generación de tarjetas cursos-->
 <div class="row">
     {% for course in courses%}
-    <div class="col-sm-3 mb-3 mb-sm-0 my-3">
+    <div class="col-sm-3 my-3 mb-sm-0">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title fw-bold">{{course.name}}</h5>
-                <a href="{{url_for('tutor.course', course_id = course.id)}}"
-                    class="btn btn-primary">Ingresar</a>
-                <a href="{{url_for('tutor.editcourse', course_id = course.id)}}"
-                    class="btn btn-warning">Editar</a>
+                <h5 class="card-title fw-bold mb-4">{{course.name}}</h5>
+                <a href="{{url_for('tutor.course', course_id = course.id)}}" class="btn btn-primary mb-1">Ingresar</a>
+                <a href="{{url_for('tutor.editcourse', course_id = course.id)}}" class="btn btn-warning">Editar</a>
 
             </div>
         </div>

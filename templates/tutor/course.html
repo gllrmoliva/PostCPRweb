@@ -3,12 +3,6 @@
 
 {% block title %}{{course.name}}{% endblock %}
 
-{% block addbutton %}
-<a href="{{url_for('tutor.editcourse', course_id = course.id)}}" class="btn btn-warning me-2">Editar curso</a>
-
-<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#createhomeworkModal">Crear
-    Tarea</button>
-{% endblock %}
 
 {% block content %}
 
@@ -30,12 +24,14 @@
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="date" class="form-control" id="new_task_deadline_date" name="deadline_date" required>
+                        <input type="date" class="form-control" id="new_task_deadline_date" name="deadline_date"
+                            required>
                         <label for="new_task_date">Fecha de entrega</label>
                     </div>
 
                     <div class="form-floating mb-3">
-                        <input type="date" class="form-control" id="new_task_review_deadline_date" name="review_deadline_date" required>
+                        <input type="date" class="form-control" id="new_task_review_deadline_date"
+                            name="review_deadline_date" required>
                         <label for="new_task_date">Fecha límite de revisión</label>
                     </div>
 
@@ -55,15 +51,25 @@
 </div>
 
 
+<div class="d-flex justify-content-between align-items-center mb-1">
+    <h2>Tareas</h2>
 
-<h1>Tareas</h1>
+    <div class="d-flex">
+        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal"
+            data-bs-target="#createhomeworkModal">Crear
+            Tarea</button>
+
+        <a href="{{url_for('tutor.editcourse', course_id = course.id)}}" class="btn btn-warning me-2">Editar curso</a>
+
+    </div>
+</div>
+<hr>
 <div class="list-group">
     {%for task in course.tasks %}
 
     <!-- ruta = -->
 
-    <a href="{{url_for('tutor.task', task_id = task.id)}}"
-        class="list-group-item list-group-item-action">
+    <a href="{{url_for('tutor.task', task_id = task.id)}}" class="list-group-item list-group-item-action">
 
         <div class="containerr">
             <div class="row align-items-start">
