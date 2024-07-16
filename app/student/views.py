@@ -7,9 +7,8 @@ from database.student_database import StudentDatabase
 
 """
 Cosas basicas sobre la interfaz de Estudiante:
-- En la barra de navegación superior, se debe poder: cerrar sesión, ir a la homepage (TODO: ver cual es la homepage),
-Ir a la vision de cursos, ir a la vision de evaluaciones (probablemente tambien se deba añadir una vista para 
-ver las evaluaciones dentro de cada curso, tipo seccion de evaluaciones INFODA)
+- En la barra de navegación superior, se debe poder: cerrar sesión, ir a la homepage,
+Ir a la vision de cursos, ir a la vision de calificaciones 
 """
 
 database = StudentDatabase()
@@ -73,20 +72,6 @@ def task(task_id):
                            criterion_score=database.criterion_score,
                            task_score=database.task_score(task))
 
-
-
-@student.route("/c/<course_id>", methods=["POST"])
-@login_required("STUDENT")
-def course_post(course_id):
-
-    # ¿cuando accedemos a aca?? - mati
-    print("Holaaaaaaaaaaaaaaa!!!")
-
-    # puede que esta ruta no sea necesaria, ya que redirigimos a los cursos a traves de href en
-    # html
-    return "se hizo una peticion post a coursetutor"
-
-
 @student.route("/t/<task_id>", methods=["POST"])
 @login_required("STUDENT")
 def task_post(task_id):
@@ -113,7 +98,10 @@ def task_post(task_id):
 @student.route("/reviews", methods=["GET"])
 @login_required("STUDENT")
 def reviews():
-
+    """
+        Aquí se muestran las tareas que un estudiante debe revisar, solo se muestran las 
+        estan pendientes de revisión. 
+    """
     # Obtenemos las variables a usar
     student = database.set_student(session["user_id"])
 
@@ -124,6 +112,9 @@ def reviews():
 @student.route("/review/r/<review_id>", methods=["GET"])
 @login_required("STUDENT")
 def review_task(review_id):
+    """
+    Accedemos a la revisión de la tarea con el id review_id
+    """
 
     # Obtenemos las variables a usar
     student = database.set_student(session["user_id"])
@@ -143,7 +134,7 @@ def review_task(review_id):
 @login_required("STUDENT")
 def review_task_post(review_id):
     """
-    Aquí se van a subir las respuestas dadas por el estudiante para la evaluación
+    Aquí se suben las respuestas dadas por el estudiante para una evaluación.
     """
 
     # Obtenemos las variables a usar
@@ -182,7 +173,8 @@ def review_task_post(review_id):
 @login_required("STUDENT")
 def grades():
     """
-    En esta vista se mostraran las calificaciones obtenidas por un estudiante
+    En esta vista se muestran las calificaciones obtenidas por un estudiante en todos los cursos en los que 
+    participa.
     """
 
     student = database.set_student(session["user_id"])

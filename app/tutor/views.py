@@ -15,7 +15,9 @@ database.init()
 @tutor.route("/", methods=["GET"])
 @login_required("TUTOR")
 def home():
-
+    """En esta vista se muestran todos los cursos que son de un tutor. Además, desde aquí se pueden 
+    crear vistas nuevas.
+    """
     # Es necesario vincular el tutor a la base de datos en cada ruta
     tutor = database.set_tutor(session["user_id"])
 
@@ -27,7 +29,9 @@ def home():
 @tutor.route("/", methods=["POST"])
 @login_required("TUTOR")
 def home_post():
-
+    """
+    Si el tutor presiono sobre el botón de crear curso y aceptar, el curso es creado.
+    """
     tutor = database.set_tutor(session["user_id"])
 
     # Obtenemos los datos del formulario
@@ -59,7 +63,10 @@ def home_post():
 @tutor.route("/c/<course_id>", methods=["GET"])
 @login_required("TUTOR")
 def course(course_id):
-
+    """
+    Se muestran las tareas disponible que tiene un curso sobre los cuales se puede presionar
+    para acceder a ellos, además el tutor puede crear nuevas tareas.
+    """
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
     course = database.get_from_id(Course, course_id)
@@ -72,6 +79,9 @@ def course(course_id):
 @tutor.route("/c/<course_id>", methods=["POST"])
 @login_required("TUTOR")
 def course_post(course_id):
+    """
+    Si el tutor quiere crear una tarea, en esta ruta la tarea se crea y se commitea en la base de datos
+    """
 
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
@@ -105,6 +115,10 @@ def course_post(course_id):
 @tutor.route("/c/<course_id>/edit", methods=["GET"])
 @login_required("TUTOR")
 def editcourse(course_id):
+    """
+    Ruta para editar un curso, se pueden añadir/eliminar estudiantes y cambiar el nombre del curso.
+    TODO: Añadir posibilidad de eliminar curso
+    """
 
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
@@ -116,6 +130,10 @@ def editcourse(course_id):
 @tutor.route("/c/<course_id>/edit", methods=["POST"])
 @login_required("TUTOR")
 def editcourse_post(course_id):
+    """
+    Recupera el formulario con los cambios hechos en la ruta editcourse y los commitea a 
+    la base de datos si es posible.
+    """
 
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
@@ -192,10 +210,21 @@ def editcourse_post(course_id):
     return "se hizo una péticion post en editcourse y paso algo raro: " + str(request_form)
 
 
-
 @tutor.route("/t/<task_id>", methods=["GET"])
 @login_required("TUTOR")
 def task(task_id):
+    """
+    Es la vista de una sola tarea, en esta de muestran:
+    - Nombre de la tarea
+    - Descripción
+    - Puntaje máximo
+    - Fechas limite
+    - Entregas hechas por alumno
+    Además el tutor puede:
+    - Eliminar tareas hechas por estudiantes
+    - Editar la tarea
+    - Asignar revisiones a los estudiantes (PCPR)
+    """
 
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
@@ -209,6 +238,12 @@ def task(task_id):
 @login_required("TUTOR")
 # TODO hacer esta ruta
 def task_post():
+    """
+    Dependiendo de los botones presionados por el tutor en vista task, se ejecutan dos acciones:
+    1. Eliminar una submission hecha por un alumno, esto le deja la posibilidad de enviarla nuevamente.
+    2. Asignar revisiones a los alumnos dependiendo de las submission en el sistema.
+    """
+    
     form = request.form
     if 'delete_submission' in form:
         # Agregar aquí función que calcula las notas con el algoritmo
@@ -222,6 +257,10 @@ def task_post():
 @tutor.route("/t/<task_id>/edit", methods=["GET"])
 @login_required("TUTOR")
 def edit_task(task_id):
+    """
+    Vista para editar una tarea. En esta se puede:
+    Agregar criterios, cambiar nombre de tarea, cambiar descripción de tarea.
+    """
 
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
@@ -232,6 +271,20 @@ def edit_task(task_id):
 @tutor.route("/t/<task_id>/edit", methods=["POST"])
 @login_required("TUTOR")
 def edit_task_post(task_id): 
+    """
+    Aquí se ejecutan los cambios hechos por el usuario en la vista edit_task. En este caso se 
+    consideran dos tipos de cambios:
+    1. Cambios mayores: estos se refieren a los cambios que cambian la forma en al que se evalua la tarea.
+    Estos pueden ser:
+        - Eliminar criterios.
+        - Modificar puntaje de un criterio.
+        - Crear criterios. 
+    2. Cambios menores: estos se refieren a los cambios que NO cambian la forma de evaluación:
+        - Cambiar nombre de tarea
+        - Cambiar datos de un criterios ya existente (se supone que se referira a lo mismo)
+    
+    Cuando los cambios son mayores, todas las revisiones ya hechas se eliminan.
+    """
 
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
@@ -278,7 +331,7 @@ def edit_task_post(task_id):
         
         if name and description and max_score:  # Asegurarse de que no estén vacíos
             new_criterion = Criterion(name = name, description = description, max_score = max_score, task = task)
-            task.criteria.append(criterion)
+            task.criteria.append(new_criterion)
 
         else:
             flash("Se ingresaron parametros vacios al intentar creas nuevos criterios")
@@ -302,6 +355,11 @@ def edit_task_post(task_id):
 @tutor.route("/c/<course_id>/t/<task_id>/submissions", methods=["GET"])
 @login_required("TUTOR")
 def task_submissions(course_id, task_id):
+    """
+    En esta vista se muestran todas las revisiones generadas con el ALGORITMO. En cada revision el tutor puede:
+    1. Aceptar la revisión generada por el ALGORITMO
+    2. Hacer una revisión manual
+    """
     # Aquí necesitamos a los estudiantes de un curso, los puntajes obtenidos en la tarea, 
     return render_template("tutor/task_submissions.html",
                            course_id = course_id,
@@ -311,7 +369,12 @@ def task_submissions(course_id, task_id):
 @tutor.route("/c/<course_id>/t/<task_id>/s/<submission_id>", methods=["POST"])
 @login_required("TUTOR")
 def task_submissions_post(course_id, task_id, submission_id):
-
+    """
+    Dado la acción seleccionada por el usuario, se hacen las siguientes acciónes:
+    1. Aceptar todas las revisiones
+    2. Aceptar una revisión en especifico
+    3. Revisar manualmente una revisión
+    """
     form = request.form
     if "accept" in form:
         flash("Se acepto wuaaat")
@@ -327,7 +390,9 @@ def task_submissions_post(course_id, task_id, submission_id):
 @tutor.route("/s/<submission_id>", methods=["GET"])
 @login_required("TUTOR")
 def submission(submission_id):
-
+    """
+    En esta vista se puede revisar una tarea hecha por un estudiante.
+    """
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
     submission = database.get_from_id(Submission, submission_id)
@@ -356,7 +421,10 @@ def submission(submission_id):
 @tutor.route("/s/<submission_id>", methods=["POST"])
 @login_required("TUTOR")
 def review_submission(submission_id):
-
+    """
+    En esta vista se corre la logica de revisar tarea estudiante, los datos se sacan de lo entregado por el
+    usuario en submission
+    """
     if (False):
         # Información para lógica del endpoint
         date1 = date.today()
