@@ -46,9 +46,8 @@
 
     </div>
     <div class="text-end my-3">
-        <a href="{{url_for('student.course', course_id = task.course.id)}}" class="btn btn-warning btn-md ">Cancelar</a>
-
         <button type="submit" class="btn btn-primary btn-md ">Enviar</button>
+        <a href="{{url_for('student.course', course_id = task.course.id)}}" class="btn btn-danger btn-md ">Cancelar</a>
     </div>
 </form>
 
@@ -125,7 +124,7 @@
     </div>
 </form>
 <div class="text-end my-3">
-    <a href="{{url_for('student.course', course_id = task.course.id)}}" class="btn btn-primary btn-md">Volver</a>
+    <a href="{{url_for('student.course', course_id = task.course.id)}}" class="btn btn-secondary btn-md">Volver</a>
 </div>
 {% endif %}
 
@@ -175,7 +174,7 @@
 </div>
 
 <div class="text-end my-3">
-    <a href="{{url_for('student.course', course_id = task.course.id)}}" class="btn btn-primary btn-md">Volver</a>
+    <a href="{{url_for('student.course', course_id = task.course.id)}}" class="btn btn-secondary btn-md">Volver</a>
 </div>
 
 {% endif %}

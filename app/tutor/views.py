@@ -210,10 +210,11 @@ def task(task_id):
 # TODO hacer esta ruta
 def task_post():
     form = request.form
-    if form['action'] == 'calculate_grades':
+    if 'delete_submission' in form:
         # Agregar aquí función que calcula las notas con el algoritmo
-        flash(f"DEBUG: Las notas han sido calculadas {str(form)}")
-        pass
+        flash(f"DEBUG: se ha borrado una submission {str(form)}")
+    elif 'assign_reviews' in form:
+        flash("Se asignaron las revisiones o el minimo de revisiones entregas debe ser 3¿?")
     return redirect(url_for('tutor.task', task_id = form['task_id']))
 
 
