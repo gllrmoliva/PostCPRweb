@@ -7,7 +7,7 @@ from database.model import *
 from database.database import IntegrityException
 from database.tutor_database import TutorDatabase
 from database.time import Time
-from trustsystem.PCPRtrustrank import get_conflictsorted_submissions, MAX_CONFLICT_LEVEL
+from trustsystem.PCPRtrustrank import get_conflictsorted_submissions, MAX_CONFLICT_LEVEL, AMOUNT_OF_ASSIGNED_REVIEWS
 
 #import sqllite3    Se utilizaba para manejar excepciones, pero creo que importar un DBMS en frontend no es buena idea
 
@@ -269,12 +269,10 @@ def task_post():
         flash(f"DEBUG: se ha borrado una submission {str(form)}")
     elif 'end_submission_period' in form:
         # Cuando se termina el periodo de entrega se asignan las revisiones que debe hacer cada estudiante
-        submissions = task.submissions
+        submissions = task.submissions  
 
-        # Esta es la cantidad de revisiones que se asignaran a cada estudiante
-        amount = 3        
-        if len(submissions)<4:
-            flash("La cantidad minima de alumnos para la asignación es de 4.")
+        if len(submissions) <= AMOUNT_OF_ASSIGNED_REVIEWS:
+            flash(f"Se requieren {AMOUNT_OF_ASSIGNED_REVIEWS +1} entregas de esta tarea como mínimo para la asignación de revisiones")
         else:
             # Hacermos que las submissions esten de forma aleatoria
             # Por ahora esta comentado, ya que el algoritmo del martin peta 
@@ -283,7 +281,7 @@ def task_post():
             # Iteramos sobre las entregas
             for i in range(len(submissions)):
                 # Luego repetimos 3 veces
-                for j in range(1,amount+1):
+                for j in range(1,AMOUNT_OF_ASSIGNED_REVIEWS+1):
                     # Si el estudiante de la entrega es distinto al que va a hacer review:
                     if(submissions[i].student.id != submissions[(i+j) % len(submissions)].student.id):
                         # creamos la review

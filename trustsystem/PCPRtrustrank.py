@@ -9,6 +9,7 @@ _QUANTILES_FEATURE = False # ¡Feature W.I.P! No colocar True a menos que se sep
 
 MAX_CONFLICT_LEVEL: float = float_info.max # Valor provisional de discrepancia para aquellas entregas con cantidad insuficiente de revisiones
 MIN_AMOUNT_OF_REVIEWS: int = 2 # Valor minimo de revisiones requeridas para qué el algoritmo se considere fiable (¡COMO MINIMO DEBE VALER 2!)
+AMOUNT_OF_ASSIGNED_REVIEWS: int = 3  # Esta es la cantidad de revisiones que se asignaran a cada estudiante cuando acabé el periodo de entregas
 
 # -- Funciones auxiliares --
 
