@@ -23,7 +23,7 @@
                 Revisiones</button>
 
             <a href="{{url_for('tutor.task_submissions',course_id = task.course_id ,task_id = task.id)}}"
-                class="btn btn-primary mx-1">Aceptar Revisiones</a>
+                class="btn btn-primary mx-1">Ver discrepancia de revisiones</a>
             {% endif %}
 
             <input type="hidden" name="task_id" value="{{task.id}}">

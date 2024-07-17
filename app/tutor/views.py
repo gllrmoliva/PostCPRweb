@@ -6,6 +6,7 @@ from database.model import *
 from database.database import IntegrityException
 from database.tutor_database import TutorDatabase
 from database.time import Time
+from trustsystem.PCPRtrustrank import get_conflictsorted_submissions
 
 #import sqllite3    Se utilizaba para manejar excepciones, pero creo que importar un DBMS en frontend no es buena idea
 
@@ -233,8 +234,8 @@ def task(task_id):
     return render_template("tutor/tasktutor.html", task=task
                                                  , task_max_score = database.task_max_score(task)
                                                  #, state = "PERIODO DE ENTREGAS"
-                                                 , state = "PERIODO DE REVISIONES"
-                                                 #, state = "FINALIZADA"
+                                                 #, state = "PERIODO DE REVISIONES"
+                                                 , state = "FINALIZADA"
                            )
 
 @tutor.route("/post/t/", methods=["POST"])
@@ -359,7 +360,7 @@ def edit_task_post(task_id):
 
     return redirect(url_for("tutor.course", course_id=task.course.id))
 
-
+# FIXME: Puntajes no se muestran actualmente (mostrados como NONE en la tabla de la template renderizada)
 @tutor.route("/c/<course_id>/t/<task_id>/submissions", methods=["GET"])
 @login_required("TUTOR")
 def task_submissions(course_id, task_id):
@@ -368,10 +369,21 @@ def task_submissions(course_id, task_id):
     1. Aceptar la revisión generada por el ALGORITMO
     2. Hacer una revisión manual
     """
-    # Aquí necesitamos a los estudiantes de un curso, los puntajes obtenidos en la tarea, 
+    current_task = database.get_from_id(Task, task_id)
+    sub_clevel_pairs: list[tuple[Submission, float]] = get_conflictsorted_submissions(current_task)
+    submissions: list[Submission] = []
+    clevels: list[float] = []
+    for i in range(len(sub_clevel_pairs)):
+        submissions.append(sub_clevel_pairs[i][0])
+        clevels.append(sub_clevel_pairs[i][1])
+
     return render_template("tutor/task_submissions.html",
+                           task_id = task_id,
                            course_id = course_id,
-                           task_id= task_id) 
+                           task = current_task,
+                           algo_submissions = submissions,
+                           algo_clevels = clevels
+                           ) 
 
 
 @tutor.route("/c/<course_id>/t/<task_id>/s/<submission_id>", methods=["POST"])
@@ -386,10 +398,6 @@ def task_submissions_post(course_id, task_id, submission_id):
     form = request.form
     if "accept" in form:
         flash("Se acepto wuaaat")
-    elif "accept_all" in form:
-        flash("Se acepto TODO wuuaaaaat")
-    elif "review" in form:
-        flash("Se review wuaaaat")
     # Esto de aca abajo es provicional uwu
     return redirect(url_for('tutor.task_submissions',
                      course_id = course_id, 
