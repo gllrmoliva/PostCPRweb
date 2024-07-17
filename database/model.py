@@ -154,7 +154,6 @@ class Review(Base):
 
     # Atributos no relacionales
     id: Mapped[int] = mapped_column(primary_key=True)
-    deadline_date: Mapped[date | None] = mapped_column()
     is_pending: Mapped[bool] = mapped_column(default=True)
 
     # Atributos relacionales

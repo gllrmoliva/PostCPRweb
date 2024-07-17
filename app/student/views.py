@@ -113,6 +113,7 @@ def reviews():
     """
     # Obtenemos las variables a usar
     student = database.set_student(session["user_id"])
+
     return render_template("student/reviews.html", reviews=student.reviews)
 
 
@@ -130,6 +131,9 @@ def review_task(review_id):
 
     if not review.is_pending:
         flash("Esta entrega ya ha sido evaluada")
+        return redirect(url_for("student.reviews"))
+    elif review.submission.task.state == "COMPLETED":
+        flash("Esta tarea ya no acepta más revisiones")
         return redirect(url_for("student.reviews"))
 
     if review.reviewer == student:
