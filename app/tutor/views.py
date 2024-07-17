@@ -73,9 +73,14 @@ def course(course_id):
     tutor = database.set_tutor(session["user_id"])
     course = database.get_from_id(Course, course_id)
 
+    if course.tutor == tutor:
+        return render_template("tutor/course.html", course=course)
+    else:
+        flash("No perteneces a este curso.")
+        return redirect(url_for('tutor.home'))
+
     # TODO Verificar que el tutor de la sesión es efectivamente el tutor del curso
 
-    return render_template("tutor/course.html", course=course)
 
 
 @tutor.route("/c/<course_id>", methods=["POST"])
@@ -126,7 +131,13 @@ def editcourse(course_id):
     tutor = database.set_tutor(session["user_id"])
     course = database.get_from_id(Course, course_id)
 
-    return render_template("tutor/editcourse.html", course=course)
+    if course.tutor == tutor:
+        return render_template("tutor/editcourse.html", course=course)
+
+    else:
+        flash("No perteneces a este curso.")
+        return redirect(url_for('tutor.home'))
+
 
 
 @tutor.route("/c/<course_id>/edit", methods=["POST"])
@@ -232,10 +243,13 @@ def task(task_id):
     tutor = database.set_tutor(session["user_id"])
     task = database.get_from_id(Task, task_id)
 
-    return render_template("tutor/tasktutor.html", task=task
-                                                 , task_max_score = database.task_max_score(task)
-                                                 , state = task.state 
-                           )
+    if task.course.tutor == tutor:
+        return render_template("tutor/tasktutor.html", task=task
+                                                    , task_max_score = database.task_max_score(task)
+                                                    , state = task.state )
+    else:
+        flash("No perteneces a este curso.")
+        return redirect(url_for('tutor.home'))
 
 @tutor.route("/post/t/", methods=["POST"])
 @login_required("TUTOR")
@@ -254,17 +268,16 @@ def task_post():
         # Agregar aquí función que calcula las notas con el algoritmo
         flash(f"DEBUG: se ha borrado una submission {str(form)}")
     elif 'end_submission_period' in form:
-        flash("Se termino el periodo de entrega. DEBUG: se asignaron tasks")
         # Cuando se termina el periodo de entrega se asignan las revisiones que debe hacer cada estudiante
         submissions = task.submissions
 
+        # Esta es la cantidad de revisiones que se asignaran a cada estudiante
         amount = 3        
         if len(submissions)<4:
             flash("La cantidad minima de alumnos para la asignación es de 4.")
         else:
             # Hacermos que las submissions esten de forma aleatoria
             # Por ahora esta comentado, ya que el algoritmo del martin peta 
-            """
             shuffle(submissions)
             print(f"cantidad de submissions: {len(submissions)}") 
             # Iteramos sobre las entregas
@@ -279,9 +292,10 @@ def task_post():
                         # Añadimos a la base de datos
                         print(f"SUBMISSION_ID: {review.submission.id}, REVIEWER_ID: {review.reviewer.id}")
                         database.add(review)
-            """
+
             task.state = "REVIEW PERIOD"
             database.commit_changes()
+            flash("Se han asignado revisiones a los estudiantes y ha iniciado el periodo de revisión.")
     elif 'end_review_period' in form:
         # al presionar no aceptar más revisiones
         task.state = "COMPLETED"
@@ -303,8 +317,12 @@ def edit_task(task_id):
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
     task = database.get_from_id(Task, task_id)
-    
-    return render_template("tutor/tasktutor_edit.html", task=task)
+
+    if task.course.tutor == tutor:
+        return render_template("tutor/tasktutor_edit.html", task=task)
+    else:
+        flash("No perteneces a este curso")
+        return redirect(url_for('tutor.home'))
 
 @tutor.route("/t/<task_id>/edit", methods=["POST"])
 @login_required("TUTOR")
@@ -398,15 +416,20 @@ def task_submissions(course_id, task_id):
     1. Aceptar la revisión generada por el ALGORITMO
     2. Hacer una revisión manual
     """
+    # TODO: solo acceder a la pagina si la tarea esta en estado "COMPLETED"
+    tutor = database.set_tutor(session["user_id"])
     current_task = database.get_from_id(Task, task_id)
-    sub_clevel_pairs: list[tuple[Submission, float]] = get_conflictsorted_submissions(current_task)
-    submissions: list[Submission] = []
-    clevels: list[float] = []
-    for i in range(len(sub_clevel_pairs)):
-        submissions.append(sub_clevel_pairs[i][0])
-        clevels.append(sub_clevel_pairs[i][1])
 
-    return render_template("tutor/task_submissions.html",
+    if current_task.course.tutor == tutor:
+
+        sub_clevel_pairs: list[tuple[Submission, float]] = get_conflictsorted_submissions(current_task)
+        submissions: list[Submission] = []
+        clevels: list[float] = []
+        for i in range(len(sub_clevel_pairs)):
+            submissions.append(sub_clevel_pairs[i][0])
+            clevels.append(sub_clevel_pairs[i][1])
+
+        return render_template("tutor/task_submissions.html",
                            task_id = task_id,
                            course_id = course_id,
                            task = current_task,
@@ -416,6 +439,11 @@ def task_submissions(course_id, task_id):
                            weighted_score = database.task_weighted_score_of_student,
                            max_score = database.task_max_score,
                            ) 
+    
+
+    else:
+        flash("No perteneces a este curso")
+        return redirect(url_for('tutor.home'))
 
 
 @tutor.route("/c/<course_id>/t/<task_id>/s/<submission_id>", methods=["POST"])
@@ -474,25 +502,29 @@ def submission(submission_id):
     tutor = database.set_tutor(session["user_id"])
     submission = database.get_from_id(Submission, submission_id)
 
-    # Revisamos si ya existe una revisión del tutor
-    status = "NO REVISADO"
-    tutor_review = None
-    score = 0
-    for review in submission.reviews:
-        if review.reviewer == tutor:
-            status = "REVISADO"
-            tutor_review = review
-            for criterion_review in review.criterion_reviews:
-                score += criterion_review.score
+    if submission.task.course.tutor == tutor:
+        # Revisamos si ya existe una revisión del tutor
+        status = "NO REVISADO"
+        tutor_review = None
+        score = 0
+        for review in submission.reviews:
+            if review.reviewer == tutor:
+                status = "REVISADO"
+                tutor_review = review
+                for criterion_review in review.criterion_reviews:
+                    score += criterion_review.score
 
-    return render_template(
-        "tutor/submission.html",
-        submission=submission,
-        estado = status,
-        review=tutor_review,
-        score = score,
-        task_max_score = database.task_max_score(submission.task)
-    )
+        return render_template(
+            "tutor/submission.html",
+            submission=submission,
+            estado = status,
+            review=tutor_review,
+            score = score,
+            task_max_score = database.task_max_score(submission.task)
+        )
+    else:
+        flash("No perteneces a este curso")
+        return redirect(url_for('tutor.home'))
 
 
 @tutor.route("/s/<submission_id>", methods=["POST"])

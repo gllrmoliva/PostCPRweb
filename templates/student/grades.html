@@ -12,12 +12,13 @@
     {% for course in student.courses %}
     <div class="accordion-item">
         <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#course1"
-                aria-expanded="false" aria-controls="course1">
+
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#course{{course.id}}" aria-expanded="false" aria-controls="course{{course.id}}">
                 {{course.name}}
             </button>
         </h2>
-        <div id="course1" class="accordion-collapse collapse">
+        <div id="course{{course.id}}" class="accordion-collapse collapse">
             <div class="accordion-body">
 
                 <table class="table table-striped">
@@ -28,14 +29,17 @@
                         <tr>
                             <th scope="row">{{task.name}}</th>
                             <td>Fecha de entrega: {{task.deadline_date}}</td>
+
                             {% if task_completion_status(task) == 'REVISADO'%}
-                                <td>Calificación: {{'%0.2f' % task_score(task)}} / {{task_max_score(task)}} </td>
+                            <td>Calificación: {{'%0.2f' % task_score(task)}} / {{task_max_score(task)}} </td>
                             {% endif %}
+
                             {% if task_completion_status(task) == 'PENDIENTE'%}
-                                <td>Entrega pendiente</td>
+                            <td>Entrega pendiente</td>
                             {% endif %}
+
                             {% if task_completion_status(task) == 'ENVIADO'%}
-                                <td>Revisión pendiente</td>
+                            <td>Revisión pendiente</td>
                             {% endif %}
                         </tr>
                         {% endfor %}

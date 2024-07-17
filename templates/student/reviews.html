@@ -12,9 +12,7 @@
         <tr>
             <th scope="col">Curso</th>
             <th scope="col">Tarea</th>
-            <!--
             <th scope="col">Estudiante</th>
-            -->
             <th scope="col" style="width: 300px;">Fecha límite</th>
         </tr>
     </thead>
@@ -26,9 +24,7 @@
             <th scope="row">{{review.submission.task.course.name}}
             </th>
             <td>{{review.submission.task.name}}</td>
-            <!--
             <td>{{review.submission.student.name}}</td>
-        -->
             <td>{{review.deadline_date}}</td>
         </tr>
         {% endif %}
@@ -36,7 +32,6 @@
 
     </tbody>
 </table>
-<!--
 <div class="mb-3">
     <h3 class="fw-bold">Tareas revisadas</h3>
 </div>
@@ -64,5 +59,4 @@
 
     </tbody>
 </table>
--->
 {% endblock %}
