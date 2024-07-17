@@ -12,18 +12,20 @@
     <div class="d-flex">
 
         <form action="{{url_for('tutor.task_post')}}" method="POST" class="mx-1">
-            {% if state=="PERIODO DE ENTREGAS" %}
+
+            {% if state=="SUBMISSION PERIOD" %}
             <button type="submit" class="btn btn-primary align-middle" name="end_submission_period">Terminar periodo de
                 entrega</button>
-            {% elif state=="PERIODO DE REVISIONES" %}
+
+            {% elif state=="REVIEW PERIOD" %}
             <button type="submit" class="btn btn-primary align-middle" name="end_review_period">Terminar periodo de
                 revisiones</button>
-            {% elif state=="FINALIZADA" %}
-            <button type="submit" class="btn btn-success align-middle" name="assign_reviews">Asignar
-                Revisiones</button>
+
+            {% elif state=="COMPLETED" %}
 
             <a href="{{url_for('tutor.task_submissions',course_id = task.course_id ,task_id = task.id)}}"
                 class="btn btn-primary mx-1">Ver discrepancia de revisiones</a>
+
             {% endif %}
 
             <input type="hidden" name="task_id" value="{{task.id}}">

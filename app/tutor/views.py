@@ -234,9 +234,7 @@ def task(task_id):
 
     return render_template("tutor/tasktutor.html", task=task
                                                  , task_max_score = database.task_max_score(task)
-                                                 #, state = "PERIODO DE ENTREGAS"
-                                                 #, state = "PERIODO DE REVISIONES"
-                                                 , state = "FINALIZADA"
+                                                 , state = task.state 
                            )
 
 @tutor.route("/post/t/", methods=["POST"])
@@ -255,8 +253,9 @@ def task_post():
     if 'delete_submission' in form:
         # Agregar aquí función que calcula las notas con el algoritmo
         flash(f"DEBUG: se ha borrado una submission {str(form)}")
-    elif 'assign_reviews' in form:
-        # tiene sentido cambiar las submissions por submissions validas
+    elif 'end_submission_period' in form:
+        flash("Se termino el periodo de entrega. DEBUG: se asignaron tasks")
+        # Cuando se termina el periodo de entrega se asignan las revisiones que debe hacer cada estudiante
         submissions = task.submissions
 
         amount = 3        
@@ -264,6 +263,8 @@ def task_post():
             flash("La cantidad minima de alumnos para la asignación es de 4.")
         else:
             # Hacermos que las submissions esten de forma aleatoria
+            # Por ahora esta comentado, ya que el algoritmo del martin peta 
+            """
             shuffle(submissions)
             print(f"cantidad de submissions: {len(submissions)}") 
             # Iteramos sobre las entregas
@@ -278,14 +279,14 @@ def task_post():
                         # Añadimos a la base de datos
                         print(f"SUBMISSION_ID: {review.submission.id}, REVIEWER_ID: {review.reviewer.id}")
                         database.add(review)
-
-
+            """
+            task.state = "REVIEW PERIOD"
             database.commit_changes()
-
-    elif 'end_submission_period' in form:
-        flash("Terminar periodo de submission")
     elif 'end_review_period' in form:
-        flash("Terminar periodo de review")
+        # al presionar no aceptar más revisiones
+        task.state = "COMPLETED"
+        database.commit_changes()
+        flash("Se termino el periodo de revisiones.")
 
     return redirect(url_for('tutor.task', task_id = form['task_id']))
 
