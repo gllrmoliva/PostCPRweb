@@ -1,8 +1,22 @@
 import heapq
 from database.model import Criterion, Submission, Review, Task, CriterionReview
-from statistics import pstdev, fmean, quantiles
+from statistics import pstdev, quantiles
 
 _DEBUG_CONFLICTSORT = False
+
+# Para ser retrocompatible con Python 3.10
+def my_fmean(values, weights):
+    sum = 0
+    n = len(values)
+    for i in range(n):
+        sum += values[i] * weights[i]
+    total_weight = 0
+    for i in range(n):
+        total_weight += weights[i]
+    if total_weight == 0:
+        return 0
+    else:
+        return sum / total_weight
 
 # -- Funciones acopladas a implementación de la base de datos (actualmente SQLAlchemy) --
 
@@ -67,7 +81,7 @@ def get_conflictsorted_submissions(some_task: Task):
                     print("Entrega de: " + submission.student.name + "; Criterio: " + criterion.name + "; Desviación estándar: " + str(pstdev(scores_for_criterion)))
                 scores_for_criterion.clear()
 
-            sub_conflict_level += fmean(sub_criteria_review_stdev, task_criteria_weights)
+            sub_conflict_level += my_fmean(sub_criteria_review_stdev, task_criteria_weights)
             t: tuple = [sub_conflict_level, submission] # heapq siempre ordena usando el primer valor
             heapq.heappush(pq, t)
         else:
@@ -88,7 +102,7 @@ def get_conflictsorted_submissions(some_task: Task):
     for i in range(len(task_criteria_weights)):
         max_criteria_stdev.append(0.5*(task_criteria_weights[i] - 0))
 
-    max_clevel = fmean(max_criteria_stdev, task_criteria_weights)
+    max_clevel = my_fmean(max_criteria_stdev, task_criteria_weights)
     task_submission_clevels.append(max_clevel)
     
     if len(task_submission_clevels) < 10:
