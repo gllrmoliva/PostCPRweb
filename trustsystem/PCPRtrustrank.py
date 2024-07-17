@@ -2,7 +2,7 @@ import heapq
 from database.model import Criterion, Submission, Review, Task, CriterionReview
 from statistics import pstdev, fmean, quantiles
 
-_DEBUG_CONFLICTSORT = False # yea
+_DEBUG_CONFLICTSORT = False
 
 # -- Funciones acopladas a implementación de la base de datos (actualmente SQLAlchemy) --
 
@@ -16,16 +16,16 @@ def get_conflictsorted_submissions(some_task: Task):
     El grado de discordancia es un ``float`` que representa cuánto difieren el puntaje asignado por las coevaluaciones hechas a una misma entrega.
 
     Args:
-        some_task (Task): Instancia de una tarea con entregas ya coevaluadas
+        some_task (``Task``): Instancia de una tarea con entregas ya coevaluadas
 
     Returns:
-        (list[Submission]): Lista de entregas ordenada por grado de discordancia.
+        ret_val (``list[ tuple[Submission, float] ]``): Lista de pares ordenados (2-tuplas) que contienen una Submission, y a su valor de discordancia asociado. **len(ret_val) siempre es igual al número de entregas que tiene la tarea.**
     """    
     pq: heapq[[float, Submission]] = []                         # Priority queue cuya key es el nivel de conflicto de una ``Submission``.
     task_criteria: list[Criterion] = some_task.criteria         # Se asume que está en el mismo orden que la lista de ``criterion_reviews`` de un ``Review``
     task_submissions: list[Submission] = some_task.submissions  # Entregas no ordenadas
     task_criteria_weights: list[float] = []                     # Lista de pesos de cada criterio en la tarea, en este caso representados por los puntajes máximos de cada criterio. 
-    ret_val: list[Submission] = []                              # Lista de ``Submission``s retornada
+    ret_val: list[ tuple[Submission, float] ] = []                              # Lista retornada
     task_submission_clevels: list[float] = []
 
     # Inserción de puntajes máximos de criterios a una lista
@@ -77,9 +77,7 @@ def get_conflictsorted_submissions(some_task: Task):
     for i in range(len(pq)):
         pq_tuple: tuple[float, Submission] = heapq.heappop(pq)
         task_submission_clevels.append(pq_tuple[0])
-        ret_val.append(pq_tuple[1])
-        if _DEBUG_CONFLICTSORT:
-            print(pq_tuple[1].student.name +  "; Nivel de conflicto: " + str(pq_tuple[0]))
+        ret_val.append([pq_tuple[1], pq_tuple[0]])
 
     # Construcción de un arreglo con los deciles (n = 10) de la distribución de niveles de conflicto. Esto puede ayudar a clasificar los valores ``float`` a algo más utilizable por el front-end del sitio web (como agrupaciones de discordancia BAJA, MEDIA, ALTA?)
     # Sin embargo, siguiendo la documentación del módulo statistics, es recomendado que el largo del iterable (task_submission_clevels) sea mayor a n.
@@ -101,8 +99,10 @@ def get_conflictsorted_submissions(some_task: Task):
     # DEBUGPRINT: deciles para la variable aleatoria X: Nivel de conflicto
     if _DEBUG_CONFLICTSORT:
         for i in range(len(clevel_quantiles)):
-            print("Decile " + str(i) + ": " + str(clevel_quantiles[i]))
-
+            print("Decil " + str(i) + ": " + str(clevel_quantiles[i]))
+        for j in range(len(ret_val)):
+            print("Entrega de: " + ret_val[j][0].student.name + "; Discordancia: " + str(ret_val[j][1]))
 
     # Devolver la lista de Submissions, con discordancia descendiente.
-    return ret_val.reverse()
+    ret_val.reverse()
+    return ret_val
