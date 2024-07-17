@@ -7,7 +7,7 @@ from database.model import *
 from database.database import IntegrityException
 from database.tutor_database import TutorDatabase
 from database.time import Time
-from trustsystem.PCPRtrustrank import get_conflictsorted_submissions
+from trustsystem.PCPRtrustrank import get_conflictsorted_submissions, MAX_CONFLICT_LEVEL
 
 #import sqllite3    Se utilizaba para manejar excepciones, pero creo que importar un DBMS en frontend no es buena idea
 
@@ -268,17 +268,16 @@ def task_post():
         # Agregar aquí función que calcula las notas con el algoritmo
         flash(f"DEBUG: se ha borrado una submission {str(form)}")
     elif 'end_submission_period' in form:
-        flash("Se termino el periodo de entrega. DEBUG: se asignaron tasks")
         # Cuando se termina el periodo de entrega se asignan las revisiones que debe hacer cada estudiante
         submissions = task.submissions
 
+        # Esta es la cantidad de revisiones que se asignaran a cada estudiante
         amount = 3        
         if len(submissions)<4:
             flash("La cantidad minima de alumnos para la asignación es de 4.")
         else:
             # Hacermos que las submissions esten de forma aleatoria
             # Por ahora esta comentado, ya que el algoritmo del martin peta 
-            """
             shuffle(submissions)
             print(f"cantidad de submissions: {len(submissions)}") 
             # Iteramos sobre las entregas
@@ -293,9 +292,10 @@ def task_post():
                         # Añadimos a la base de datos
                         print(f"SUBMISSION_ID: {review.submission.id}, REVIEWER_ID: {review.reviewer.id}")
                         database.add(review)
-            """
+
             task.state = "REVIEW PERIOD"
             database.commit_changes()
+            flash("Se han asignado revisiones a los estudiantes y ha iniciado el periodo de revisión.")
     elif 'end_review_period' in form:
         # al presionar no aceptar más revisiones
         task.state = "COMPLETED"
@@ -428,15 +428,18 @@ def task_submissions(course_id, task_id):
         for i in range(len(sub_clevel_pairs)):
             submissions.append(sub_clevel_pairs[i][0])
             clevels.append(sub_clevel_pairs[i][1])
-    
+
         return render_template("tutor/task_submissions.html",
-                            task_id = task_id,
-                            course_id = course_id,
-                            task = current_task,
-                            algo_submissions = submissions,
-                            algo_clevels = clevels,
-                            weighted_score = database.task_weighted_score_of_student,
-                            max_score = database.task_max_score) 
+                           task_id = task_id,
+                           course_id = course_id,
+                           task = current_task,
+                           algo_submissions = submissions,
+                           algo_clevels = clevels,
+                           max_conflict_level = MAX_CONFLICT_LEVEL,
+                           weighted_score = database.task_weighted_score_of_student,
+                           max_score = database.task_max_score,
+                           ) 
+    
 
     else:
         flash("No perteneces a este curso")

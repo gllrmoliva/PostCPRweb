@@ -1,8 +1,14 @@
 import heapq
 from database.model import Criterion, Submission, Review, Task, CriterionReview
 from statistics import pstdev, quantiles
+from sys import float_info
 
-_DEBUG_CONFLICTSORT = False
+_DEBUG_CONFLICTSORT = False # Depuración
+
+_QUANTILES_FEATURE = False # ¡Feature W.I.P! No colocar True a menos que se sepa lo que se esta haciendo
+
+MAX_CONFLICT_LEVEL: float = float_info.max # Valor provisional de discrepancia para aquellas entregas con cantidad insuficiente de revisiones
+MIN_AMOUNT_OF_REVIEWS: int = 2 # Valor minimo de revisiones requeridas para qué el algoritmo se considere fiable (¡COMO MINIMO DEBE VALER 2!)
 
 # Para ser retrocompatible con Python 3.10
 def my_fmean(values, weights):
@@ -18,9 +24,18 @@ def my_fmean(values, weights):
     else:
         return sum / total_weight
 
+# Devuelve las revisiones de una entrega que NO esten pendientes y sean de estudiantes
+def get_not_pending_student_reviews(submission: Submission):
+    reviews = submission.reviews
+
+    output: list[Review] = []
+    for review in reviews:
+        if review.reviewer.type == "STUDENT" and not review.is_pending:
+            output.append(review)
+    
+    return output
+
 # -- Funciones acopladas a implementación de la base de datos (actualmente SQLAlchemy) --
-
-
 
 def get_score_for_criterion(tg_crit: Criterion, rev: Review):
     for rev_crit in rev.criterion_reviews:
@@ -68,12 +83,12 @@ def get_conflictsorted_submissions(some_task: Task):
     # Loop principal: Determinación de "nivel de conflicto" (o discordancia) presente entre las revisiones de cada entrega
     for submission in task_submissions:
         sub_conflict_level: float = 0
-        sub_reviews: list[Review] = submission.reviews          # Lista de coevaluaciones realizadas a esta entrega
-        sub_criteria_review_stdev: list[float] = []             # Estructura auxiliar: Lista donde cada valor es la desviación estándar poblacional entre los puntajes asignados a un mismo criterio.
+        sub_reviews: list[Review] = get_not_pending_student_reviews(submission)         # Lista de coevaluaciones realizadas a esta entrega
+        sub_criteria_review_stdev: list[float] = []         # Estructura auxiliar: Lista donde cada valor es la desviación estándar poblacional entre los puntajes asignados a un mismo criterio.
         scores_for_criterion: list[float] = []              # Estructura auxiliar: Puntajes asignados por distintos Review a un mismo criterio de esta entrega
 
         # El sistema actualmente no maneja nivel de conflicto para entregas que poseen una única coevaluación.
-        if len(sub_reviews) > 1:
+        if len(sub_reviews) > MIN_AMOUNT_OF_REVIEWS:
             # Se busca calcular la desviación estándar entre los puntajes que las coevaluaciones asignaron a un criterio. Esto se repite para cada criterio de la tarea.
             for criterion in task_criteria:
                 for j in range(len(sub_reviews)):
@@ -87,7 +102,8 @@ def get_conflictsorted_submissions(some_task: Task):
             t: tuple = [sub_conflict_level, submission] # heapq siempre ordena usando el primer valor
             heapq.heappush(pq, t)
         else:
-            continue
+            t: tuple = [MAX_CONFLICT_LEVEL, submission]
+            heapq.heappush(pq, t)
 
     # Inserción a ret_val de las entregas por orden ascendente de conflicto
     for i in range(len(pq)):
@@ -95,29 +111,31 @@ def get_conflictsorted_submissions(some_task: Task):
         task_submission_clevels.append(pq_tuple[0])
         ret_val.append([pq_tuple[1], pq_tuple[0]])
 
-    # Construcción de un arreglo con los deciles (n = 10) de la distribución de niveles de conflicto. Esto puede ayudar a clasificar los valores ``float`` a algo más utilizable por el front-end del sitio web (como agrupaciones de discordancia BAJA, MEDIA, ALTA?)
-    # Sin embargo, siguiendo la documentación del módulo statistics, es recomendado que el largo del iterable (task_submission_clevels) sea mayor a n.
-    # Además, para lograr esta clasificación, es necesario encontrar un valor de nivel de discordancia máximo, y que este sea el valor en el decil 10.
-    # Realizamos esta última tarea con la desigualdad de Popoviciu para varianzas.
-    max_clevel: float = 0.0
-    max_criteria_stdev: list[float] = []
-    for i in range(len(task_criteria_weights)):
-        max_criteria_stdev.append(0.5*(task_criteria_weights[i] - 0))
+    # Construcción de quintiles
+    if _QUANTILES_FEATURE:
+        # Construcción de un arreglo con los deciles (n = 10) de la distribución de niveles de conflicto. Esto puede ayudar a clasificar los valores ``float`` a algo más utilizable por el front-end del sitio web (como agrupaciones de discordancia BAJA, MEDIA, ALTA?)
+        # Sin embargo, siguiendo la documentación del módulo statistics, es recomendado que el largo del iterable (task_submission_clevels) sea mayor a n.
+        # Además, para lograr esta clasificación, es necesario encontrar un valor de nivel de discordancia máximo, y que este sea el valor en el decil 10.
+        # Realizamos esta última tarea con la desigualdad de Popoviciu para varianzas.
+        max_clevel: float = 0.0
+        max_criteria_stdev: list[float] = []
+        for i in range(len(task_criteria_weights)):
+            max_criteria_stdev.append(0.5*(task_criteria_weights[i] - 0))
 
-    max_clevel = my_fmean(max_criteria_stdev, task_criteria_weights)
-    task_submission_clevels.append(max_clevel)
-    
-    if len(task_submission_clevels) < 10:
-        clevel_quantiles = quantiles(task_submission_clevels, n=len(task_submission_clevels))
-    else:
-        clevel_quantiles = quantiles(task_submission_clevels, n=10)
+        max_clevel = my_fmean(max_criteria_stdev, task_criteria_weights)
+        task_submission_clevels.append(max_clevel)
+        
+        if len(task_submission_clevels) < 10:
+            clevel_quantiles = quantiles(task_submission_clevels, n=len(task_submission_clevels))
+        else:
+            clevel_quantiles = quantiles(task_submission_clevels, n=10)
 
-    # DEBUGPRINT: deciles para la variable aleatoria X: Nivel de conflicto
-    if _DEBUG_CONFLICTSORT:
-        for i in range(len(clevel_quantiles)):
-            print("Decil " + str(i) + ": " + str(clevel_quantiles[i]))
-        for j in range(len(ret_val)):
-            print("Entrega de: " + ret_val[j][0].student.name + "; Discordancia: " + str(ret_val[j][1]))
+        # DEBUGPRINT: deciles para la variable aleatoria X: Nivel de conflicto
+        if _DEBUG_CONFLICTSORT:
+            for i in range(len(clevel_quantiles)):
+                print("Decil " + str(i) + ": " + str(clevel_quantiles[i]))
+            for j in range(len(ret_val)):
+                print("Entrega de: " + ret_val[j][0].student.name + "; Discordancia: " + str(ret_val[j][1]))
 
     # Devolver la lista de Submissions, con discordancia descendiente.
     ret_val.reverse()
