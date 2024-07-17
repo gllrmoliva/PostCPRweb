@@ -1,5 +1,6 @@
 from . import tutor
 from flask import render_template, request, redirect, url_for, session, flash
+from random import shuffle
 
 from login_required import login_required
 from database.model import *
@@ -249,11 +250,38 @@ def task_post():
     """
     
     form = request.form
+    task = database.get_from_id(Task, form['task_id'])
+
     if 'delete_submission' in form:
         # Agregar aquí función que calcula las notas con el algoritmo
         flash(f"DEBUG: se ha borrado una submission {str(form)}")
     elif 'assign_reviews' in form:
-        flash("Se asignaron las revisiones o el minimo de revisiones entregas debe ser 3¿?")
+        # tiene sentido cambiar las submissions por submissions validas
+        submissions = task.submissions
+
+        amount = 3        
+        if len(submissions)<4:
+            flash("La cantidad minima de alumnos para la asignación es de 4.")
+        else:
+            # Hacermos que las submissions esten de forma aleatoria
+            shuffle(submissions)
+            print(f"cantidad de submissions: {len(submissions)}") 
+            # Iteramos sobre las entregas
+            for i in range(len(submissions)):
+                # Luego repetimos 3 veces
+                for j in range(1,amount+1):
+                    # Si el estudiante de la entrega es distinto al que va a hacer review:
+                    if(submissions[i].student.id != submissions[(i+j) % len(submissions)].student.id):
+                        # creamos la review
+                        review = Review(submission = submissions[(i+j) % len(submissions)]
+                                        ,reviewer = submissions[i].student)
+                        # Añadimos a la base de datos
+                        print(f"SUBMISSION_ID: {review.submission.id}, REVIEWER_ID: {review.reviewer.id}")
+                        database.add(review)
+
+
+            database.commit_changes()
+
     elif 'end_submission_period' in form:
         flash("Terminar periodo de submission")
     elif 'end_review_period' in form:

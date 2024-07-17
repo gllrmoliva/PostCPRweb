@@ -31,6 +31,8 @@ def insert_default_values(database: Database):
     diego = Student(email="diego@stu.com", password="1234", name="Diego Díaz")
 
     fisica.students.extend([pedro, juan, diego])
+    quimica.students.extend([pedro, juan, diego])
+    biologia.students.extend([pedro, juan, diego])
 
     # Mendel: Esta en biologia
     mendel = Student(email="mendel@stu.com", password="efgh", name="Gregor Mendel") # ¡Contraseña distinta!

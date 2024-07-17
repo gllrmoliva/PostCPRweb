@@ -6,6 +6,8 @@ _DEBUG_CONFLICTSORT = False
 
 # -- Funciones acopladas a implementación de la base de datos (actualmente SQLAlchemy) --
 
+
+
 def get_score_for_criterion(tg_crit: Criterion, rev: Review):
     for rev_crit in rev.criterion_reviews:
         if tg_crit.id == rev_crit.criterion_id:
