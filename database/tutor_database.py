@@ -16,6 +16,10 @@ class TutorDatabase(Database):
 
     # Recibe la id del tutor a vincular. Devuelve dicho tutor, o None en caso de que no exista.
     def set_tutor(self, id):
+
+        # Para sincronizar con sesiones simultaneas. ¡No es una buena solución!
+        self._session.expire_all()
+        
         self.tutor = self.get_from_id(Tutor, id)
         return self.tutor
     

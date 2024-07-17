@@ -128,7 +128,7 @@ class Database:
             print("Student hasn't submitted the task yet")
         return output
     
-    # Obtiene el puntaje obtenido en un criterio en la entrega de un estudiante dado
+    # Obtiene el puntaje ponderado obtenido en un criterio en la entrega de un estudiante dado
     def criterion_weighted_score_of_student(self, criterion, student):
 
         sum = 0
@@ -155,7 +155,7 @@ class Database:
 
         return sum / n
     
-    # Obtiene el puntaje obtenido en una tarea en la entrega de un estudiante dado
+    # Obtiene el puntaje ponderado obtenido en una tarea en la entrega de un estudiante dado
     def task_weighted_score_of_student(self, task, student):
 
         sum = 0
@@ -163,5 +163,43 @@ class Database:
         # Sumamos el puntaje obtenido en cada criterio
         for criterion in task.criteria:
             sum += self.criterion_weighted_score_of_student(criterion, student)
+        
+        return sum
+    
+    # Obteiene el puntaje final asignado por el tutor en un criterio en la entrega de un estudiante dado
+    def criterion_tutor_score_of_student(self, criterion, student):
+
+        # Obtenemos la entrega del estudiante
+        submission = self.get_submission_of_student(criterion.task, student)
+        if (submission == None): return 0
+
+        # Revisamos que la entrega este revisada por el tutor
+        if submission.reviewed_by_tutor == False:
+            return 0
+        
+        # Obtenemos la revisión del tutor
+        tutor = criterion.task.course.tutor
+        for review in submission.reviews:
+            if review.reviewer == tutor:
+                tutor_review = review
+                break
+        
+        # Obtenemos la revisión del criterio
+        score = 0
+        for criterion_review in tutor_review.criterion_reviews:
+            if criterion_review.criterion == criterion:
+                score = criterion_review.score
+                break
+
+        return score
+    
+    # Obtiene el puntaje final asignado por el tutor en una tarea en la entrega de un estudiante dado
+    def task_tutor_score_of_student(self, task, student):
+
+        sum = 0
+
+        # Sumamos el puntaje obtenido en cada criterio
+        for criterion in task.criteria:
+            sum += self.criterion_tutor_score_of_student(criterion, student)
         
         return sum
