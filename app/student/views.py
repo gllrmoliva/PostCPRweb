@@ -132,7 +132,7 @@ def review_task(review_id):
         flash("Esta entrega ya ha sido evaluada")
         return redirect(url_for("student.reviews"))
 
-    if review.submission.student == student:
+    if review.reviewer == student:
         return render_template(
             "student/reviewtask.html",
             review=review,
