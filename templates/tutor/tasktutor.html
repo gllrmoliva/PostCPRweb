@@ -12,13 +12,23 @@
     <div class="d-flex">
 
         <form action="{{url_for('tutor.task_post')}}" method="POST" class="mx-1">
+            {% if state=="PERIODO DE ENTREGAS" %}
+            <button type="submit" class="btn btn-primary align-middle" name="end_submission_period">Terminar periodo de
+                entrega</button>
+            {% elif state=="PERIODO DE REVISIONES" %}
+            <button type="submit" class="btn btn-primary align-middle" name="end_review_period">Terminar periodo de
+                revisiones</button>
+            {% elif state=="FINALIZADA" %}
             <button type="submit" class="btn btn-success align-middle" name="assign_reviews">Asignar
                 Revisiones</button>
+
+            <a href="{{url_for('tutor.task_submissions',course_id = task.course_id ,task_id = task.id)}}"
+                class="btn btn-primary mx-1">Aceptar Revisiones</a>
+            {% endif %}
+
             <input type="hidden" name="task_id" value="{{task.id}}">
         </form>
 
-        <a href="{{url_for('tutor.task_submissions',course_id = task.course_id ,task_id = task.id)}}"
-            class="btn btn-primary mx-1">Aceptar Revisiones</a>
 
         <form action="{{url_for('tutor.edit_task', task_id = task.id)}}" class="aling-middle mx-1">
             <button type="submit" class="btn btn-warning me-2">Editar tarea</button>

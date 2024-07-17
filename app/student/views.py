@@ -40,9 +40,14 @@ def course(course_id):
     student = database.set_student(session["user_id"])
     course = database.get_from_id(Course, course_id)
 
-    return render_template("student/course.html",
-                           course=course,
-                           task_completion_status=database.task_completion_status)
+    if student in course.students:
+        return render_template("student/course.html",
+                            course=course,
+                            task_completion_status=database.task_completion_status)
+    else:
+        flash("No perteneces a este curso")
+        return redirect(url_for("student.home"))
+
 
 
 @student.route("/t/<task_id>", methods=["GET"])
@@ -64,13 +69,17 @@ def task(task_id):
 
     # TODO : Los siguientes estados: 
     # REVISADO
-    return render_template("student/uploadtask.html",
-                           task=task,
-                           submission=submission,
-                           estado=state,
-                           task_max_score=database.task_max_score(task),
-                           criterion_score=database.criterion_score,
-                           task_score=database.task_score(task))
+    if student in task.course.students:
+        return render_template("student/uploadtask.html",
+                            task=task,
+                            submission=submission,
+                            estado=state,
+                            task_max_score=database.task_max_score(task),
+                            criterion_score=database.criterion_score,
+                            task_score=database.task_score(task))
+    else:
+        flash("No perteneces a este curso")
+        return redirect(url_for("student.home"))
 
 @student.route("/t/<task_id>", methods=["POST"])
 @login_required("STUDENT")
@@ -104,7 +113,6 @@ def reviews():
     """
     # Obtenemos las variables a usar
     student = database.set_student(session["user_id"])
-
     return render_template("student/reviews.html", reviews=student.reviews)
 
 
@@ -123,11 +131,15 @@ def review_task(review_id):
     if not review.is_pending:
         flash("Esta entrega ya ha sido evaluada")
         return redirect(url_for("student.reviews"))
-    
-    return render_template(
-        "student/reviewtask.html",
-        review=review,
-    )
+
+    if review.submission.student == student:
+        return render_template(
+            "student/reviewtask.html",
+            review=review,
+        )
+    else:
+        flash("No tienes permisos para acceder a esta ruta.")
+        return render_template("student/reviews.html", reviews=student.reviews)
 
 
 @student.route("/review/r/<review_id>", methods=["POST"])

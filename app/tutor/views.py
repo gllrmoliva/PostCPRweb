@@ -232,6 +232,9 @@ def task(task_id):
 
     return render_template("tutor/tasktutor.html", task=task
                                                  , task_max_score = database.task_max_score(task)
+                                                 #, state = "PERIODO DE ENTREGAS"
+                                                 , state = "PERIODO DE REVISIONES"
+                                                 #, state = "FINALIZADA"
                            )
 
 @tutor.route("/post/t/", methods=["POST"])
@@ -250,6 +253,11 @@ def task_post():
         flash(f"DEBUG: se ha borrado una submission {str(form)}")
     elif 'assign_reviews' in form:
         flash("Se asignaron las revisiones o el minimo de revisiones entregas debe ser 3¿?")
+    elif 'end_submission_period' in form:
+        flash("Terminar periodo de submission")
+    elif 'end_review_period' in form:
+        flash("Terminar periodo de review")
+
     return redirect(url_for('tutor.task', task_id = form['task_id']))
 
 
