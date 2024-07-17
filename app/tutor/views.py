@@ -410,7 +410,9 @@ def task_submissions(course_id, task_id):
                            course_id = course_id,
                            task = current_task,
                            algo_submissions = submissions,
-                           algo_clevels = clevels
+                           algo_clevels = clevels,
+                           weighted_score = database.task_weighted_score_of_student,
+                           max_score = database.task_max_score,
                            ) 
 
 

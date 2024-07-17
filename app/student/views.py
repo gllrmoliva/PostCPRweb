@@ -75,8 +75,8 @@ def task(task_id):
                             submission=submission,
                             estado=state,
                             task_max_score=database.task_max_score(task),
-                            criterion_score=database.criterion_weighted_score,
-                            task_score=database.task_weighted_score(task))
+                            criterion_score=database.criterion_tutor_score,
+                            task_score=database.task_tutor_score(task))
     else:
         flash("No perteneces a este curso")
         return redirect(url_for("student.home"))
@@ -193,5 +193,5 @@ def grades():
 
     return render_template("student/grades.html", student = student
                                                 , task_completion_status = database.task_completion_status
-                                                , task_score = database.task_weighted_score
+                                                , task_score = database.task_tutor_score
                                                 , task_max_score = database.task_max_score)

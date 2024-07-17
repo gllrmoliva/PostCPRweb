@@ -83,6 +83,45 @@
 </div>
 {% endif %}
 
+{% if estado == 'FUERA DE PLAZO' %}
+<div class="my-4">
+    <div class="mb-3">
+        <h3 class="fw-bold">Criterios</h3>
+    </div>
+    <hr>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th scope="col">{{Criterio}}</th>
+                <th scope="col">Descripción</th>
+                <th scope="col" style="width: 8%;">Puntaje máximo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for criterion in task.criteria%}
+            <tr>
+                <th scope="row">{{criterion.name}}</th>
+                <td>{{criterion.description}}</td>
+                <td>{{'%0.2f' % criterion.max_score}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="2">Total</th>
+                <td>{{'%0.2f' % task_max_score}}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<hr>
+<div>
+    <h6 class="fw-normal">Actualmente el plazo de realización de esta tarea ya acabó
+                           y se no aceptan más entregas.</h6>
+</div>
+<hr>
+{% endif %}
+
 {% if estado == 'ENVIADO'%}
 <form action="{{url_for('student.task_post',task_id=task.id)}}">
     <div class="form-floating">

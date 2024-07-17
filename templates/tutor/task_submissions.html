@@ -22,8 +22,9 @@
             <tr>
                 <td scope="row" class="align-middle">{{submission.student.name}}</th>
                 <td class="align-middle">{{submission.student.email}}</td>
-                <td class="align-middle">NONE</td>
-                <td class="align-middle">{{algo_clevels[loop.index0]}}</td>
+                <td class="align-middle">{{'%0.2f' % weighted_score(submission.task, submission.student)}}
+                                        / {{'%0.2f' % max_score(submission.task)}}</td>
+                <td class="align-middle">{{'%0.2f' % algo_clevels[loop.index0]}}</td>
                 <td class="align-middle">
 
                     <form action="{{url_for('tutor.task_submissions_post', course_id = course_id
