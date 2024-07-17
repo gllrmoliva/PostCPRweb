@@ -142,6 +142,12 @@ class Submission(Base):
     task: Mapped[Task] = relationship(back_populates="submissions")
     reviews: Mapped[List[Review]] = relationship(back_populates="submission")
 
+    # Funciones
+    def __lt__(self, other: Submission): return self.id < other.id
+    def __le__(self, other: Submission): return self.id <= other.id
+    def __gt__(self, other: Submission): return self.id > other.id
+    def __ge__(self, other: Submission): return self.id >= other.id
+
 # Describe la revisión de una entrega de una tarea. La evaluación de los criterios se describen en una tabla aparte
 class Review(Base):
     __tablename__ = "review_table"

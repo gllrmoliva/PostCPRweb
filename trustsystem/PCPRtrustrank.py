@@ -10,6 +10,8 @@ _QUANTILES_FEATURE = False # ¡Feature W.I.P! No colocar True a menos que se sep
 MAX_CONFLICT_LEVEL: float = float_info.max # Valor provisional de discrepancia para aquellas entregas con cantidad insuficiente de revisiones
 MIN_AMOUNT_OF_REVIEWS: int = 2 # Valor minimo de revisiones requeridas para qué el algoritmo se considere fiable (¡COMO MINIMO DEBE VALER 2!)
 
+# -- Funciones auxiliares --
+
 # Para ser retrocompatible con Python 3.10
 def my_fmean(values, weights):
     sum = 0
