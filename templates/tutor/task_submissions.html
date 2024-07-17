@@ -18,23 +18,25 @@
     </thead>
     <tbody>
         {% for submission in algo_submissions %}
-        <tr>
-            <td scope="row" class="align-middle">{{submission.student.name}}</th>
-            <td class="align-middle">{{submission.student.email}}</td>
-            <td class="align-middle">NONE</td>
-            <td class="align-middle">{{algo_clevels[loop.index0]}}</td>
-            <td class="align-middle">
+            {% if submission.reviewed_by_tutor == False %}
+            <tr>
+                <td scope="row" class="align-middle">{{submission.student.name}}</th>
+                <td class="align-middle">{{submission.student.email}}</td>
+                <td class="align-middle">NONE</td>
+                <td class="align-middle">{{algo_clevels[loop.index0]}}</td>
+                <td class="align-middle">
 
-                <form action="{{url_for('tutor.task_submissions_post', course_id = course_id
-                                                                   , task_id = task_id
-                                                                   , submission_id = 'submission.id')}}" method="post">
+                    <form action="{{url_for('tutor.task_submissions_post', course_id = course_id
+                                                                    , task_id = task_id
+                                                                    , submission_id = submission.id)}}" method="post">
 
-                    <button type="submit" name="accept" class="btn btn-success border">Aceptar revisión</button>
-                    <a type="submit" href="{{url_for('tutor.submission',submission_id = submission.id)}}"
-                        class="btn btn-primary border">Corregir</a>
-                </form>
-            </td>
-        </tr>
+                        <button type="submit" name="accept" class="btn btn-success border">Aceptar revisión</button>
+                        <a type="submit" href="{{url_for('tutor.submission',submission_id = submission.id)}}"
+                            class="btn btn-primary border">Corregir</a>
+                    </form>
+                </td>
+            </tr>
+            {% endif %}
         {% endfor %}
     </tbody>
 </table>

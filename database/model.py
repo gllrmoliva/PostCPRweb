@@ -99,6 +99,8 @@ class Task(Base):
     instructions: Mapped[str | None] = mapped_column()
     deadline_date: Mapped[date | None] = mapped_column()
     review_deadline_date: Mapped[date | None] = mapped_column()
+    # Posibles estados: "SUBMISSION PERIOD", "REVIEW PERIOD", "COMPLETED"
+    state: Mapped[str] = mapped_column(nullable=False, default="SUBMISSION PERIOD")
 
     # Atributos relacionales
     course_id: Mapped[int] = mapped_column(ForeignKey("course_table.id"), nullable=False)
@@ -131,6 +133,7 @@ class Submission(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     url: Mapped[str] = mapped_column(nullable=False)
     date: Mapped[date | None] = mapped_column()
+    reviewed_by_tutor: Mapped[bool] = mapped_column(nullable=False, default=False)
 
     # Atributos relacionales
     student_id: Mapped[int] = mapped_column(ForeignKey("student_table.id"), nullable=False)
@@ -156,7 +159,7 @@ class Review(Base):
     criterion_reviews: Mapped[List[CriterionReview]] = relationship(back_populates="review",
                                                                     cascade="all, delete-orphan")
                                                                     # No existe instancia de CriterionReview que no tenga una instancia de Review asociada
-
+    
 # Describe la evaluación de un criterio en la revisión de una entrega
 class CriterionReview(Base):
     __tablename__ = "criterion_review_table"

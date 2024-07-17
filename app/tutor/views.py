@@ -395,13 +395,42 @@ def task_submissions_post(course_id, task_id, submission_id):
     2. Aceptar una revisión en especifico
     3. Revisar manualmente una revisión
     """
+
+    # Obtenemos las variables a usar
+    tutor = database.set_tutor(session["user_id"])
+    submission = database.get_from_id(Submission, submission_id)
     form = request.form
+
+    # Revisión automática
     if "accept" in form:
-        flash("Se acepto wuaaat")
+
+        # Creamos la revisión
+        review = Review(submission = submission, reviewer = tutor)
+        # Creamos la revisión de cada criterio
+        criterion_review_list = []
+
+        for criterion in submission.task.criteria:
+            # El puntaje en ese criterio es el promedio de todas las revisiones
+            weighted_score = database.criterion_weighted_score_of_student(criterion, submission.student)
+
+            # Creamos la revisión del criterio actual
+            criterion_review = CriterionReview(review=review, criterion=criterion, score=weighted_score)
+            criterion_review_list.append(criterion_review)
+
+        review.is_pending = False
+        submission.reviewed_by_tutor = True
+        
+        database.add(review)
+        database.add_all(criterion_review_list)
+        database.commit_changes()
+
+        flash("Revision automática enviada exitosamente")
+
     # Esto de aca abajo es provicional uwu
     return redirect(url_for('tutor.task_submissions',
                      course_id = course_id, 
                      task_id = task_id))
+
 
 @tutor.route("/s/<submission_id>", methods=["GET"])
 @login_required("TUTOR")
@@ -441,31 +470,12 @@ def review_submission(submission_id):
     En esta vista se corre la logica de revisar tarea estudiante, los datos se sacan de lo entregado por el
     usuario en submission
     """
-    if (False):
-        # Información para lógica del endpoint
-        date1 = date.today()
-        submission = database.get_submission_by_review(review_id)
-        user_id = session["user_id"]
-        database.mark_review_as_reviewed(submission=submission, user_id=user_id)
-        print(f"request form: {request_form}")
-        teacher_score = 0
-
-        for criterion_name, score in request_form.items():
-            criterion = database.get_criterion_by_name(criterion_name, task_id)
-            database.create_review_criterion(review_id, criterion.criterion_id, score)
-            teacher_score += int(score)
-        database.mark_submission_as_reviewed(
-            submission=submission, date=date1, teacher_score=teacher_score
-        )
-
-        return redirect(url_for("tutor.task", course_id=course_id, task_id=task_id))
 
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
     submission = database.get_from_id(Submission, submission_id)
     review = Review(submission = submission, reviewer = tutor)
-    request_form = request.form   
-    # date1 = date.today()
+    request_form = request.form
 
     # Creamos la revisión de cada criterio
     criterion_review_list = []
@@ -485,10 +495,13 @@ def review_submission(submission_id):
             flash("Es necesario evaluar todos los criterios de la tarea")
             return redirect(url_for("tutor.submission", submission_id))
     
+    submission.reviewed_by_tutor = True
+    review.is_pending = False
+
     database.add(review)
     database.add_all(criterion_review_list)
-    review.is_pending = False
     database.commit_changes()
-    flash("Revision enviada exitosamente")
+
+    flash("Revision manual enviada exitosamente")
 
     return redirect(url_for("tutor.submission", submission_id=submission_id))
