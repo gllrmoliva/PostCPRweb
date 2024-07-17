@@ -220,6 +220,10 @@ def editcourse_post(course_id):
             flash(e)
             return redirect(url_for("tutor.editcourse", course_id=course_id))
 
+    elif request_form["form_type"] == "delete_course":
+        flash(f"El curso {course.name} se ha eliminado.")
+        return redirect(url_for("tutor.home"))
+
     return "se hizo una péticion post en editcourse y paso algo raro: " + str(request_form)
 
 
@@ -345,6 +349,12 @@ def edit_task_post(task_id):
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
     task = database.get_from_id(Task, task_id)
+
+    # En caso de querer eliminar el curso
+
+    if 'delete_task' in request.form:
+        flash(f"En {task.course.name} se eliminó: {task.name}") 
+        return redirect(url_for('tutor.course', course_id = task.course.id))
 
     # Hay cambios que son drásticos y que requieren desechar las revisiones hechas a la entrega
     major_changes = False
