@@ -3,6 +3,7 @@ from database.model import *
 from sqlalchemy import (
     create_engine,
     MetaData,
+    select,
     exc
 )
 from sqlalchemy.orm import (
@@ -45,8 +46,8 @@ class Database:
     def commit_changes(self):
         try:
             self._session.commit()
-        except exc.IntegrityError:
-            raise IntegrityException()
+        except exc.IntegrityError as e:
+            raise IntegrityException(e._message)
         except Exception as e:
             raise e
     
@@ -84,6 +85,15 @@ class Database:
             return None
         else:
             return instance
+    
+    # Devuelve todas las intancias de una clase
+    def get_all(self, Type):
+        instances = self._session.scalars(select(User).order_by(User.type)).all()
+        if (len(instances) == 0):
+            print(f"Getting all instances of {Type.__name__} failed")
+            return None
+        else:
+            return instances
     
     # Suma el puntaje de todos los criterios de una tarea
     def task_max_score(self, task):
