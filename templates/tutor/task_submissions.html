@@ -24,13 +24,14 @@
             <td class="align-middle">NONE</td>
             <td class="align-middle">{{algo_clevels[loop.index0]}}</td>
             <td class="align-middle">
-                <!--Aquí deberiamos ver si los estudiantes pueden solicitar correción-->
+
                 <form action="{{url_for('tutor.task_submissions_post', course_id = course_id
                                                                    , task_id = task_id
                                                                    , submission_id = 'submission.id')}}" method="post">
 
                     <button type="submit" name="accept" class="btn btn-success border">Aceptar revisión</button>
-                    <button type="submit" name="review" class="btn btn-primary border">Corregir</button>
+                    <a type="submit" href="{{url_for('tutor.submission',submission_id = submission.id)}}"
+                        class="btn btn-primary border">Corregir</a>
                 </form>
             </td>
         </tr>
