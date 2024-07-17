@@ -7,7 +7,7 @@ from database.model import *
 from database.database import IntegrityException
 from database.tutor_database import TutorDatabase
 from database.time import Time
-from trustsystem.PCPRtrustrank import get_conflictsorted_submissions
+from trustsystem.PCPRtrustrank import get_conflictsorted_submissions, MAX_CONFLICT_LEVEL
 
 #import sqllite3    Se utilizaba para manejar excepciones, pero creo que importar un DBMS en frontend no es buena idea
 
@@ -412,6 +412,7 @@ def task_submissions(course_id, task_id):
                            task = current_task,
                            algo_submissions = submissions,
                            algo_clevels = clevels,
+                           max_conflict_level = MAX_CONFLICT_LEVEL,
                            weighted_score = database.task_weighted_score_of_student,
                            max_score = database.task_max_score,
                            ) 
