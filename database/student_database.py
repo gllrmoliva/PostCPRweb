@@ -19,61 +19,19 @@ class StudentDatabase(Database):
         self.student = self.get_from_id(Student, id)
         return self.student
 
-    # Da el estado de completitud de una tarea del estudiante: PENDIENTE, ENVIADA, REVISADA
+    # Da el estado de completitud de una tarea del estudiante vinculado: PENDIENTE, FUERA DE PLAZO, ENVIADO, REVISADO
     def task_completion_status(self, task):
-        status = "PENDIENTE"
-        for submission in task.submissions:
-            if submission in self.student.submissions:
-                if len(submission.reviews) == 0:
-                    status = "ENVIADO"
-                else:
-                    status = "REVISADO"
-        return status
+        return self.task_completion_status_of_student(task, self.student)
     
-    # Obtiene el puntaje obtenido en un criterio en la entrega de un estudiante
-    # TODO Reemplazar con el algoritmo cuando exista, actualmente como placeholder se calcula el promedio de las revisiones
-    def criterion_score(self, criterion):
+    # Obtiene el puntaje obtenido en un criterio en la entrega del estudiante vinculado
+    def criterion_weighted_score(self, criterion):
+        return self.criterion_weighted_score_of_student(self, criterion, self.student)
 
-        sum = 0
-
-        # Obtenemos la entrega del estudiante
-        submission = self.get_submission(criterion.task)
-        if (submission == None): return 0
-
-        # Por cada revisión de esa entrega
-        for review in submission.reviews:
-            # Accedemos a las revisiones de los criterios
-            for criterion_review in review.criterion_reviews:
-                # Y buscamos las revisiones-criterio que hablen del criterio que nos interesa
-                if criterion_review.criterion == criterion:
-
-                    sum += criterion_review.score
-        
-        # Obtenemos el promedio
-        n = len(submission.reviews)
-        if n == 0: return 0
-
-        return sum / n
-
-    # Obtiene el puntaje obtenido en una tarea en la entrega de un estudiante
-    # TODO Reemplazar con el algoritmo cuando exista, actualmente como placeholder se calcula el promedio de las revisiones
-    def task_score(self, task):
-
-        sum = 0
-
-        # Sumamos el puntaje obtenido en cada criterio
-        for criterion in task.criteria:
-            sum += self.criterion_score(criterion)
-        
-        return sum
+    # Obtiene el puntaje obtenido en una tarea en la entrega del estudiante vinculado
+    def task_weighted_score(self, task):
+        return self.task_weighted_score_of_student(self, task, self.student)
     
-    # Devuelve la entrega (instancia de Submission) de una tarea del estudiante. Devuelve None si no existe.
+    # Devuelve la entrega (instancia de Submission) de una tarea del estudiante vinculado. Devuelve None si no existe.
     def get_submission(self, task):
-        output = None
-        for submission in task.submissions:
-            if submission in self.student.submissions:
-                output = submission
-        if output == None:
-            print("Student hasn't submitted the task yet")
-        return output
+        return self.get_submission_of_student(task, self.student)
         

@@ -101,3 +101,67 @@ class Database:
         for criterion in task.criteria:
             max_score += criterion.max_score
         return max_score
+
+    # Da el estado de completitud de una tarea de un estudiante dado: PENDIENTE, FUERA DE PLAZO, ENVIADO, REVISADO
+    def task_completion_status_of_student(self, task, student):
+
+        if task.state == "SUBMISSION PERIOD":
+            status = "PENDIENTE"
+        else:
+            status = "FUERA DE PLAZO"
+
+        for submission in task.submissions:
+            if submission in student.submissions:
+                if submission.reviewed_by_tutor == True:
+                    status = "REVISADO"
+                else:
+                    status = "ENVIADO"
+        return status
+    
+    # Devuelve la entrega (instancia de Submission) de una tarea de un estudiante dado. Devuelve None si no existe.
+    def get_submission_of_student(self, task, student):
+        output = None
+        for submission in task.submissions:
+            if submission in student.submissions:
+                output = submission
+        if output == None:
+            print("Student hasn't submitted the task yet")
+        return output
+    
+    # Obtiene el puntaje obtenido en un criterio en la entrega de un estudiante dado
+    def criterion_weighted_score_of_student(self, criterion, student):
+
+        sum = 0
+        n = 0
+
+        # Obtenemos la entrega del estudiante
+        submission = self.get_submission_of_student(criterion.task, student)
+        if (submission == None): return 0
+
+        # Por cada revisión de esa entrega
+        for review in submission.reviews:
+            # Revisamos que la entrega sea de un estudiante y no este pendiente
+            if review.reviewer.type == "STUDENT" and review.is_pending == False:
+                # Accedemos a las revisiones de los criterios
+                for criterion_review in review.criterion_reviews:
+                    # Y buscamos las revisiones-criterio que hablen del criterio que nos interesa
+                    if criterion_review.criterion == criterion:
+
+                        sum += criterion_review.score
+                        n += 1
+        
+        # Obtenemos el promedio
+        if n == 0: return 0
+
+        return sum / n
+    
+    # Obtiene el puntaje obtenido en una tarea en la entrega de un estudiante dado
+    def task_weighted_score_of_student(self, task, student):
+
+        sum = 0
+
+        # Sumamos el puntaje obtenido en cada criterio
+        for criterion in task.criteria:
+            sum += self.criterion_weighted_score_of_student(criterion, student)
+        
+        return sum
