@@ -220,6 +220,10 @@ def editcourse_post(course_id):
             flash(e)
             return redirect(url_for("tutor.editcourse", course_id=course_id))
 
+    elif request_form["form_type"] == "delete_course":
+        flash(f"El curso {course.name} se ha eliminado.")
+        return redirect(url_for("tutor.home"))
+
     return "se hizo una péticion post en editcourse y paso algo raro: " + str(request_form)
 
 
@@ -246,7 +250,9 @@ def task(task_id):
     if task.course.tutor == tutor:
         return render_template("tutor/tasktutor.html", task=task
                                                     , task_max_score = database.task_max_score(task)
-                                                    , state = task.state )
+                                                    , state = task.state
+                                                    , task_tutor_score_of_student = database.task_tutor_score_of_student
+        )
     else:
         flash("No perteneces a este curso.")
         return redirect(url_for('tutor.home'))
@@ -343,6 +349,12 @@ def edit_task_post(task_id):
     # Obtenemos las variables a usar
     tutor = database.set_tutor(session["user_id"])
     task = database.get_from_id(Task, task_id)
+
+    # En caso de querer eliminar el curso
+
+    if 'delete_task' in request.form:
+        flash(f"En {task.course.name} se eliminó: {task.name}") 
+        return redirect(url_for('tutor.course', course_id = task.course.id))
 
     # Hay cambios que son drásticos y que requieren desechar las revisiones hechas a la entrega
     major_changes = False
@@ -567,3 +579,38 @@ def review_submission(submission_id):
     flash("Revision manual enviada exitosamente")
 
     return redirect(url_for("tutor.submission", submission_id=submission_id))
+
+
+@tutor.route("/s/<submission_id>/points", methods=["GET"])
+@login_required("TUTOR")
+def submission_points(submission_id):
+    """
+    En esta vista se puede revisar una tarea hecha por un estudiante.
+    a esta vista se accede desde tutor.task
+    """
+    # Obtenemos las variables a usar
+    tutor = database.set_tutor(session["user_id"])
+    submission = database.get_from_id(Submission, submission_id)
+
+    if submission.task.course.tutor == tutor:
+        # Revisamos si ya existe una revisión del tutor
+        status = "NO REVISADO"
+        tutor_review = None
+        score = 0
+        for review in submission.reviews:
+            if review.reviewer == tutor:
+                status = "REVISADO"
+                tutor_review = review
+                for criterion_review in review.criterion_reviews:
+                    score += criterion_review.score
+
+        return render_template(
+            "tutor/submission_points.html",
+            submission=submission,
+            review=tutor_review,
+            score = score,
+            task_max_score = database.task_max_score(submission.task)
+        )
+    else:
+        flash("No perteneces a este curso")
+        return redirect(url_for('tutor.home'))

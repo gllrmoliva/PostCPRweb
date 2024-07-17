@@ -79,6 +79,12 @@
         data-bs-target="#createhomeworkModal">Agregar Estudiante</button>
 </div>
 
-
+<div class="text-end" style="margin-top: 50px;">
+    <hr>
+    <form action="{{ url_for('tutor.editcourse_post', course_id=course.id) }}" method="post">
+        <button type="submit" class="btn btn-danger">Eliminar curso</button>
+        <input type="hidden" name="form_type" value="delete_course">
+    </form>
+</div>
 
 {% endblock %}

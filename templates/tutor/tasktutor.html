@@ -93,7 +93,8 @@
 <hr>
 <div class="list-group">
     {%for submission in task.submissions%}
-    <div href="{{url_for('tutor.submission', submission_id = submission.id)}}"
+    <{% if submission.reviewed_by_tutor==True %}a{% else %}div{% endif %}
+        href="{{url_for('tutor.submission_points', submission_id = submission.id)}}"
         class="list-group-item list-group-item-action">
 
         <div class="row mb-0">
@@ -101,15 +102,30 @@
             <div class="d-flex justify-content-between align-items-center">
 
                 <span class="fw-bold d-inline">{{submission.student.name}}</span>
+
+                {% if state=="SUBMISSION PERIOD" %}
                 <form action="{{url_for('tutor.task_post', task_id = task.id)}}" method="post">
                     <button type="submit" name="delete_submission" class="btn btn-danger">Eliminar entrega</button>
                     <input type="hidden" name="task_id" value="{{task.id}}">
                     <input type="hidden" name="submission_id" value="{{submission.id}}">
                 </form>
+                {% elif state=="COMPLETED"%}
+                <div>
+                    <span class="fw-bold d-inline">Calificación:</span>
+                    {% if submission.reviewed_by_tutor == True %}
+                    <span class="d-inline">{{'%0.2f'
+                        %
+                        task_tutor_score_of_student(submission.task,submission.student)}}/{{task_max_score}}</span>
+                    {% else %}
+                    <span class="d-inline">no revisada</span>
+                    {% endif %}
+                </div>
+
+                {% endif %}
             </div>
 
         </div>
-    </div>
+    </{% if submission.reviewed_by_tutor==True %}a{% else %}div{% endif %}>
     {% endfor %}
 </div>
 <a href="{{url_for('tutor.course',course_id = task.course_id )}}" class="btn btn-secondary mt-2">Volver</a>
