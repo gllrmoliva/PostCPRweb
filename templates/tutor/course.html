@@ -85,6 +85,19 @@
                     <!--TODO:Añadir en base de datos la fecha de revision como fecha-->
                     <span>{{task.review_deadline_date}}</span>
                 </div>
+                <div class="col">
+                    <span class="fw-bold">Estado: </span>
+                    <!--TODO:Añadir en base de datos la fecha de revision como fecha-->
+                    {% if task.state == "SUBMISSION PERIOD" %}
+                        Periodo de entregas
+                    {% endif %}
+                    {% if task.state == "REVIEW PERIOD" %}
+                        Periodo de revisión
+                    {% endif %}
+                    {% if task.state == "COMPLETED" %}
+                        Completado
+                    {% endif %}
+                </div>
             </div>
         </div>
     </a>

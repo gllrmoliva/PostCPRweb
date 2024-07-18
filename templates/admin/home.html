@@ -62,7 +62,7 @@ se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña 
     <div>
         <form action="{{url_for('admin.home_post')}}" method="post">
 
-            <button type="submit" class="btn btn-danger me-2" style="height: 50px;">DROP ALL TABLES</button>
+            <button type="submit" class="btn btn-danger me-2" style="height: 50px;">Limpiar base de datos</button>
             <input type="hidden" name="form_type" value="clear_database">
 
             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newuserModal"
@@ -81,7 +81,7 @@ se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña 
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Correo</th>
-            <th scope="col" style="width: 70px;">Contraseña por defecto</th>
+            <th scope="col" style="width: 20%;">Contraseña por defecto</th>
             <th scope="col">Tipo</th>
             <th scope="col" style="width: 470px;"></th>
         </tr>
@@ -95,7 +95,14 @@ se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña 
             <td class="align-middle">{{user.email}}</td>
             <!--Esta es la contraseña por defecto-->
             <td class="align-middle">1234</td>
-            <td class="align-middle">{{user.type}}</td>
+            <td class="align-middle">
+                {% if user.type == "STUDENT" %}
+                    Estudiante
+                {% endif %}
+                {% if user.type == "TUTOR" %}
+                    Tutor
+                {% endif %}
+            </td>
             <td class="align-middle">
                 <form action="{{url_for('admin.home_post')}}" method="post">
 
