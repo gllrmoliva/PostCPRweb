@@ -10,9 +10,6 @@ from sqlalchemy.orm import (
     Session
 )
 
-class IntegrityException(Exception):
-    pass
-
 
 # Clase con métodos que acceden a la base de datos a traves de la lógica orientada a objetos de SQLAlchemy
 class Database:
@@ -26,29 +23,44 @@ class Database:
         self._session.close()
 
     # Añade una instancia a la base de datos. IMPORTANTE: No hace commit automaticamente.
-    def add(self, entry):
-        self._session.add(entry)
+    def add(self, entry, auto_rollback=True):
+        try:
+            self._session.add(entry)
+        except Exception as e:
+            if auto_rollback: self._session.rollback()
+            raise e
     
     # Añade un conjunto de instancias a la base de datos. IMPORTANTE: No hace commit automaticamente.
-    def add_all(self, entries):
-        self._session.add_all(entries)
+    def add_all(self, entries, auto_rollback=True):
+        try:
+            self._session.add_all(entries)
+        except Exception as e:
+            if auto_rollback: self._session.rollback()
+            raise e
     
      # Elimina una instancia de la base de datos. IMPORTANTE: No hace commit automaticamente.
-    def delete(self, entry):
-        self._session.delete(entry)
+    def delete(self, entry, auto_rollback=True):
+        try:
+            self._session.delete(entry)
+        except Exception as e:
+            if auto_rollback: self._session.rollback()
+            raise e
     
     # Elimina un conjunto de instancias de la base de datos. IMPORTANTE: No hace commit automaticamente.
-    def delete_all(self, entries):
-        for entry in entries:
-            self.delete(entry)
+    def delete_all(self, entries, auto_rollback=True):
+        try:
+            for entry in entries:
+                self.delete(entry, auto_rollback=False)
+        except Exception as e:
+            if auto_rollback: self._session.rollback()
+            raise e
 
     # Cualquier cambio primero es ingresado en un espacio intermedio (Session). Con este metodo se ingresan a la base de datos.
-    def commit_changes(self):
+    def commit_changes(self, auto_rollback=True):
         try:
             self._session.commit()
-        except exc.IntegrityError as e:
-            raise IntegrityException(e._message)
         except Exception as e:
+            if auto_rollback: self._session.rollback()
             raise e
     
     # Desecha los cambios no commiteados. Muy util si ocurre una excepción al hacer commit.
@@ -77,7 +89,7 @@ class Database:
         else:
             return tutor
 
-    # Devuelve instancia de una clase a partir de su id
+    # Devuelve instancia de una clase a partir del tipo de la clase y de su id
     def get_from_id(self, Type, id):
         instance = self._session.query(Type).where(Type.id == id).first()    
         if (instance == None):
@@ -85,6 +97,15 @@ class Database:
             return None
         else:
             return instance
+    
+    # Devuelve, en una lista, las instancias de una clase a partir del tipo de la clase, el tipo del parametro, y el valor de dicho parametro
+    def get_from(self, Type_class, Type_parameter, value):
+        instances = self._session.scalars(select(Type_class).where(Type_parameter == value)).all()
+        if (len(instances) == 0):
+            print(f"Getting all instances of {Type_class.__name__} where {Type_parameter} is {value} failed")
+            return None
+        else:
+            return instances
     
     # Devuelve todas las intancias de una clase
     def get_all(self, Type):

@@ -4,7 +4,6 @@ from random import shuffle
 
 from login_required import login_required
 from database.model import *
-from database.database import IntegrityException
 from database.tutor_database import TutorDatabase
 from database.time import Time
 from trustsystem.PCPRtrustrank import get_conflictsorted_submissions, MAX_CONFLICT_LEVEL, AMOUNT_OF_ASSIGNED_REVIEWS
@@ -46,21 +45,19 @@ def home_post():
     #   enviamos al usuario a home
     if request_form["form_type"] == "create_course":
 
-        try:
-            new_course = Course(name = request_form["name"], tutor = tutor)
-            database.add(new_course)
-            database.commit_changes()
-            return redirect(url_for("tutor.home"))
-        
-        except IntegrityException:
+        new_name = request_form["name"]
+
+        # Ya existe un curso con ese nombre
+        if database.get_from(Course, Course.name, new_name) != None:
             flash("Ya existe un curso de mismo nombre")
-            database.rollback_changes()
-            return redirect(url_for("tutor.home"))
-        
-        except Exception as e:  # Idealmente no se deberia llegar acá
-            flash(e)
             return redirect(url_for("tutor.home"))
 
+        # Creamos el curso
+        new_course = Course(name = new_name, tutor = tutor)
+        database.add(new_course)
+        database.commit_changes()
+        return redirect(url_for("tutor.home"))
+    
 
 @tutor.route("/c/<course_id>", methods=["GET"])
 @login_required("TUTOR")
@@ -191,8 +188,9 @@ def editcourse_post(course_id):
         # (3) y (3.1)
         for submission in student.submissions:
             if submission.task.course == course:
-                database.delete_all(submission.reviews) # (3.1)
-                database.delete(submission)
+                # database.delete_all(submission.reviews) # (3.1)   # Debido a cambios en el modelo, esta linea se
+                                                                    # deberia ejecutar automaticamente al borrar la entrega
+                database.delete(submission) # Confiamos en la cascada
         
         # (1)
         course.students.remove(student)
@@ -204,24 +202,32 @@ def editcourse_post(course_id):
 
     elif request_form["form_type"] == "edit_course_name":
 
-        try:
-            new_name = request_form["course_name"]
-            course.name = new_name
-            database.commit_changes()
-            flash("Nombre del curso cambiado exitosamente")
-            return redirect(url_for("tutor.editcourse", course_id=course_id))
-        
-        except IntegrityException:
-            flash("Ya existe un curso de mismo nombre")
-            database.rollback_changes()
-            return redirect(url_for("tutor.editcourse", course_id=course_id))
-        
-        except Exception as e:  # Idealmente no se deberia llegar acá
-            flash(e)
-            return redirect(url_for("tutor.editcourse", course_id=course_id))
+        new_name = request_form["course_name"]
 
+        # Ya existe un curso con ese nombre
+        courses_of_the_same_name  = database.get_from(Course, Course.name, new_name)
+        if courses_of_the_same_name != None:
+            conflict = courses_of_the_same_name[0]
+            if conflict == course:
+                # Y ese curso es el mismo curso que se esta cambiando
+                return redirect(url_for("tutor.editcourse", course_id=course_id))
+            else:
+                # Y ese curso NO es el mismo curso que se esta cambiando
+                flash("Ya existe un curso de mismo nombre")
+                return redirect(url_for("tutor.editcourse", course_id=course_id))
+
+        course.name = new_name
+        database.commit_changes()
+        flash("Nombre del curso cambiado exitosamente")
+        return redirect(url_for("tutor.editcourse", course_id=course_id))
+
+    # Eliminación de un curso
     elif request_form["form_type"] == "delete_course":
-        flash(f"El curso {course.name} se ha eliminado.")
+        course_name = course.name
+        # CONFIAMOS EN LA CASCADA
+        database.delete(course)
+        database.commit_changes()
+        flash(f'El curso "{course_name}" se ha eliminado exitosamente.')
         return redirect(url_for("tutor.home"))
 
     return "se hizo una péticion post en editcourse y paso algo raro: " + str(request_form)
@@ -271,8 +277,13 @@ def task_post():
     task = database.get_from_id(Task, form['task_id'])
 
     if 'delete_submission' in form:
-        # Agregar aquí función que calcula las notas con el algoritmo
-        flash(f"DEBUG: se ha borrado una submission {str(form)}")
+        # Lógica de borrar una entrega
+        submission = database.get_from_id(Submission, form["submission_id"])
+        name = submission.student.name
+        database.delete(submission) # Confiamos en la cascada
+        database.commit_changes()
+        flash(f"Se ha removido la entrega exitosamente")
+
     elif 'end_submission_period' in form:
         # Cuando se termina el periodo de entrega se asignan las revisiones que debe hacer cada estudiante
         submissions = task.submissions  
@@ -353,8 +364,12 @@ def edit_task_post(task_id):
     # En caso de querer eliminar el curso
 
     if 'delete_task' in request.form:
-        flash(f"En {task.course.name} se eliminó: {task.name}") 
-        return redirect(url_for('tutor.course', course_id = task.course.id))
+        task_name = task.name
+        course_id = task.course.id
+        database.delete(task) # Confiamos en la cascada
+        database.commit_changes()
+        flash(f'Se eliminó la tarea "{task_name}" del curso exitosamente')
+        return redirect(url_for('tutor.course', course_id = course_id))
 
     # Hay cambios que son drásticos y que requieren desechar las revisiones hechas a la entrega
     major_changes = False
