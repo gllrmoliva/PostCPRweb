@@ -41,6 +41,14 @@ se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña 
                         <label for="new_user_mail">Correo</label>
                     </div>
 
+                    <div class="mb-3">
+                        <select class="form-select" name="user_type">
+                            <!--TODO: esto sirve para mostrar si es student o tutor-->
+                            <option value="STUDENT" selected>Estudiante</option>
+                            <option value="TUTOR">Tutor</option>
+                        </select>
+                    </div>
+
                     <input type="hidden" name="form_type" value="create_new_user">
                     <button name="action" value="create" type="submit" class="btn btn-primary">Crear</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -51,9 +59,19 @@ se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña 
 </div>
 <div class="d-flex justify-content-between">
     <h1>Usuarios</h1>
-    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newuserModal">Crear
-        Usuario
-    </button>
+    <div>
+        <form action="{{url_for('admin.home_post')}}" method="post">
+
+            <button type="submit" class="btn btn-danger me-2" style="height: 50px;">DROP ALL TABLES</button>
+            <input type="hidden" name="form_type" value="clear_database">
+
+            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#newuserModal"
+                style="height: 50px;">Crear
+                Usuario
+            </button>
+
+        </form>
+    </div>
 </div>
 <hr>
 
@@ -63,44 +81,43 @@ se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña 
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Correo</th>
+            <th scope="col">Tipo</th>
             <th scope="col" style="width: 570px;"></th>
         </tr>
     </thead>
     <tbody>
+        {% if users %}
         {%for user in users%}
         <tr>
             <th class="align-middle" scope="row">{{user.id}}</th>
             <td class="align-middle">{{user.name}}</td>
             <td class="align-middle">{{user.email}}</td>
+            <td class="align-middle">{{user.type}}</td>
             <td class="align-middle">
                 <form action="{{url_for('admin.home_post')}}" method="post">
 
                     <!--Checkbox reestablecer contraseña-->
-                    <input class="form-check-input align-middle" type="checkbox" name="reset_password"
-                        id="flexCheckDefault">
-                    <label class="form-check-label align-middle" for="flexCheckDefault">
-                        Restablecer contraseña
-                    </label>
+                    <div class="text-end">
+                        <input class="form-check-input align-middle mx-2" type="checkbox" name="reset_password"
+                            id="flexCheckDefault">
+                        <label class="form-check-label align-middle" for="flexCheckDefault">
+                            Restablecer contraseña
+                        </label>
 
-                    <!--selector entre estudiante o usuario-->
-                    <select class="mx-2 align-middle" style="width: 150px;" name="user_type">
-                        <!--TODO: esto sirve para mostrar si es student o tutor-->
-                        <option value="STUDENT" {% if user.type == 'STUDENT' %}selected{% endif %}>Estudiante</option>
-                        <option value="TUTOR" {% if user.type == 'TUTOR' %}selected{% endif %}>Tutor</option>
-                    </select>
+                        <!-- Botones Modificar/Eliminar-->
+                        <button type="submit" name="modify" class="btn btn-primary mx-2">Modificar</button>
+                        <button type="submit" name="delete" class="btn btn-danger mx-2">Eliminar</button>
 
-                    <!-- Botones Modificar/Eliminar-->
-                    <button type="submit" name="modify" class="btn btn-primary">Modificar</button>
-                    <button type="submit" name="delete" class="btn btn-danger">Eliminar</button>
-
-                    <!-- Variables ocultar para utilizar en post-->
-                    <input type="hidden" name="form_type" value="edit_user">
-                    <input type="hidden" name="user_id" value={{user.id}}>
+                        <!-- Variables ocultar para utilizar en post-->
+                        <input type="hidden" name="form_type" value="edit_user">
+                        <input type="hidden" name="user_id" value={{user.id}}>
+                    </div>
 
                 </form>
             </td>
         </tr>
         {% endfor %}
+        {% endif %}
     </tbody>
 </table>
 

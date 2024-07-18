@@ -34,7 +34,7 @@ def home_post():
         new_user = User(name = form["name"], email = form["email"])
 
         # TODO: ¡No hay forma de seleccionar tipo de usuario en la creación!
-        new_user.type = "STUDENT" # Estudiante por defecto
+        new_user.type = form["user_type"] # Estudiante por defecto
 
         # Contraseña por defecto
         new_user.password = defaul_password
@@ -43,6 +43,8 @@ def home_post():
         database.commit_changes()
         flash("Usuario añadido existosamente")
 
+    elif (form['form_type'] == "clear_database"):
+        flash("Se borro la base de datos")
     # En caso de que se quiera modificar / eliminar un usuario
     elif (form['form_type'] == "edit_user"):
 
