@@ -115,9 +115,9 @@
                     {% if submission.reviewed_by_tutor == True %}
                     <span class="d-inline">{{'%0.2f'
                         %
-                        task_tutor_score_of_student(submission.task,submission.student)}}/{{task_max_score}}</span>
+                        task_tutor_score_of_student(submission.task,submission.student)}} / {{task_max_score}}</span>
                     {% else %}
-                    <span class="d-inline">no revisada</span>
+                    <span class="d-inline">Sin calificar</span>
                     {% endif %}
                 </div>
 
@@ -128,6 +128,7 @@
     </{% if submission.reviewed_by_tutor==True %}a{% else %}div{% endif %}>
     {% endfor %}
 </div>
+<hr>
 <a href="{{url_for('tutor.course',course_id = task.course_id )}}" class="btn btn-secondary mt-2">Volver</a>
 
 {% endblock %}

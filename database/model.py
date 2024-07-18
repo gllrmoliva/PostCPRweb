@@ -39,7 +39,9 @@ class User(Base):
     name: Mapped[str] = mapped_column(nullable=False)
 
     # Atributos relacionales
-    reviews: Mapped[List[Review]] = relationship(back_populates="reviewer")
+    reviews: Mapped[List[Review]] = relationship(back_populates="reviewer",
+                                                 cascade="all, delete-orphan")
+                                                 # No existe instancia de Review que no tenga una instancia de User asociada
 
     # Herencia
     type: Mapped[str]
@@ -54,7 +56,9 @@ class Tutor(User):
 
     # Atributos relacionales
     id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), primary_key=True)
-    courses: Mapped[List[Course]] = relationship(back_populates="tutor")
+    courses: Mapped[List[Course]] = relationship(back_populates="tutor",
+                                                 cascade="all, delete-orphan")
+                                                 # No existe instancia de Course que no tenga una instancia de Tutor asociada
 
     # Herencia
     __mapper_args__ = {
@@ -68,7 +72,9 @@ class Student(User):
     # Atributos relacionales
     id: Mapped[int] = mapped_column(ForeignKey("user_table.id"), primary_key=True)
     courses: Mapped[List[Course]] = relationship(secondary=student_course_association, back_populates="students")
-    submissions: Mapped[List[Submission]] = relationship(back_populates="student")
+    submissions: Mapped[List[Submission]] = relationship(back_populates="student",
+                                                         cascade="all, delete-orphan")
+                                                         # No existe instancia de Submission que no tenga una instancia de Student asociada
 
     # Herencia
     __mapper_args__ = {
@@ -87,7 +93,9 @@ class Course(Base):
     tutor_id: Mapped[int] = mapped_column(ForeignKey("tutor_table.id"), nullable=False)
     tutor: Mapped[Tutor] = relationship(back_populates="courses")
     students: Mapped[List[Student]] = relationship(secondary=student_course_association, back_populates="courses")
-    tasks: Mapped[List[Task]] = relationship(back_populates="course")
+    tasks: Mapped[List[Task]] = relationship(back_populates="course",
+                                             cascade="all, delete-orphan")
+                                             # No existe instancia de Task que no tenga una instancia de Course asociada
 
 # Describe una tarea de un curso. No confundir con una entrega ni revisión
 class Task(Base):
@@ -105,8 +113,12 @@ class Task(Base):
     # Atributos relacionales
     course_id: Mapped[int] = mapped_column(ForeignKey("course_table.id"), nullable=False)
     course: Mapped[Course] = relationship(back_populates="tasks")
-    criteria: Mapped[List[Criterion]] = relationship(back_populates="task")
-    submissions: Mapped[List[Submission]] = relationship(back_populates="task")
+    criteria: Mapped[List[Criterion]] = relationship(back_populates="task",
+                                                     cascade="all, delete-orphan")
+                                                     # No existe instancia de Criterion que no tenga una instancia de Task asociada
+    submissions: Mapped[List[Submission]] = relationship(back_populates="task",
+                                                         cascade="all, delete-orphan")
+                                                         # No existe instancia de Submission que no tenga una instancia de Task asociada
 
 # Describe un criterio de evaluación de una tarea. No confundir con la revisión de un criterio
 class Criterion(Base):
@@ -140,7 +152,9 @@ class Submission(Base):
     student: Mapped[Student] = relationship(back_populates="submissions")
     task_id: Mapped[int] = mapped_column(ForeignKey("task_table.id"), nullable=False)
     task: Mapped[Task] = relationship(back_populates="submissions")
-    reviews: Mapped[List[Review]] = relationship(back_populates="submission")
+    reviews: Mapped[List[Review]] = relationship(back_populates="submission",
+                                                 cascade="all, delete-orphan")
+                                                 # No existe instancia de Review que no tenga una instancia de Submission asociada
 
     # Funciones
     def __lt__(self, other: Submission): return self.id < other.id
