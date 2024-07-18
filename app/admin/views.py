@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, url_for, session, flash
 
 from login_required import login_required
 from database.database import Database
-from database.database import User
+from database.database import User, Student, Tutor
 
 """
 Todas las rutas que están aquí tienen el prefijo "/admin"
@@ -31,10 +31,11 @@ def home_post():
 
     # En caso de que se quiera crear un nuevo usuario
     if (form['form_type'] == "create_new_user"):
-        new_user = User(name = form["name"], email = form["email"])
-
-        # TODO: ¡No hay forma de seleccionar tipo de usuario en la creación!
-        new_user.type = form["user_type"] # Estudiante por defecto
+        
+        if form["user_type"] == "STUDENT":
+            new_user = Student(name = form["name"], email = form["email"])
+        elif form["user_type"] == "TUTOR":
+            new_user = Tutor(name = form["name"], email = form["email"])
 
         # Contraseña por defecto
         new_user.password = defaul_password
@@ -44,7 +45,13 @@ def home_post():
         flash("Usuario añadido existosamente")
 
     elif (form['form_type'] == "clear_database"):
+        database.clear()
         flash("Se borro la base de datos")
+
+    elif (form['form_type'] == "add_example_values"):
+
+        flash("Se cargo la base de datos de ejemplo")
+
     # En caso de que se quiera modificar / eliminar un usuario
     elif (form['form_type'] == "edit_user"):
 
@@ -57,8 +64,6 @@ def home_post():
             if 'reset_password' in form:
                 user.password = defaul_password
 
-            # Cambiar tipo de usuario
-            user.type = form["user_type"]
 
             database.commit_changes()
             flash("Usuario modificado existosamente.")

@@ -32,9 +32,11 @@
         </form>
 
 
+        {% if state!="COMPLETED" %}
         <form action="{{url_for('tutor.edit_task', task_id = task.id)}}" class="aling-middle mx-1">
             <button type="submit" class="btn btn-warning me-2">Editar tarea</button>
         </form>
+        {% endif %}
     </div>
 </div>
 

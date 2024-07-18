@@ -81,8 +81,9 @@ se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña 
             <th scope="col">Id</th>
             <th scope="col">Nombre</th>
             <th scope="col">Correo</th>
+            <th scope="col" style="width: 70px;">Contraseña por defecto</th>
             <th scope="col">Tipo</th>
-            <th scope="col" style="width: 570px;"></th>
+            <th scope="col" style="width: 470px;"></th>
         </tr>
     </thead>
     <tbody>
@@ -92,6 +93,8 @@ se olvida de su contraseña. Además se deberia agregar un "Cambiar contraseña 
             <th class="align-middle" scope="row">{{user.id}}</th>
             <td class="align-middle">{{user.name}}</td>
             <td class="align-middle">{{user.email}}</td>
+            <!--Esta es la contraseña por defecto-->
+            <td class="align-middle">1234</td>
             <td class="align-middle">{{user.type}}</td>
             <td class="align-middle">
                 <form action="{{url_for('admin.home_post')}}" method="post">
