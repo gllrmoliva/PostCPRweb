@@ -326,6 +326,7 @@ def task_post():
             task.state = "REVIEW PERIOD"
             database.commit_changes()
             flash("Se han asignado revisiones a los estudiantes y ha iniciado el periodo de revisión.")
+            
     elif 'end_review_period' in form:
         # al presionar no aceptar más revisiones
         task.state = "COMPLETED"

@@ -10,7 +10,7 @@ Todas las rutas que están aquí tienen el prefijo "/admin"
 """
 
 # En caso de que se desee restablacer contraseña, esta contraseña será la provisional
-defaul_password = "1234"
+default_password = "1234"
 
 database = Database()
 database.init()
@@ -31,14 +31,20 @@ def home_post():
 
     # En caso de que se quiera crear un nuevo usuario
     if (form['form_type'] == "create_new_user"):
+
+        email = form["email"]
+        # Verificamos que el correo no se repita
+        if database.get_from(User, User.email, email) != None:
+            flash("Ya existe un usuario con el correo ingresado")
+            return redirect(url_for("admin.home"))
         
         if form["user_type"] == "STUDENT":
-            new_user = Student(name = form["name"], email = form["email"])
+            new_user = Student(name = form["name"], email = email)
         elif form["user_type"] == "TUTOR":
-            new_user = Tutor(name = form["name"], email = form["email"])
+            new_user = Tutor(name = form["name"], email = email)
 
         # Contraseña por defecto
-        new_user.password = defaul_password
+        new_user.password = default_password
 
         database.add(new_user)
         database.commit_changes()
@@ -46,7 +52,7 @@ def home_post():
 
     elif (form['form_type'] == "clear_database"):
         database.clear()
-        flash("Se borro la base de datos")
+        flash("Se ha limpiado la base de datos exitosamente")
 
     elif (form['form_type'] == "add_example_values"):
 
@@ -62,15 +68,16 @@ def home_post():
 
             # Restablecer contraseña
             if 'reset_password' in form:
-                user.password = defaul_password
-
+                user.password = default_password
 
             database.commit_changes()
-            flash("Usuario modificado existosamente.")
+            flash("Se ha restablecido la contraseña del usuario exitosamente")
 
         elif 'delete' in form:
 
-            flash(f"ELIMINA: {str(form)}")
-            # Aquí solo se deberia hacer al logica de eliminar usuario
+            # CONFIAMOS EN LA CASCADA
+            database.delete(user)
+            database.commit_changes()
+            flash("Se ha removido la cuenta del usuario exitosamente")
 
     return redirect(url_for("admin.home"))

@@ -182,16 +182,25 @@ def account_post():
         flash("La contraseña actual ingresada es incorrecta")
         return redirect(url_for("auth.account"))
     
+    email_changed = False # ¡ Es importante empezar por el correo, ya qué es el unico que puede fallar !
     name_changed = False
-    email_changed = False
     password_changed  = False
 
+    if form["email"] != user.email:
+
+        new_email = form["email"]
+        # Verificamos que el correo no se repita
+        if database.get_from(User, User.email, new_email) != None:
+            flash("Ya existe un usuario con el correo ingresado")
+            return redirect(url_for("auth.account"))
+
+        user.email = new_email
+        email_changed = True
+    
     if form["username"] != user.name:
         user.name = form["username"]
         name_changed = True
-    if form["email"] != user.email:
-        user.email = form["email"]
-        email_changed = True
+
     if form["newPassword"] != user.password and form["newPassword"] != "":
         user.password = form["newPassword"]
         password_changed = True
