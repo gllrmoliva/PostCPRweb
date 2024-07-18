@@ -1,6 +1,6 @@
 from . import tutor
 from flask import render_template, request, redirect, url_for, session, flash
-from random import shuffle
+import random
 
 from login_required import login_required
 from database.model import *
@@ -263,6 +263,20 @@ def task(task_id):
         flash("No perteneces a este curso.")
         return redirect(url_for('tutor.home'))
 
+
+def shuffle_submisssion(submissions: list[Submission]):
+    n = len(submissions)
+    indexes: list[int] = list(range(n))
+    output: list[Submission] = []
+
+    while len(indexes) != 0:
+        choice = random.choice(indexes)
+        output.append(submissions[choice])
+        indexes.remove(choice)
+    
+    return output
+
+
 @tutor.route("/post/t/", methods=["POST"])
 @login_required("TUTOR")
 # TODO hacer esta ruta
@@ -279,7 +293,6 @@ def task_post():
     if 'delete_submission' in form:
         # Lógica de borrar una entrega
         submission = database.get_from_id(Submission, form["submission_id"])
-        name = submission.student.name
         database.delete(submission) # Confiamos en la cascada
         database.commit_changes()
         flash(f"Se ha removido la entrega exitosamente")
@@ -291,19 +304,21 @@ def task_post():
         if len(submissions) <= AMOUNT_OF_ASSIGNED_REVIEWS:
             flash(f"Se requieren {AMOUNT_OF_ASSIGNED_REVIEWS +1} entregas de esta tarea como mínimo para la asignación de revisiones")
         else:
-            # Hacermos que las submissions esten de forma aleatoria
+            # Hacemos que las submissions esten de forma aleatoria
             # Por ahora esta comentado, ya que el algoritmo del martin peta 
-            shuffle(submissions)
-            print(f"cantidad de submissions: {len(submissions)}") 
+            shuffled_submissions = shuffle_submisssion(submissions)
+            print("submissions:")
+            print(shuffled_submissions)
+            print(f"cantidad de submissions: {len(shuffled_submissions)}") 
             # Iteramos sobre las entregas
-            for i in range(len(submissions)):
+            for i in range(len(shuffled_submissions)):
                 # Luego repetimos 3 veces
                 for j in range(1,AMOUNT_OF_ASSIGNED_REVIEWS+1):
                     # Si el estudiante de la entrega es distinto al que va a hacer review:
-                    if(submissions[i].student.id != submissions[(i+j) % len(submissions)].student.id):
+                    if(shuffled_submissions[i].student.id != shuffled_submissions[(i+j) % len(shuffled_submissions)].student.id):
                         # creamos la review
-                        review = Review(submission = submissions[(i+j) % len(submissions)]
-                                        ,reviewer = submissions[i].student)
+                        review = Review(submission = shuffled_submissions[(i+j) % len(shuffled_submissions)]
+                                        ,reviewer = shuffled_submissions[i].student)
                         # Añadimos a la base de datos
                         print(f"SUBMISSION_ID: {review.submission.id}, REVIEWER_ID: {review.reviewer.id}")
                         database.add(review)
